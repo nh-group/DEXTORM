@@ -44,7 +44,7 @@ public class DemoApplicationParameters implements ApplicationParameters {
 
 	@Override
 	public RequirementIssueDecorator getRequirementIssueDecorator() {
-		return new GitHubRequirementIssueDecorator("http://github.com/nherbaut/basic-cli-uni/issues/");
+		return new GitHubRequirementIssueDecorator("https://github.com/nh-group/basic-cli-uni");
 	}
 
 }
