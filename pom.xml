@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>fr.pantheonsorbonne.cri</groupId>
-	<artifactId>req-agent</artifactId>
+	<artifactId>dextorm</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
@@ -155,7 +155,7 @@
 						</manifestEntries>
 
 					</archive>
-					<finalName>req-agent</finalName>
+					<finalName>dextorm</finalName>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
