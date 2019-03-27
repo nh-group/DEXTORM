@@ -26,7 +26,7 @@ public class DemoApplicationParameters implements ApplicationParameters {
 	}
 
 	public final String getRepoAddress() {
-		return "file:///home/nherbaut/workspace/basic-cli-uni.git";
+		return "file:///home/nherbaut/tmp/dex/basic-cli-uni-bare";
 	}
 
 	public final String getGRPEndpointHost() {
