@@ -39,7 +39,7 @@ public abstract class JavaParserTreeVisitorComposite extends JavaParserTreeVisit
 								.newInstance(ctx, parentMatcher.clone());
 
 						Collection<String> commitIds = (Collection<String>) subtree.getMetadata(GumTreeFacade.BLAME_ID);
-						subVisitor.parentMatcher.commits(commitIds);
+						//subVisitor.parentMatcher.commits(commitIds);
 						subVisitor.startTree(subtree);
 						subVisitor.endTree(subtree);
 						matchers.addAll(subVisitor.getMatchers());

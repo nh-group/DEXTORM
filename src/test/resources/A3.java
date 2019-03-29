@@ -1,9 +1,13 @@
 class A {
 
 	public static void main(String args[]) {
-		int i;
+		
 	}
 
+	int toto() {
+		return 3;
+	}
+	
 	public void a() {
 		System.out.println("toto");
 	}

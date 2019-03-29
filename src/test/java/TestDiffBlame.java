@@ -1,15 +1,21 @@
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
 import com.github.gumtreediff.tree.TreeContext;
 import com.github.gumtreediff.tree.TreeUtils;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
 import fr.pantheonsorbonne.cri.mapping.ReqMatcher;
@@ -73,10 +79,31 @@ class TestDiffBlame {
 
 		}
 
-		Collection<ReqMatcher> reqMatcher = Utils.getReqMatcher(currentContext);
-		reqMatcher.stream().map((ReqMatcher m) -> m.toString()).forEach(System.out::println);
+		Collection<ReqMatcher> reqMatchers = Utils.getReqMatcher(currentContext);
 
-		TreeUtils.visitTree(currentContext.getRoot(), new PrettyBlameTreePrinter(currentContext));
+		assertEquals(3, reqMatchers.size());
+		for (ReqMatcher m : reqMatchers) {
+			if (m.getClassName().equals("A") && m.getMethodName().equals("main")) {
+				assertEquals(1, m.getReq().size());
+				assertTrue(m.getReq().get(0).equals("commit1"));
+			}
+			if (m.getClassName().equals("A") && m.getMethodName().equals("sum2")) {
+				assertEquals(3, m.getReq().stream().distinct().count());
+				List<String> commits = m.getReq().stream().distinct().collect(Collectors.toList());
+				assertTrue(m.getReq().contains("commit4"));
+				assertTrue(m.getReq().contains("commit3"));
+				assertTrue(m.getReq().contains("commit2"));
+			}
+			if (m.getClassName().equals("A") && m.getMethodName().equals("toto")) {
+				assertEquals(1, m.getReq().stream().distinct().count());
+				List<String> commits = m.getReq().stream().distinct().collect(Collectors.toList());
+				assertTrue(m.getReq().contains("commit2"));
+			}
+		}
+//		ReqMatcher first = new ReqMatcher("A","main", "String[]", 0, Arrays.asList(commit1))
+//		A:main (String[] )//commit1:1
+//		A:sum2 ( void  )//commit4:2 ,commit3:2 ,commit2:5
+//		A:toto ( void  )//commit2:3	
 
 	}
 

@@ -36,44 +36,15 @@ public class GumTreeFacade {
 		MappingStore store = m.getMappings();
 
 		for (ITree t : d.dst.getRoot().getTrees()) {
-			System.out.println("@before" + t.toPrettyString(d.dst) + " " + t.getMetadata(BLAME_ID));
+
 			if (store.getSrc(t) != null) {
 				Utils.appendMetadata(t, BLAME_ID, store.getSrc(t).getMetadata(BLAME_ID), false);
 			} else {
 
 				Utils.appendMetadata(t, BLAME_ID, d.commitId, false);
 			}
-			System.out.println("@after" + t.toPrettyString(d.dst) + " " + t.getMetadata(BLAME_ID));
 
 		}
-
-//		TreeClassifier c = new RootsClassifier(d.src, d.dst, m);
-//
-//		for (ITree t : d.dst.getRoot().getTrees()) {
-//
-//			// System.out.println("before " + t.toPrettyString(d.dst) + " // " +
-//
-//			if (c.getDstMvTrees().contains(t)) { // MV
-//
-//				Utils.appendMetadata(t, BLAME_ID, d.commitId);
-//
-//			} else if (c.getDstUpdTrees().contains(t)) { // UPD
-//
-//				Utils.appendMetadata(t, BLAME_ID, d.commitId);
-//
-//			} else if (c.getDstAddTrees().contains(t)) { // add
-//				
-//				Utils.appendMetadata(t, BLAME_ID, d.commitId);
-//				
-//			} else {
-//
-//			}
-
-		// System.out.println("after " + t.toPrettyString(d.dst) + " // " +
-		// t.getMetadata(BLAME_ID));
-
-//		}
-
 	}
 
 }

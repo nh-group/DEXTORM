@@ -1,4 +1,4 @@
-package fr.pantheonsorbonne.cri.mapping.impl.gumTree;
+package fr.pantheonsorbonne.cri.mapping.impl.gumTree.visitor;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,9 +9,6 @@ import com.github.gumtreediff.tree.TreeContext;
 import com.github.gumtreediff.tree.TreeUtils.TreeVisitor;
 
 import fr.pantheonsorbonne.cri.mapping.ReqMatcher.ReqMatcherBuilder;
-import fr.pantheonsorbonne.cri.mapping.impl.gumTree.visitor.ClassOrInterfaceDeclaration;
-import fr.pantheonsorbonne.cri.mapping.impl.gumTree.visitor.JavaParserTreeVisitor;
-import fr.pantheonsorbonne.cri.mapping.impl.gumTree.visitor.JavaParserTreeVisitorComposite;
 
 public class CompilationUnitVisitor extends JavaParserTreeVisitorComposite implements TreeVisitor {
 
