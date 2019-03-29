@@ -11,12 +11,12 @@ import fr.pantheonsorbonne.cri.mapping.ReqMatcher.ReqMatcherBuilder;
 
 public abstract class JavaParserTreeVisitor implements TreeVisitor {
 	protected TreeContext ctx;
-	protected ReqMatcherBuilder treeBuilder;
+	protected final ReqMatcherBuilder parentMatcher;
 	protected Collection<ReqMatcherBuilder> matchers = new ArrayList<>();
 	
 	public JavaParserTreeVisitor(TreeContext ctx, ReqMatcherBuilder treeBuilder) {
 		this.ctx = ctx;
-		this.treeBuilder = treeBuilder;
+		this.parentMatcher = treeBuilder;
 	}
 
 	public Collection<ReqMatcherBuilder> getMatchers() {

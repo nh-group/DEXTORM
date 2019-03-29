@@ -2,12 +2,14 @@ package fr.pantheonsorbonne.cri.mapping.impl.gumTree.visitor;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 
+import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.TreeContext;
 
 import fr.pantheonsorbonne.cri.mapping.ReqMatcher.ReqMatcherBuilder;
 
-public class MethodDeclaration extends JavaParserTreeVisitorComposite {
+public class MethodDeclaration extends JavaParserTreeVisitor {
 
 	public MethodDeclaration(TreeContext ctx, ReqMatcherBuilder treeBuilder) {
 		super(ctx, treeBuilder);
@@ -15,8 +17,30 @@ public class MethodDeclaration extends JavaParserTreeVisitorComposite {
 	}
 
 	@Override
-	public Collection<Class<? extends JavaParserTreeVisitor>> getChildVisitors() {
-		return Arrays.asList(Parameter.class);
+	public void startTree(ITree tree) {
+
+		Optional<ITree> methodName = tree.getChildren().stream()
+				.filter((ITree child) -> child.toPrettyString(ctx).startsWith("SimpleName")).findFirst();
+		if (methodName.isPresent()) {
+			ReqMatcherBuilder currentMethodMatcher = (ReqMatcherBuilder) this.parentMatcher
+					.methodName(methodName.get().getLabel()).clone();
+
+			for (ITree child : tree.getChildren()) {
+				String treeType = child.toPrettyString(this.ctx);
+				if (treeType.equals(Parameter.class.getSimpleName())) {
+					new Parameter(ctx, currentMethodMatcher).startTree(child);
+				} else if (treeType.equals("BlockStmt")) {
+					new SimpleRequirementGrabberCompositeVisitor(currentMethodMatcher).startTree(child);
+				}
+			}
+			this.matchers.add(currentMethodMatcher);
+		}
+
+	}
+
+	@Override
+	public void endTree(ITree tree) {
+
 	}
 
 }

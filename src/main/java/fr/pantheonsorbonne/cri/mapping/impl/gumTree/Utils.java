@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import fr.pantheonsorbonne.cri.mapping.ReqMatcher;
+import fr.pantheonsorbonne.cri.mapping.ReqMatcher.ReqMatcherBuilder;
 
 public abstract class Utils {
 
@@ -49,7 +50,12 @@ public abstract class Utils {
 
 	public static Collection<ReqMatcher> getReqMatcher(final TreeContext ctx) {
 
-		TreeUtils.visitTree(ctx.getRoot(), new CompilationUnitVisitor(ctx, ReqMatcher.newBuilder()));
+		CompilationUnitVisitor visitor = new CompilationUnitVisitor(ctx, ReqMatcher.newBuilder());
+		TreeUtils.visitTree(ctx.getRoot(),visitor  );
+		
+		for( ReqMatcherBuilder builder : visitor.getMatchers()) {
+			System.out.println(builder.build().toString());
+		}
 
 		TreeUtils.visitTree(ctx.getRoot(), new TreeVisitor() {
 
@@ -58,7 +64,6 @@ public abstract class Utils {
 			@Override
 			public void startTree(ITree tree) {
 				tabs += "\t";
-				// if(ctx.getTypeLabel(tree.getType()).equals(anObject))
 				System.out.println(tabs + tree.toPrettyString(ctx));
 
 			}

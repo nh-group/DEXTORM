@@ -15,7 +15,7 @@ public class PrimitiveType extends JavaParserTreeVisitorHelper {
 
 	@Override
 	public void startTree(ITree tree) {
-		this.treeBuilder.arg(tree.getChild(0).getLabel());
+		this.parentMatcher.arg(tree.getChild(0).getLabel());
 	}
 
 	

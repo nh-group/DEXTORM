@@ -18,26 +18,25 @@ public class Parameter extends JavaParserTreeVisitor {
 
 	@Override
 	public void startTree(ITree tree) {
+
+		
 		ITree paramChild = tree.getChild(0);
 		String paramType = paramChild.toPrettyString(ctx);
 		String postpand = "";
-		if (paramType.equals("ArrayType")) {
+		if (paramType.startsWith("ArrayType")) {
 			postpand = "[]";
 			paramChild = paramChild.getChild(0);
 			paramType = paramChild.toPrettyString(ctx);
 		}
 
-		if (paramType.equals("ClassOrInterfaceType")) {
-			treeBuilder.arg(paramChild.getChild(0).getLabel() + "postpand");
-		} else if (paramType.equals("PrimitiveType")) {
-			System.out.println(paramChild.getId());
-			if (paramChild.getId() == 38) {
-				treeBuilder.arg("int" + "postpand");
-			} else if (paramChild.getId() == 18) {
-				treeBuilder.arg("boolean" + "postpand");
-			}
+		if (paramType.startsWith("ClassOrInterfaceType")) {
+			this.parentMatcher.arg(paramChild.getChild(0).getLabel() + postpand);
+		} else if (paramType.startsWith("PrimitiveType")) {
+			this.parentMatcher.arg(paramChild.getLabel() + postpand);
+
 		}
 
+		
 	}
 
 	@Override
