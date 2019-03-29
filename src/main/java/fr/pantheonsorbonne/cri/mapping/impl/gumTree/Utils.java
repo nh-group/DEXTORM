@@ -2,12 +2,12 @@ package fr.pantheonsorbonne.cri.mapping.impl.gumTree;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 import com.github.gumtreediff.gen.javaparser.JavaParserGenerator;
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.TreeContext;
 import com.github.gumtreediff.tree.TreeUtils;
-import com.github.gumtreediff.tree.TreeUtils.TreeVisitor;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -25,8 +25,16 @@ public abstract class Utils {
 		return sb.toString();
 	}
 
+	public static void addCommitMetadataToTree(ITree t, String commitID) {
+		appendMetadata(t, GumTreeFacade.BLAME_ID, commitID, false);
+	}
+
+	public static void addCommitMetadataToTreeRecursive(ITree t, String commitID) {
+		appendMetadata(t, GumTreeFacade.BLAME_ID, commitID, true);
+	}
+
 	@SuppressWarnings("unchecked")
-	public static void updateMetadata(ITree t, String key, Object value) {
+	public static void appendMetadata(ITree t, String key, Object value, boolean recursive) {
 
 		Collection<Object> existingValue = (Collection<Object>) t.getMetadata(key);
 		if (existingValue == null) {
@@ -40,9 +48,9 @@ public abstract class Utils {
 			existingValue.add(value);
 		}
 
-		if (t.getHeight() > 0) {
+		if (recursive && t.getHeight() > 0) {
 			for (ITree tt : t.getChildren()) {
-				updateMetadata(tt, key, value);
+				appendMetadata(tt, key, value, recursive);
 			}
 		}
 
@@ -51,32 +59,8 @@ public abstract class Utils {
 	public static Collection<ReqMatcher> getReqMatcher(final TreeContext ctx) {
 
 		CompilationUnitVisitor visitor = new CompilationUnitVisitor(ctx, ReqMatcher.newBuilder());
-		TreeUtils.visitTree(ctx.getRoot(),visitor  );
-		
-		for( ReqMatcherBuilder builder : visitor.getMatchers()) {
-			System.out.println(builder.build().toString());
-		}
-
-		TreeUtils.visitTree(ctx.getRoot(), new TreeVisitor() {
-
-			String tabs = "";
-
-			@Override
-			public void startTree(ITree tree) {
-				tabs += "\t";
-				System.out.println(tabs + tree.toPrettyString(ctx));
-
-			}
-
-			@Override
-			public void endTree(ITree tree) {
-				tabs = tabs.substring(0, tabs.length() - 1);
-
-			}
-
-		});
-
-		return Collections.EMPTY_SET;
+		TreeUtils.visitTree(ctx.getRoot(), visitor);
+		return visitor.getMatchers().stream().map((ReqMatcherBuilder b) -> b.build()).collect(Collectors.toList());
 
 	}
 }

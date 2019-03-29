@@ -17,11 +17,10 @@ public class ReqMatcher {
 	@Override
 	public String toString() {
 		Optional<String> params = this.args.stream().reduce((String a, String b) -> a + "," + b);
-		String commits = this.commits.stream()
-				.collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-				.entrySet().stream()
-					.map((Entry<String, Long> entry) -> entry.getKey() + ":" + entry.getValue())
-					.collect(Collectors.joining(" ,"));
+		String commits = this.commits.stream().filter((String s) -> s != null)
+				.collect(Collectors.groupingBy(Function.identity(), Collectors.counting())).entrySet().stream()
+				.map((Entry<String, Long> entry) -> entry.getKey() + ":" + entry.getValue())
+				.collect(Collectors.joining(" ,"));
 
 		return new StringBuilder().append(this.className).append(":").append(this.methodName).append(" (")
 				.append(params.isPresent() ? params.get() : " void ").append(" )").append("//").append(commits)
@@ -92,7 +91,9 @@ public class ReqMatcher {
 		}
 
 		public ReqMatcherBuilder commit(String commit) {
-			this.buildee.getReq().add(commit);
+			if (commit != null) {
+				this.buildee.getReq().add(commit);
+			}
 			return this;
 		}
 

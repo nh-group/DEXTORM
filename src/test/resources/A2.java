@@ -1,12 +1,10 @@
 class A {
 
 	public static void main(String args[]) {
-		int r = a(1, 2);
+		int i;
 	}
 
-//coucou	
-	public static int a(int i, int j) {
-		return i + j;
+	int sum() {
+		return 1 + 1;
 	}
-
 }

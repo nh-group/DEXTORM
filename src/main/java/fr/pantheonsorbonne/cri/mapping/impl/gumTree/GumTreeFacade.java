@@ -5,14 +5,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-
 import com.github.gumtreediff.actions.RootsClassifier;
 import com.github.gumtreediff.actions.TreeClassifier;
 import com.github.gumtreediff.client.Run;
 import com.github.gumtreediff.matchers.Mapping;
+import com.github.gumtreediff.matchers.MappingStore;
 import com.github.gumtreediff.matchers.Matcher;
 import com.github.gumtreediff.matchers.Matchers;
 import com.github.gumtreediff.tree.ITree;
+import com.github.gumtreediff.tree.TreeUtils;
 
 import fr.pantheonsorbonne.cri.mapping.ReqMatcher;
 import gnu.trove.map.TIntIntMap;
@@ -32,35 +33,47 @@ public class GumTreeFacade {
 
 		Matcher m = Matchers.getInstance().getMatcher(d.src.getRoot(), d.dst.getRoot()); // retrieve the default matcher
 		m.match();
-		for (Mapping mapping : m.getMappingsAsSet()) {
-			
-			Utils.updateMetadata(mapping.second, BLAME_ID, mapping.first.getMetadata(BLAME_ID));
-			
-		}
-
-		TreeClassifier c = new RootsClassifier(d.src, d.dst, m);
+		MappingStore store = m.getMappings();
 
 		for (ITree t : d.dst.getRoot().getTrees()) {
-			if (c.getDstMvTrees().contains(t)) { // MV
-				
-				Utils.updateMetadata(t, BLAME_ID,  d.commitId);
-			} else if (c.getDstUpdTrees().contains(t)) { // UPD
-				
-				Utils.updateMetadata(t, BLAME_ID,  d.commitId);
-			} else if (c.getDstAddTrees().contains(t)) { // add
-				
-				Utils.updateMetadata(t, BLAME_ID,  d.commitId);
+			System.out.println("@before" + t.toPrettyString(d.dst) + " " + t.getMetadata(BLAME_ID));
+			if (store.getSrc(t) != null) {
+				Utils.appendMetadata(t, BLAME_ID, store.getSrc(t).getMetadata(BLAME_ID), false);
 			} else {
-				// don't tag it
+
+				Utils.appendMetadata(t, BLAME_ID, d.commitId, false);
 			}
+			System.out.println("@after" + t.toPrettyString(d.dst) + " " + t.getMetadata(BLAME_ID));
 
 		}
 
-	}
+//		TreeClassifier c = new RootsClassifier(d.src, d.dst, m);
+//
+//		for (ITree t : d.dst.getRoot().getTrees()) {
+//
+//			// System.out.println("before " + t.toPrettyString(d.dst) + " // " +
+//
+//			if (c.getDstMvTrees().contains(t)) { // MV
+//
+//				Utils.appendMetadata(t, BLAME_ID, d.commitId);
+//
+//			} else if (c.getDstUpdTrees().contains(t)) { // UPD
+//
+//				Utils.appendMetadata(t, BLAME_ID, d.commitId);
+//
+//			} else if (c.getDstAddTrees().contains(t)) { // add
+//				
+//				Utils.appendMetadata(t, BLAME_ID, d.commitId);
+//				
+//			} else {
+//
+//			}
 
-	public Collection<ReqMatcher> getReqMatcher() {
-		// TODO Auto-generated method stub
-		return null;
+		// System.out.println("after " + t.toPrettyString(d.dst) + " // " +
+		// t.getMetadata(BLAME_ID));
+
+//		}
+
 	}
 
 }
