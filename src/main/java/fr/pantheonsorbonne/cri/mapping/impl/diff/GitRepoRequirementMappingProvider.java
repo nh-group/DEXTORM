@@ -18,28 +18,28 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import fr.pantheonsorbonne.cri.configuration.variables.ApplicationParameters;
-import fr.pantheonsorbonne.cri.mapping.RepoRequirementMappingProvider;
+import fr.pantheonsorbonne.cri.mapping.RequirementMappingProvider;
 import fr.pantheonsorbonne.cri.mapping.ReqMatcher;
 import fr.pantheonsorbonne.cri.mapping.impl.FileRequirementMappingProvider;
 
-public class GitBlameRequirementProvider extends SimpleFileVisitor<Path> implements RepoRequirementMappingProvider {
-
-	private final Set<ReqMatcher> repoReqMatchers = new HashSet<>();
+public class GitRepoRequirementMappingProvider extends SimpleFileVisitor<Path> implements RequirementMappingProvider {
 
 	@Inject
-	ApplicationParameters vars;
+	protected ApplicationParameters vars;
 
 	protected Repository repo;
-	FileRequirementMappingProvider fileReqProvider;
+	protected FileRequirementMappingProvider fileReqProvider;
+	private final Set<ReqMatcher> repoReqMatchers = new HashSet<>();
 
+	@Override
 	public Collection<ReqMatcher> getReqMatcher() {
 		return repoReqMatchers;
 	}
 
 	@Inject
-	public GitBlameRequirementProvider(@Named("temp-git-repo") Path tempFolderGitRepo, Repository repo,
+	public GitRepoRequirementMappingProvider(@Named("temp-git-repo") Path tempFolderGitRepo, Repository repo,
 			FileRequirementMappingProvider fileReqProvider) {
-		// this.sourceRootDir = new File(vars.getSourceRootDir()).toPath();
+
 		try {
 			this.fileReqProvider = fileReqProvider;
 			this.repo = repo;
@@ -56,7 +56,9 @@ public class GitBlameRequirementProvider extends SimpleFileVisitor<Path> impleme
 
 		try {
 
-			this.repoReqMatchers.addAll(fileReqProvider.getReqMatcher(file));
+			if (com.google.common.io.Files.getFileExtension(file.toString()).equals("java")) {
+				this.repoReqMatchers.addAll(fileReqProvider.getReqMatcher(file));
+			}
 
 		} catch (RevisionSyntaxException e) {
 

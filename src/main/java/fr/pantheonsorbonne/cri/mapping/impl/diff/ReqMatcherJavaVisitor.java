@@ -18,7 +18,7 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import fr.pantheonsorbonne.cri.mapping.ReqMatcher;
-import fr.pantheonsorbonne.cri.mapping.impl.diff.BlameVisitorAdaptor.BlameDataWrapper;
+import fr.pantheonsorbonne.cri.mapping.impl.diff.GitBlameFileRequirementProvider.BlameDataWrapper;
 
 public class ReqMatcherJavaVisitor extends VoidVisitorAdapter<BlameDataWrapper> {
 

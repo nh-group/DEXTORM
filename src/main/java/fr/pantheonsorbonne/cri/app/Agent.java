@@ -14,7 +14,7 @@ import fr.pantheonsorbonne.cri.configuration.GitRepoProvider;
 import fr.pantheonsorbonne.cri.configuration.variables.DemoApplicationParameters;
 import fr.pantheonsorbonne.cri.instrumentation.InstrumentationClient;
 import fr.pantheonsorbonne.cri.instrumentation.configuration.InstrumentationConfiguration;
-import fr.pantheonsorbonne.cri.mapping.RepoRequirementMappingProvider;
+import fr.pantheonsorbonne.cri.mapping.RequirementMappingProvider;
 import fr.pantheonsorbonne.cri.mapping.configuration.RequirementMappingConfiguration;
 import fr.pantheonsorbonne.cri.mapping.impl.gumTree.GumTreeFileRequirementMappingProvider;
 import fr.pantheonsorbonne.cri.publisher.grpc.configuration.GRPCPublisherConfiguration;
@@ -36,7 +36,7 @@ public class Agent {
 
 		Injector injector = Guice.createInjector(conf);
 
-		RepoRequirementMappingProvider provider = injector.getInstance(RepoRequirementMappingProvider.class);
+		RequirementMappingProvider provider = injector.getInstance(RequirementMappingProvider.class);
 		provider.getReqMatcher().stream().forEach(System.out::println);
 
 	}

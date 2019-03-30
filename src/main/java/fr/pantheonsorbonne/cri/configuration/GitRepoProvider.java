@@ -39,17 +39,25 @@ public class GitRepoProvider extends AbstractModule {
 	@Inject
 	@Provides
 	@Singleton
-	public Repository getRepository(@Named("temp-git-repo") Path tempFolder, ApplicationParameters params) {
+	public Git getRepository(@Named("temp-git-repo") Path tempFolder, ApplicationParameters params) {
 
 		try {
 
-			Git repo = Git.cloneRepository().setURI(params.getRepoAddress()).setDirectory(tempFolder.toFile()).call();
-			return repo.getRepository();
+			return Git.cloneRepository().setURI(params.getRepoAddress()).setDirectory(tempFolder.toFile()).call();
+
 		} catch (GitAPIException e) {
 
 			throw new RuntimeException(e);
 
 		}
+
+	}
+
+	@Inject
+	@Provides
+	public Repository getRepository(Git git) {
+
+		return git.getRepository();
 
 	}
 

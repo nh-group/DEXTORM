@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import com.google.inject.Inject;
 
 import fr.pantheonsorbonne.cri.configuration.variables.DemoApplicationParameters;
-import fr.pantheonsorbonne.cri.mapping.RepoRequirementMappingProvider;
+import fr.pantheonsorbonne.cri.mapping.RequirementMappingProvider;
 import fr.pantheonsorbonne.cri.mapping.StackTraceParser;
 import fr.pantheonsorbonne.cri.publisher.RequirementPublisher;
 import fr.pantheonsorbonne.cri.requirements.Requirement;
@@ -25,7 +25,7 @@ public class MethodCallInterceptor {
 	DemoApplicationParameters vars;
 
 	@Inject
-	RepoRequirementMappingProvider mapper;
+	RequirementMappingProvider mapper;
 
 	@RuntimeType
 	public Object intercept(@SuperCall Callable<?> zuper, @AllArguments Object... args) throws Exception {

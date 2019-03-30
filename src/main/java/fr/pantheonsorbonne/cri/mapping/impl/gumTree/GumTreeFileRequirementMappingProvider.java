@@ -30,35 +30,25 @@ import com.google.inject.Inject;
 import fr.pantheonsorbonne.cri.configuration.variables.ApplicationParameters;
 import fr.pantheonsorbonne.cri.mapping.ReqMatcher;
 import fr.pantheonsorbonne.cri.mapping.impl.FileRequirementMappingProvider;
-import fr.pantheonsorbonne.cri.mapping.RepoRequirementMappingProvider;
+import fr.pantheonsorbonne.cri.mapping.RequirementMappingProvider;
 
 public class GumTreeFileRequirementMappingProvider implements FileRequirementMappingProvider {
 
-	private Git repo;
-
-	private GumTreeFacade facade;
+	@Inject
+	private Repository repo;
 
 	@Inject
-	public GumTreeFileRequirementMappingProvider(ApplicationParameters vars) {
+	private Git git;
 
-		Path tempFolder;
-		try {
-			tempFolder = Files.createTempDirectory("nhe-agent");
-			repo = Git.cloneRepository().setURI(vars.getRepoAddress()).setDirectory(tempFolder.toFile()).call();
-		} catch (IOException | GitAPIException e) {
-			throw new RuntimeException(e.getMessage());
-		}
-
-	}
+	private GumTreeFacade facade = new GumTreeFacade();
 
 	private List<Diff> materializeCommitDiff(Path file) throws GitAPIException, IOException {
 
-		File relativeFilePath = this.repo.getRepository().getDirectory().getParentFile().toPath().relativize(file)
-				.toFile();
+		File relativeFilePath = this.repo.getDirectory().getParentFile().toPath().relativize(file).toFile();
 		if (Files.isRegularFile(file)
 				&& com.google.common.io.Files.getFileExtension(relativeFilePath.toString()).equals("java")) {
 
-			LogCommand logCommand = this.repo.log().add(this.repo.getRepository().resolve(Constants.HEAD))
+			LogCommand logCommand = git.log().add(this.repo.resolve(Constants.HEAD))
 					.addPath(relativeFilePath.toString());
 
 			List<ObjectId> commitsList = new ArrayList<>();
@@ -69,7 +59,7 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
 
 			List<Diff> diffs = new ArrayList<>();
 			for (ObjectId commit : commitsList) {
-				Path path = materializeFileFromCommit(this.repo.getRepository(), commit, relativeFilePath.toString());
+				Path path = materializeFileFromCommit(this.repo, commit, relativeFilePath.toString());
 				diffs.add(new Diff(null, path, commit.getName().substring(0, 7)));
 			}
 

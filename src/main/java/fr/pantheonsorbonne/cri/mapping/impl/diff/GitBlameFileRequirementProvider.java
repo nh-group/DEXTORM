@@ -49,7 +49,8 @@ import fr.pantheonsorbonne.cri.mapping.ReqMatcher;
 import fr.pantheonsorbonne.cri.mapping.ReqMatcher.ReqMatcherBuilder;
 import fr.pantheonsorbonne.cri.mapping.impl.FileRequirementMappingProvider;
 
-public class BlameVisitorAdaptor extends VoidVisitorAdapter<Void> implements FileRequirementMappingProvider {
+public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
+		implements FileRequirementMappingProvider {
 	String className = "";
 
 	public class BlameDataWrapper {
@@ -64,10 +65,6 @@ public class BlameVisitorAdaptor extends VoidVisitorAdapter<Void> implements Fil
 
 	@Inject
 	ApplicationParameters vars;
-
-	public BlameVisitorAdaptor() {
-
-	}
 
 	@Override
 	public Collection<ReqMatcher> getReqMatcher(Path p) {
