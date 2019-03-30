@@ -124,7 +124,7 @@ public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
 			BlameResult blamed = blamer.call();
 
 			int lines = countLinesOfFileInCommit(this.repo, commitID, relativeFilePath.toString());
-			final Pattern p = Pattern.compile(".*(#[0-9]+)");
+			final Pattern p = Pattern.compile(".*#([0-9]+)");
 			Map<Integer, String> fileBlameData = new HashMap<>();
 			for (int i = 0; i < lines; i++) {
 				RevCommit commit = blamed.getSourceCommit(i);

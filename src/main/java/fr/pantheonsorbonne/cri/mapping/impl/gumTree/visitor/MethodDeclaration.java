@@ -27,7 +27,7 @@ public class MethodDeclaration extends JavaParserTreeVisitor {
 					.methodName(methodName.get().getLabel())
 					.commits((Collection<String>) tree.getMetadata(GumTreeFacade.BLAME_ID))
 					.clone();
-
+			
 			for (ITree child : tree.getChildren()) {
 				String treeType = child.toPrettyString(this.ctx);
 				if (treeType.equals(Parameter.class.getSimpleName())) {

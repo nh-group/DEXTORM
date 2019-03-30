@@ -1,12 +1,18 @@
 package fr.pantheonsorbonne.cri.mapping;
 
 import java.net.URI;
+import java.util.logging.Logger;
+
+import org.slf4j.LoggerFactory;
+
+import com.google.inject.Inject;
 
 import fr.pantheonsorbonne.cri.configuration.RequirementIssueDecorator;
 import fr.pantheonsorbonne.cri.requirements.Requirement;
 
 public class GitHubRequirementIssueDecorator implements RequirementIssueDecorator {
 
+	private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(GitHubRequirementIssueDecorator.class);
 	String baseGithubURI;
 
 	public GitHubRequirementIssueDecorator(String baseGithubURI) {
@@ -15,9 +21,13 @@ public class GitHubRequirementIssueDecorator implements RequirementIssueDecorato
 
 	@Override
 	public Requirement getIssueLink(Requirement req) {
-		String[] parsedIssue = req.getId().split("#");
-		Integer issue = Integer.parseInt(parsedIssue[parsedIssue.length - 1]);
-		return Requirement.newBuilder(req).setIssueURI(URI.create(baseGithubURI + "/" + issue).toString()).build();
+		try {
+			Integer issue = Integer.parseInt(req.getId());
+			return Requirement.newBuilder(req).setIssueURI(URI.create(baseGithubURI + "/" + issue).toString()).build();
+		} catch (java.lang.NumberFormatException e) {
+			LOG.warn("failed to find github issue for req" + req);
+			return req;
+		}
 
 	}
 

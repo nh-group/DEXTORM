@@ -16,20 +16,6 @@ import fr.pantheonsorbonne.cri.mapping.GitHubRequirementIssueDecorator;
 
 public class DemoApplicationParameters implements ApplicationParameters {
 
-	public enum SourceRootDIR {
-		MAVEN("src/main/java");
-
-		String str;
-
-		SourceRootDIR(String str) {
-			this.str = str;
-		}
-
-		public String getPath() {
-			return this.str;
-		}
-	}
-
 	public String getInstrumentedPackage() {
 		return "fr.pantheonsorbonne.ufr27";
 	}
@@ -53,7 +39,12 @@ public class DemoApplicationParameters implements ApplicationParameters {
 
 	@Override
 	public RequirementIssueDecorator getRequirementIssueDecorator() {
-		return new GitHubRequirementIssueDecorator("https://github.com/nh-group/basic-cli-uni");
+		return new GitHubRequirementIssueDecorator("https://github.com/nh-group/basic-cli-uni/issues");
+	}
+
+	@Override
+	public String getDiffAlgorithm() {
+		return DiffAlgorithm.BLAME.toString();
 	}
 
 }

@@ -15,9 +15,7 @@ public class CompilationUnitVisitor extends JavaParserTreeVisitorComposite imple
 
 	public CompilationUnitVisitor(TreeContext ctx, ReqMatcherBuilder treeBuilder) {
 		super(ctx, treeBuilder);
-		System.out.println(ctx.getRoot().toPrettyString(ctx));
-		System.out.println(ctx.getRoot().getLabel());
-		System.out.println(ctx.getRoot().isRoot());
+		
 
 	}
 

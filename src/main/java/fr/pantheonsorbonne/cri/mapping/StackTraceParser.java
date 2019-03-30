@@ -2,6 +2,7 @@ package fr.pantheonsorbonne.cri.mapping;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.function.Predicate;
 
 import com.google.common.base.Strings;
 
@@ -30,26 +31,22 @@ public class StackTraceParser {
 		this.reqMatchers = reqMatchers;
 	}
 
+	private static boolean match(StackTraceElement elt, ReqMatcher m) {
+		return m.getFQClassName().equals(elt.getClassName())
+				&& m.getMethodName().equals(elt.getMethodName().split("\\$")[0])
+				&& m.getReq().stream().filter(Predicate.not(Strings::isNullOrEmpty)).count() > 0;
+
+	}
+
 	public Collection<String> getReqs() {
 
 		Collection<String> res = new HashSet<>();
 		for (StackTraceElement elt : elements) {
-			if (elt.getClassName().startsWith(this.vars.getInstrumentedPackage()) ) {
-				String classNAme = elt.getClassName();
-				String methodName = elt.getMethodName().split("\\$")[0];
-				Integer lineNumber = elt.getLineNumber();// can we use that?
+			if (elt.getClassName().startsWith(this.vars.getInstrumentedPackage())) {
 
 				for (ReqMatcher m : reqMatchers) {
-					if (m.getFQClassName().equals(classNAme)) {
-						if (m.getMethodName().equals(methodName)) {
-
-							for (String reqStr : m.getReq()) {
-								if (!Strings.isNullOrEmpty(reqStr)) {
-									res.add(reqStr);
-								}
-							}
-
-						}
+					if (match(elt, m)) {
+						res.addAll(m.getReq());
 					}
 				}
 

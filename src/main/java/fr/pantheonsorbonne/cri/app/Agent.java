@@ -3,6 +3,8 @@ package fr.pantheonsorbonne.cri.app;
 import java.lang.instrument.Instrumentation;
 import java.util.Set;
 
+import org.eclipse.jgit.diff.DiffAlgorithm;
+
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -11,6 +13,7 @@ import com.google.inject.util.Modules;
 
 import fr.pantheonsorbonne.cri.configuration.AppConfiguration;
 import fr.pantheonsorbonne.cri.configuration.GitRepoProvider;
+import fr.pantheonsorbonne.cri.configuration.variables.ApplicationParameters;
 import fr.pantheonsorbonne.cri.configuration.variables.DemoApplicationParameters;
 import fr.pantheonsorbonne.cri.instrumentation.InstrumentationClient;
 import fr.pantheonsorbonne.cri.instrumentation.configuration.InstrumentationConfiguration;
@@ -27,12 +30,13 @@ public class Agent {
 	public static void main(String args[]) {
 
 		// gather all modules to be used in the IC
-		Module applicationConfiguraiton = new AppConfiguration();
+		Module applicationConfiguration = new AppConfiguration();
 
 		// how do I match what's executed to a requirment?
-		Module requirementMappingConfiguration = new RequirementMappingConfiguration();
+		Module requirementMappingConfiguration = new RequirementMappingConfiguration(
+				ApplicationParameters.DiffAlgorithm.GUMTREE);
 
-		Module conf = Modules.combine(applicationConfiguraiton, requirementMappingConfiguration, new GitRepoProvider());
+		Module conf = Modules.combine(applicationConfiguration, requirementMappingConfiguration, new GitRepoProvider());
 
 		Injector injector = Guice.createInjector(conf);
 
@@ -44,20 +48,25 @@ public class Agent {
 	public static void premain(String arg, Instrumentation instZ) {
 
 		// gather all modules to be used in the IC
-		Module applicationConfiguraiton = new AppConfiguration();
+		Module applicationConfiguration = new AppConfiguration();
+		Injector configurationInjector = Guice.createInjector(applicationConfiguration);
 
 		// how to I find what's executed?
 		Module instrumentationConfiguration = new InstrumentationConfiguration(instZ);
 
 		// how do I match what's executed to a requirment?
-		Module requirementMappingConfiguration = new RequirementMappingConfiguration();
+		Module requirementMappingConfiguration = new RequirementMappingConfiguration(
+				fr.pantheonsorbonne.cri.configuration.variables.ApplicationParameters.DiffAlgorithm
+						.valueOf(configurationInjector.getInstance(ApplicationParameters.class).getDiffAlgorithm())
+
+		);
 		Module gitRepoModule = new GitRepoProvider();
 
 		// how do I tell the world?
 		Module publisherConfiguration = new GRPCPublisherConfiguration();
 
 		// consolidate modules
-		Module conf = Modules.combine(applicationConfiguraiton, requirementMappingConfiguration,
+		Module conf = Modules.combine(applicationConfiguration, requirementMappingConfiguration,
 				instrumentationConfiguration, publisherConfiguration, gitRepoModule);
 
 		// create the agent a hook instrumentation directives

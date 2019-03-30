@@ -10,7 +10,10 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import com.google.common.base.Strings;
 
 public class ReqMatcher {
 
@@ -32,7 +35,7 @@ public class ReqMatcher {
 	}
 
 	public String getFQClassName() {
-		return this.packageName.isBlank() ? className : this.packageName + "." + className;
+		return this.packageName.isEmpty() ? className : this.packageName + "." + className;
 	}
 
 	public void setClassName(String className) {
@@ -96,9 +99,10 @@ public class ReqMatcher {
 		}
 
 		public ReqMatcherBuilder commit(String commit) {
-			if (commit != null) {
+			if (!Strings.isNullOrEmpty(commit)) {
 				this.buildee.getReq().add(commit);
 			}
+
 			return this;
 		}
 
@@ -115,7 +119,9 @@ public class ReqMatcher {
 		}
 
 		public ReqMatcherBuilder commits(Collection<String> commits) {
-			this.buildee.getReq().addAll(commits);
+
+			this.buildee.getReq().addAll(
+					commits.stream().filter(Predicate.not(Strings::isNullOrEmpty)).collect(Collectors.toList()));
 			return this;
 		}
 

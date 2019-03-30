@@ -14,6 +14,7 @@ import com.github.gumtreediff.matchers.Matchers;
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.TreeContext;
 import com.github.gumtreediff.tree.TreeUtils;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import fr.pantheonsorbonne.cri.mapping.ReqMatcher;
@@ -25,13 +26,11 @@ public class GumTreeFacade {
 	private List<Diff> diffs;
 
 	{
-		Arrays.asList(JavaParserGenerator.class).forEach(
-                gen -> {
-                    com.github.gumtreediff.gen.Register a =
-                            gen.getAnnotation(com.github.gumtreediff.gen.Register.class);
-                    if (a != null)
-                        Generators.getInstance().install(gen, a);
-                });
+		Arrays.asList(JavaParserGenerator.class).forEach(gen -> {
+			com.github.gumtreediff.gen.Register a = gen.getAnnotation(com.github.gumtreediff.gen.Register.class);
+			if (a != null)
+				Generators.getInstance().install(gen, a);
+		});
 	}
 
 	public static final String BLAME_ID = "blameid";
@@ -73,7 +72,7 @@ public class GumTreeFacade {
 
 		if (value instanceof Collection) {
 			existingValue.addAll((Collection<Object>) value);
-		} else {
+		} else if (value instanceof String && !Strings.isNullOrEmpty(((String) value))) {
 			existingValue.add(value);
 		}
 
@@ -97,7 +96,7 @@ public class GumTreeFacade {
 
 		CompilationUnitVisitor visitor = new CompilationUnitVisitor(ctx, ReqMatcher.newBuilder());
 		TreeUtils.visitTree(ctx.getRoot(), visitor);
-		return visitor.getMatchers().stream().map((ReqMatcherBuilder b) -> b.build()).collect(Collectors.toList());
+		return visitor.getMatchers().stream().map(ReqMatcherBuilder::build).collect(Collectors.toList());
 
 	}
 

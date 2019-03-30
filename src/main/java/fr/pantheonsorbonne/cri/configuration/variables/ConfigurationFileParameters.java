@@ -63,4 +63,9 @@ public class ConfigurationFileParameters implements ApplicationParameters {
 		throw new RuntimeException("failed to load issue provider");
 	}
 
+	@Override
+	public String getDiffAlgorithm() {
+		return this.properties.getProperty("diffAlgorithm", DiffAlgorithm.GUMTREE.toString());
+	}
+
 }
