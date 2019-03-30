@@ -1,5 +1,4 @@
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,32 +66,38 @@ class TestDiffBlame {
 
 		GumTreeFacade facade = new GumTreeFacade();
 
-		
 		Collection<ReqMatcher> reqMatchers = facade.getReqMatcher(diffs);
 
 		assertEquals(3, reqMatchers.size());
+		boolean []  assertions= new boolean[] {false,false,false};
+		
 		for (ReqMatcher m : reqMatchers) {
-			if (m.getClassName().equals("A") && m.getMethodName().equals("main")) {
-				assertEquals(1, m.getReq().size());
+			if (m.getFQClassName().equals("toto.A") && m.getMethodName().equals("main")) {
+				assertEquals(1, m.getReq().stream().distinct().count());
 				assertTrue(m.getReq().get(0).equals("commit1"));
+				assertions[0]=true;
+				
 			}
-			if (m.getClassName().equals("A") && m.getMethodName().equals("sum2")) {
+			else if (m.getFQClassName().equals("toto.A") && m.getMethodName().equals("sum2")) {
 				assertEquals(3, m.getReq().stream().distinct().count());
 				List<String> commits = m.getReq().stream().distinct().collect(Collectors.toList());
-				assertTrue(m.getReq().contains("commit4"));
-				assertTrue(m.getReq().contains("commit3"));
-				assertTrue(m.getReq().contains("commit2"));
+				assertTrue(commits .contains("commit4"));
+				assertTrue(commits .contains("commit3"));
+				assertTrue(commits .contains("commit2"));
+				assertions[1]=true;
 			}
-			if (m.getClassName().equals("A") && m.getMethodName().equals("toto")) {
+			else if (m.getFQClassName().equals("toto.A") && m.getMethodName().equals("toto")) {
 				assertEquals(1, m.getReq().stream().distinct().count());
 				List<String> commits = m.getReq().stream().distinct().collect(Collectors.toList());
-				assertTrue(m.getReq().contains("commit2"));
+				assertTrue(commits.contains("commit2"));
+				assertions[2]=true;
 			}
+			else {
+				fail();
+			}
+			
 		}
-//		ReqMatcher first = new ReqMatcher("A","main", "String[]", 0, Arrays.asList(commit1))
-//		A:main (String[] )//commit1:1
-//		A:sum2 ( void  )//commit4:2 ,commit3:2 ,commit2:5
-//		A:toto ( void  )//commit2:3	
+		assertArrayEquals(new boolean[]{true,true,true}, assertions);
 
 	}
 

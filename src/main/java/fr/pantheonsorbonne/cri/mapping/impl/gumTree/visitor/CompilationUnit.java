@@ -5,18 +5,19 @@ import java.util.Collection;
 
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.TreeContext;
+import com.github.javaparser.ast.PackageDeclaration;
 
 import fr.pantheonsorbonne.cri.mapping.ReqMatcher.ReqMatcherBuilder;
 
 public class CompilationUnit extends JavaParserTreeVisitorComposite {
 
-	public CompilationUnit(TreeContext ctx, ReqMatcherBuilder treeBuilder) {
-		super(ctx, treeBuilder);
+	public CompilationUnit(TreeContext ctx, ReqMatcherBuilder parentMatcher) {
+		super(ctx, parentMatcher);
+		
 
 	}
 	
 	
-
 	@Override
 	public Collection<Class<? extends JavaParserTreeVisitor>> getChildVisitors() {
 		return Arrays.asList(ClassOrInterfaceDeclaration.class);

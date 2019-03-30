@@ -22,13 +22,17 @@ public class ReqMatcher {
 				.map((Entry<String, Long> entry) -> entry.getKey() + ":" + entry.getValue())
 				.collect(Collectors.joining(" ,"));
 
-		return new StringBuilder().append(this.className).append(":").append(this.methodName).append(" (")
+		return new StringBuilder().append(this.getFQClassName()).append("::").append(this.methodName).append(" (")
 				.append(params.isPresent() ? params.get() : " void ").append(" )").append("//").append(commits)
 				.toString();
 	}
 
 	public String getClassName() {
-		return className;
+		return this.className;
+	}
+
+	public String getFQClassName() {
+		return this.packageName.isBlank() ? className : this.packageName + "." + className;
 	}
 
 	public void setClassName(String className) {
@@ -65,6 +69,7 @@ public class ReqMatcher {
 	private Integer line;
 	private ArrayList<String> commits = new ArrayList();
 	private ArrayList<String> args = new ArrayList<>();
+	private String packageName = "";
 
 	public static class ReqMatcherBuilder implements Cloneable {
 
@@ -105,13 +110,19 @@ public class ReqMatcher {
 		@Override
 		public Object clone() {
 			return ReqMatcher.newBuilder().className(this.buildee.getClassName()).methodName(this.buildee.methodName)
-					.args((ArrayList<String>) this.buildee.args.clone())
+					.packageName(this.buildee.packageName).args((ArrayList<String>) this.buildee.args.clone())
 					.commits((ArrayList<String>) this.buildee.commits.clone());
 		}
 
-		public Object commits(Collection<String> commits) {
+		public ReqMatcherBuilder commits(Collection<String> commits) {
 			this.buildee.getReq().addAll(commits);
 			return this;
+		}
+
+		public ReqMatcherBuilder packageName(String label) {
+			this.buildee.packageName = label;
+			return this;
+
 		}
 	}
 

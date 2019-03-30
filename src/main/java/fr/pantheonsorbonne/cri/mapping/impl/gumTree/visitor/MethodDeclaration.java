@@ -8,6 +8,7 @@ import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.TreeContext;
 
 import fr.pantheonsorbonne.cri.mapping.ReqMatcher.ReqMatcherBuilder;
+import fr.pantheonsorbonne.cri.mapping.impl.gumTree.GumTreeFacade;
 
 public class MethodDeclaration extends JavaParserTreeVisitor {
 
@@ -23,7 +24,9 @@ public class MethodDeclaration extends JavaParserTreeVisitor {
 				.filter((ITree child) -> child.toPrettyString(ctx).startsWith("SimpleName")).findFirst();
 		if (methodName.isPresent()) {
 			ReqMatcherBuilder currentMethodMatcher = (ReqMatcherBuilder) this.parentMatcher
-					.methodName(methodName.get().getLabel()).clone();
+					.methodName(methodName.get().getLabel())
+					.commits((Collection<String>) tree.getMetadata(GumTreeFacade.BLAME_ID))
+					.clone();
 
 			for (ITree child : tree.getChildren()) {
 				String treeType = child.toPrettyString(this.ctx);

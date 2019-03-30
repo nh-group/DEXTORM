@@ -51,13 +51,14 @@ public class Agent {
 
 		// how do I match what's executed to a requirment?
 		Module requirementMappingConfiguration = new RequirementMappingConfiguration();
+		Module gitRepoModule = new GitRepoProvider();
 
 		// how do I tell the world?
 		Module publisherConfiguration = new GRPCPublisherConfiguration();
 
 		// consolidate modules
 		Module conf = Modules.combine(applicationConfiguraiton, requirementMappingConfiguration,
-				instrumentationConfiguration, publisherConfiguration);
+				instrumentationConfiguration, publisherConfiguration, gitRepoModule);
 
 		// create the agent a hook instrumentation directives
 		Injector injector = Guice.createInjector(conf);

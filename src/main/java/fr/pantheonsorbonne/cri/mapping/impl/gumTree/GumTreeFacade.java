@@ -1,12 +1,13 @@
 package fr.pantheonsorbonne.cri.mapping.impl.gumTree;
 
 import java.io.IOException;
-import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.github.gumtreediff.client.Run;
+import com.github.gumtreediff.gen.Generators;
+import com.github.gumtreediff.gen.javaparser.JavaParserGenerator;
 import com.github.gumtreediff.matchers.MappingStore;
 import com.github.gumtreediff.matchers.Matcher;
 import com.github.gumtreediff.matchers.Matchers;
@@ -16,7 +17,6 @@ import com.github.gumtreediff.tree.TreeUtils;
 import com.google.common.collect.Sets;
 
 import fr.pantheonsorbonne.cri.mapping.ReqMatcher;
-
 import fr.pantheonsorbonne.cri.mapping.ReqMatcher.ReqMatcherBuilder;
 import fr.pantheonsorbonne.cri.mapping.impl.gumTree.visitor.CompilationUnitVisitor;
 
@@ -25,7 +25,13 @@ public class GumTreeFacade {
 	private List<Diff> diffs;
 
 	{
-		Run.initGenerators();
+		Arrays.asList(JavaParserGenerator.class).forEach(
+                gen -> {
+                    com.github.gumtreediff.gen.Register a =
+                            gen.getAnnotation(com.github.gumtreediff.gen.Register.class);
+                    if (a != null)
+                        Generators.getInstance().install(gen, a);
+                });
 	}
 
 	public static final String BLAME_ID = "blameid";

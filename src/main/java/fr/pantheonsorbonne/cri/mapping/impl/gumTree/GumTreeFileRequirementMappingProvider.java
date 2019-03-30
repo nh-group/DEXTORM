@@ -8,7 +8,12 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
@@ -44,6 +49,7 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
 
 	private List<Diff> materializeCommitDiff(Path file) throws GitAPIException, IOException {
 
+		List<Diff> diffs = new ArrayList<>();
 		File relativeFilePath = this.repo.getDirectory().getParentFile().toPath().relativize(file).toFile();
 		if (Files.isRegularFile(file)
 				&& com.google.common.io.Files.getFileExtension(relativeFilePath.toString()).equals("java")) {
@@ -51,16 +57,20 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
 			LogCommand logCommand = git.log().add(this.repo.resolve(Constants.HEAD))
 					.addPath(relativeFilePath.toString());
 
-			List<ObjectId> commitsList = new ArrayList<>();
-
+			List<CommitIssueMapping> commitIssueMappings = new ArrayList<>();
 			for (RevCommit revCommit : logCommand.call()) {
-				commitsList.add(revCommit.getId());
+
+				CommitIssueMapping mapping = new CommitIssueMapping();
+				mapping.id = revCommit;
+				mapping.issueId = getIssueIdFromCommits(revCommit.getFullMessage());
+				commitIssueMappings.add(mapping);
+
 			}
 
-			List<Diff> diffs = new ArrayList<>();
-			for (ObjectId commit : commitsList) {
-				Path path = materializeFileFromCommit(this.repo, commit, relativeFilePath.toString());
-				diffs.add(new Diff(null, path, commit.getName().substring(0, 7)));
+			for (CommitIssueMapping mapping : commitIssueMappings) {
+				Path path = materializeFileFromCommit(this.repo, mapping.id, relativeFilePath.toString());
+
+				diffs.add(new Diff(null, path, mapping.issueId.stream().collect(Collectors.joining(" "))));
 			}
 
 			for (int i = 1; i < diffs.size() - 1; i++) {
@@ -75,15 +85,24 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
 
 	}
 
-	private Path materializeFileFromCommit(Repository repository, ObjectId commitID, String name)
-			throws MissingObjectException, IncorrectObjectTypeException, IOException {
+	private List<String> getIssueIdFromCommits(String message) {
+		List<String> res = new ArrayList<>();
+		final Pattern p = Pattern.compile("#([0-9]+)");
+		Matcher m = p.matcher(message);
+		while (m.find()) {
+			res.add(m.group(1));
+		}
+		return res;
+	}
+
+	private Path materializeFileFromCommit(Repository repository, ObjectId commitID, String name) throws IOException {
 
 		Path temp1 = Files.createTempFile(
-				com.google.common.io.Files.getNameWithoutExtension(name) + "-" + commitID.getName(), ".java");
+				com.google.common.io.Files.getNameWithoutExtension(name), ".java");
 		try (RevWalk revWalk = new RevWalk(repository)) {
 			RevCommit commit = revWalk.parseCommit(commitID);
 			RevTree tree = commit.getTree();
-			System.out.println("Having tree: " + tree);
+			
 
 			// now try to find a specific file
 			try (TreeWalk treeWalk = new TreeWalk(repository)) {

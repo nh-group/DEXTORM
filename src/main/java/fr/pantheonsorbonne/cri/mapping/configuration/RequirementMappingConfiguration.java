@@ -18,6 +18,7 @@ public class RequirementMappingConfiguration extends AbstractModule {
 		
 		bind(RequirementMappingProvider.class).to(GitRepoRequirementMappingProvider.class);
 		bind(FileRequirementMappingProvider.class).to(GumTreeFileRequirementMappingProvider.class);
+		//bind(FileRequirementMappingProvider.class).to(GitBlameFileRequirementProvider.class);
 
 	}
 }

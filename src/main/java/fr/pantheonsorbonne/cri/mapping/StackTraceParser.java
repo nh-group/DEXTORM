@@ -34,13 +34,13 @@ public class StackTraceParser {
 
 		Collection<String> res = new HashSet<>();
 		for (StackTraceElement elt : elements) {
-			if (elt.getClassName().startsWith(this.vars.getInstrumentedPackage()) && elt.getLineNumber() != -1) {
+			if (elt.getClassName().startsWith(this.vars.getInstrumentedPackage()) ) {
 				String classNAme = elt.getClassName();
 				String methodName = elt.getMethodName().split("\\$")[0];
 				Integer lineNumber = elt.getLineNumber();// can we use that?
 
 				for (ReqMatcher m : reqMatchers) {
-					if (m.getClassName().equals(classNAme)) {
+					if (m.getFQClassName().equals(classNAme)) {
 						if (m.getMethodName().equals(methodName)) {
 
 							for (String reqStr : m.getReq()) {
