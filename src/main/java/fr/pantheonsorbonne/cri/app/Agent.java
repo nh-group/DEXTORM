@@ -10,11 +10,13 @@ import com.google.inject.Module;
 import com.google.inject.util.Modules;
 
 import fr.pantheonsorbonne.cri.configuration.AppConfiguration;
+import fr.pantheonsorbonne.cri.configuration.GitRepoProvider;
 import fr.pantheonsorbonne.cri.configuration.variables.DemoApplicationParameters;
 import fr.pantheonsorbonne.cri.instrumentation.InstrumentationClient;
 import fr.pantheonsorbonne.cri.instrumentation.configuration.InstrumentationConfiguration;
+import fr.pantheonsorbonne.cri.mapping.RepoRequirementMappingProvider;
 import fr.pantheonsorbonne.cri.mapping.configuration.RequirementMappingConfiguration;
-import fr.pantheonsorbonne.cri.mapping.impl.gumTree.SimpleGitFileVisitor;
+import fr.pantheonsorbonne.cri.mapping.impl.gumTree.GumTreeFileRequirementMappingProvider;
 import fr.pantheonsorbonne.cri.publisher.grpc.configuration.GRPCPublisherConfiguration;
 
 public class Agent {
@@ -30,14 +32,12 @@ public class Agent {
 		// how do I match what's executed to a requirment?
 		Module requirementMappingConfiguration = new RequirementMappingConfiguration();
 
-		Module conf = Modules.combine(applicationConfiguraiton, requirementMappingConfiguration);
+		Module conf = Modules.combine(applicationConfiguraiton, requirementMappingConfiguration, new GitRepoProvider());
 
 		Injector injector = Guice.createInjector(conf);
-		
-		SimpleGitFileVisitor visitor = new SimpleGitFileVisitor(new DemoApplicationParameters());
-		
-		
-	
+
+		RepoRequirementMappingProvider provider = injector.getInstance(RepoRequirementMappingProvider.class);
+		provider.getReqMatcher().stream().forEach(System.out::println);
 
 	}
 

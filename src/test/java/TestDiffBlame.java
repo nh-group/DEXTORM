@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -23,7 +24,6 @@ import fr.pantheonsorbonne.cri.mapping.impl.gumTree.Diff;
 import fr.pantheonsorbonne.cri.mapping.impl.gumTree.DiffTree;
 import fr.pantheonsorbonne.cri.mapping.impl.gumTree.PrettyBlameTreePrinter;
 import fr.pantheonsorbonne.cri.mapping.impl.gumTree.GumTreeFacade;
-import fr.pantheonsorbonne.cri.mapping.impl.gumTree.Utils;
 
 class TestDiffBlame {
 
@@ -58,28 +58,16 @@ class TestDiffBlame {
 		CommitFileMaterialization f4 = new CommitFileMaterialization(Paths.get("src/test/resources/A4.java"),
 				"commit4");
 
-		List<CommitFileMaterialization> files = Lists.newArrayList(f1, f2, f3, f4);
+		List<Diff> diffs = new ArrayList<>();
+		diffs.add(new Diff(null, f1.file, f1.commitId));
+		diffs.add(new Diff(f1.file, f2.file, f2.commitId));
+		diffs.add(new Diff(f2.file, f3.file, f3.commitId));
+		diffs.add(new Diff(f3.file, f4.file, f4.commitId));
 
 		GumTreeFacade facade = new GumTreeFacade();
 
-		Diff diff = new Diff(null, null, null);
-		TreeContext currentContext = null;
-		for (CommitFileMaterialization file : files) {
-			diff.dst = file.file;
-			DiffTree currentDiff = diff.toDiffTree();
-			currentDiff.commitId = file.commitId;
-
-			if (currentContext == null) {
-				Utils.appendMetadata(currentDiff.dst.getRoot(), GumTreeFacade.BLAME_ID, file.commitId, true);
-			} else {
-				currentDiff.src = currentContext;
-				facade.labelDestWithCommit(currentDiff);
-			}
-			currentContext = currentDiff.dst;
-
-		}
-
-		Collection<ReqMatcher> reqMatchers = Utils.getReqMatcher(currentContext);
+		
+		Collection<ReqMatcher> reqMatchers = facade.getReqMatcher(diffs);
 
 		assertEquals(3, reqMatchers.size());
 		for (ReqMatcher m : reqMatchers) {

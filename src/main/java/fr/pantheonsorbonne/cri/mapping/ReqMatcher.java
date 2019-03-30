@@ -80,7 +80,7 @@ public class ReqMatcher {
 			return this;
 		}
 
-		public ReqMatcherBuilder args(ArrayList<String> args) {
+		public ReqMatcherBuilder args(java.util.List<String> args) {
 			this.buildee.setArgs(args);
 			return this;
 		}
@@ -126,7 +126,7 @@ public class ReqMatcher {
 	public ReqMatcher(String className, String methodName, Collection<String> args, Integer line, String... reqs) {
 		this.className = className;
 		this.methodName = methodName;
-		this.setArgs((ArrayList<String>) args);
+		this.setArgs((java.util.List<String>) args);
 		this.line = line;
 		commits.addAll(Arrays.asList(reqs));
 
@@ -136,8 +136,10 @@ public class ReqMatcher {
 		return args;
 	}
 
-	public void setArgs(ArrayList<String> args) {
-		this.args = args;
+	public void setArgs(java.util.List<String> args) {
+		this.args.clear();
+		this.args.addAll(args);
+
 	}
 
 }

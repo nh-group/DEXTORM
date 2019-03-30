@@ -1,4 +1,4 @@
-package fr.pantheonsorbonne.cri.mapping.impl.diff;
+package fr.pantheonsorbonne.cri.mapping;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -6,7 +6,6 @@ import java.util.HashSet;
 import com.google.common.base.Strings;
 
 import fr.pantheonsorbonne.cri.configuration.variables.DemoApplicationParameters;
-import fr.pantheonsorbonne.cri.mapping.ReqMatcher;
 
 public class StackTraceParser {
 

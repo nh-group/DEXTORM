@@ -21,6 +21,8 @@ public class AppConfiguration extends AbstractModule {
 			System.out.println("Fallback on default configuration");
 			bind(ApplicationParameters.class).to(DemoApplicationParameters.class);
 		}
+		
+		
 
 	}
 

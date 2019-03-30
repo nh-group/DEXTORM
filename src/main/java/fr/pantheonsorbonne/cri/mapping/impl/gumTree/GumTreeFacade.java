@@ -1,35 +1,36 @@
 package fr.pantheonsorbonne.cri.mapping.impl.gumTree;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
-import com.github.gumtreediff.actions.RootsClassifier;
-import com.github.gumtreediff.actions.TreeClassifier;
 import com.github.gumtreediff.client.Run;
-import com.github.gumtreediff.matchers.Mapping;
 import com.github.gumtreediff.matchers.MappingStore;
 import com.github.gumtreediff.matchers.Matcher;
 import com.github.gumtreediff.matchers.Matchers;
 import com.github.gumtreediff.tree.ITree;
+import com.github.gumtreediff.tree.TreeContext;
 import com.github.gumtreediff.tree.TreeUtils;
+import com.google.common.collect.Sets;
 
 import fr.pantheonsorbonne.cri.mapping.ReqMatcher;
-import gnu.trove.map.TIntIntMap;
-import gnu.trove.map.hash.TIntIntHashMap;
+
+import fr.pantheonsorbonne.cri.mapping.ReqMatcher.ReqMatcherBuilder;
+import fr.pantheonsorbonne.cri.mapping.impl.gumTree.visitor.CompilationUnitVisitor;
 
 public class GumTreeFacade {
 
-	public GumTreeFacade() {
+	private List<Diff> diffs;
 
+	{
 		Run.initGenerators();
-
 	}
 
 	public static final String BLAME_ID = "blameid";
 
-	public void labelDestWithCommit(DiffTree d) throws UnsupportedOperationException, IOException {
+	public void labelDestWithCommit(DiffTree d) {
 
 		Matcher m = Matchers.getInstance().getMatcher(d.src.getRoot(), d.dst.getRoot()); // retrieve the default matcher
 		m.match();
@@ -38,13 +39,90 @@ public class GumTreeFacade {
 		for (ITree t : d.dst.getRoot().getTrees()) {
 
 			if (store.getSrc(t) != null) {
-				Utils.appendMetadata(t, BLAME_ID, store.getSrc(t).getMetadata(BLAME_ID), false);
+				GumTreeFacade.appendMetadata(t, BLAME_ID, store.getSrc(t).getMetadata(BLAME_ID), false);
 			} else {
-
-				Utils.appendMetadata(t, BLAME_ID, d.commitId, false);
+				GumTreeFacade.appendMetadata(t, BLAME_ID, d.commitId, false);
 			}
 
 		}
+	}
+
+	public static String dump(TreeContext ct) {
+		StringBuilder sb = new StringBuilder();
+		for (ITree tr : ct.getRoot().getTrees()) {
+			sb.append(tr.toPrettyString(ct)).append("//").append(tr.getMetadata(BLAME_ID)).append("\n");
+		}
+
+		return sb.toString();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static void appendMetadata(ITree t, String key, Object value, boolean recursive) {
+
+		Collection<Object> existingValue = (Collection<Object>) t.getMetadata(key);
+		if (existingValue == null) {
+			existingValue = Sets.newHashSet();
+			t.setMetadata(key, existingValue);
+		}
+
+		if (value instanceof Collection) {
+			existingValue.addAll((Collection<Object>) value);
+		} else {
+			existingValue.add(value);
+		}
+
+		if (recursive && t.getHeight() > 0) {
+			for (ITree tt : t.getChildren()) {
+				appendMetadata(tt, key, value, recursive);
+			}
+		}
+
+	}
+
+	public static void addCommitMetadataToTreeRecursive(ITree t, String commitID) {
+		GumTreeFacade.appendMetadata(t, BLAME_ID, commitID, true);
+	}
+
+	public static void addCommitMetadataToTree(ITree t, String commitID) {
+		GumTreeFacade.appendMetadata(t, BLAME_ID, commitID, false);
+	}
+
+	private static Collection<ReqMatcher> getReqMatcher(final TreeContext ctx) {
+
+		CompilationUnitVisitor visitor = new CompilationUnitVisitor(ctx, ReqMatcher.newBuilder());
+		TreeUtils.visitTree(ctx.getRoot(), visitor);
+		return visitor.getMatchers().stream().map((ReqMatcherBuilder b) -> b.build()).collect(Collectors.toList());
+
+	}
+
+	public Collection<ReqMatcher> getReqMatcher(List<Diff> diffs) {
+
+		TreeContext currentContext = null;
+
+		for (Diff diff : diffs) {
+
+			DiffTree currentDiff;
+			try {
+				currentDiff = diff.toDiffTree();
+
+				if (currentContext == null) {
+					GumTreeFacade.appendMetadata(currentDiff.dst.getRoot(), GumTreeFacade.BLAME_ID,
+							currentDiff.commitId, true);
+				} else {
+					currentDiff.src = currentContext;
+					this.labelDestWithCommit(currentDiff);
+				}
+				currentContext = currentDiff.dst;
+			} catch (UnsupportedOperationException | IOException e) {
+
+				e.printStackTrace();
+				System.exit(-2);
+			}
+
+		}
+
+		return GumTreeFacade.getReqMatcher(currentContext);
+
 	}
 
 }
