@@ -67,7 +67,10 @@ class TestDiffBlame {
 		GumTreeFacade facade = new GumTreeFacade();
 
 		Collection<ReqMatcher> reqMatchers = facade.getReqMatcher(diffs);
-
+		
+		//DiffTree dt = diffs.get(3).toDiffTree();
+		//TreeUtils.visitTree(dt.dst.getRoot(), new PrettyBlameTreePrinter(dt.dst));
+		
 		assertEquals(3, reqMatchers.size());
 		boolean []  assertions= new boolean[] {false,false,false};
 		
