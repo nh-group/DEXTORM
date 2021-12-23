@@ -1,4 +1,4 @@
-package fr.pantheonsorbonne.cri.mapping.impl.diff;
+package fr.pantheonsorbonne.cri.mapping.impl.blame;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,7 +18,7 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import fr.pantheonsorbonne.cri.mapping.ReqMatcher;
-import fr.pantheonsorbonne.cri.mapping.impl.diff.GitBlameFileRequirementProvider.BlameDataWrapper;
+import fr.pantheonsorbonne.cri.mapping.impl.blame.GitBlameFileRequirementProvider.BlameDataWrapper;
 
 public class ReqMatcherJavaVisitor extends VoidVisitorAdapter<BlameDataWrapper> {
 

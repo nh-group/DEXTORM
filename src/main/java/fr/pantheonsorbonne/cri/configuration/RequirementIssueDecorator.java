@@ -6,4 +6,6 @@ public interface RequirementIssueDecorator {
 
 	public Requirement getIssueLink(Requirement req);
 
+	public String getRoot();
+
 }

@@ -6,6 +6,8 @@ import java.util.Set;
 import fr.pantheonsorbonne.cri.requirements.Requirement;
 
 public interface RequirementPublisher {
+	
+	
 
 	void publish(Requirement req);
 

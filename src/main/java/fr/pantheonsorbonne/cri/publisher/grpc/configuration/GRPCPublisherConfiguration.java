@@ -6,10 +6,12 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 
+import fr.pantheonsorbonne.cri.configuration.variables.ApplicationParameters;
 import fr.pantheonsorbonne.cri.configuration.variables.DemoApplicationParameters;
 import fr.pantheonsorbonne.cri.publisher.RequirementPublisher;
 import fr.pantheonsorbonne.cri.publisher.grpc.impl.DummyObserver;
 import fr.pantheonsorbonne.cri.publisher.grpc.impl.GrPCRequirementPublisher;
+import fr.pantheonsorbonne.cri.requirements.AgentConfigurationGrpc.AgentConfigurationBlockingStub;
 import fr.pantheonsorbonne.cri.requirements.Empty;
 import fr.pantheonsorbonne.cri.requirements.ReqCollectorGrpc;
 import fr.pantheonsorbonne.cri.requirements.Requirement;
@@ -55,4 +57,7 @@ public class GRPCPublisherConfiguration extends AbstractModule {
 		return stub.pushRequirement(obs);
 
 	}
+	
+	
+
 }

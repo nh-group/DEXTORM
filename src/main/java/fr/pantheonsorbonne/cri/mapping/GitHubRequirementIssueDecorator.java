@@ -31,4 +31,9 @@ public class GitHubRequirementIssueDecorator implements RequirementIssueDecorato
 
 	}
 
+	@Override
+	public String getRoot() {
+		return this.baseGithubURI;
+	}
+
 }

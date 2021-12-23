@@ -1,4 +1,4 @@
-package fr.pantheonsorbonne.cri.mapping.impl.diff;
+package fr.pantheonsorbonne.cri.mapping.impl.blame;
 
 import static java.nio.file.FileVisitResult.CONTINUE;
 

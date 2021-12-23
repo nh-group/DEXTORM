@@ -1,4 +1,4 @@
-package fr.pantheonsorbonne.cri.mapping.impl.diff;
+package fr.pantheonsorbonne.cri.mapping.impl.blame;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
