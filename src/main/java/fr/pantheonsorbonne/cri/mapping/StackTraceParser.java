@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 
 import com.google.common.base.Strings;
 
+import fr.pantheonsorbonne.cri.configuration.variables.ApplicationParameters;
 import fr.pantheonsorbonne.cri.configuration.variables.DemoApplicationParameters;
 
 public class StackTraceParser {
@@ -21,7 +22,7 @@ public class StackTraceParser {
 	public static final String ANSI_WHITE = "\u001B[37m";
 
 	private StackTraceElement[] elements;
-	private DemoApplicationParameters vars;
+	private ApplicationParameters vars;
 	private Collection<ReqMatcher> reqMatchers;
 
 	public StackTraceParser(StackTraceElement[] elements, DemoApplicationParameters vars,

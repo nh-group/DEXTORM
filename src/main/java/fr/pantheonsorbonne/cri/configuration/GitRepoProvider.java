@@ -3,6 +3,7 @@ package fr.pantheonsorbonne.cri.configuration;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.jgit.api.Git;
@@ -21,44 +22,44 @@ import fr.pantheonsorbonne.cri.configuration.variables.ApplicationParameters;
 
 public class GitRepoProvider extends AbstractModule {
 
-	@Inject
-	Logger logger;
+    private static final Logger logger = Logger.getLogger(GitRepoProvider.class.getName());
 
-	@Provides
-	@Singleton
-	@Named("temp-git-repo")
-	public Path getTempFolder() {
-		try {
-			return Files.createTempDirectory("dextorm");
-		} catch (IOException e) {
-			logger.info("failed to create temp folder " + e.getMessage());
-			return null;
-		}
-	}
+    @Provides
+    @Singleton
+    @Named("temp-git-repo")
+    public Path getTempFolder() {
+        try {
+            return Files.createTempDirectory("dextorm");
+        } catch (IOException e) {
+            logger.info("failed to create temp folder " + e.getMessage());
+            return null;
+        }
+    }
 
-	@Inject
-	@Provides
-	@Singleton
-	public Git getRepository(@Named("temp-git-repo") Path tempFolder, ApplicationParameters params) {
+    @Inject
+    @Provides
+    @Singleton
+    public Git getRepository(@Named("temp-git-repo") Path tempFolder, ApplicationParameters params) {
 
-		try {
+        try {
+            System.out.println(logger);
+            logger.log(Level.INFO, "cloning bare repository from" + params.getRepoAddress() + " to " + tempFolder);
+            return Git.cloneRepository().setURI(params.getRepoAddress()).setDirectory(tempFolder.toFile()).setBare(false).call();
 
-			return Git.cloneRepository().setURI(params.getRepoAddress()).setDirectory(tempFolder.toFile()).call();
+        } catch (GitAPIException e) {
 
-		} catch (GitAPIException e) {
+            throw new RuntimeException(e);
 
-			throw new RuntimeException(e);
+        }
 
-		}
+    }
 
-	}
+    @Inject
+    @Provides
+    public Repository getRepository(Git git) {
 
-	@Inject
-	@Provides
-	public Repository getRepository(Git git) {
+        return git.getRepository();
 
-		return git.getRepository();
-
-	}
+    }
 
 }
