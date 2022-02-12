@@ -81,7 +81,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.2.0</version>
                     <executions>
                         <execution>
                             <id>copy-resources</id>
@@ -91,10 +91,10 @@
                                 <goal>copy-resources</goal>
                             </goals>
                             <configuration>
-                                <outputDirectory>${project.build.directory}/protos</outputDirectory>
+                                <outputDirectory>${project.basedir}/target</outputDirectory>
                                 <resources>
                                     <resource>
-                                        <directory>protos</directory>
+                                        <directory>src/main/resources</directory>
                                         <filtering>true</filtering>
                                     </resource>
                                 </resources>
@@ -130,6 +130,27 @@
 
         </pluginManagement>
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifact>fr.pantheonsorbonne.cri:basic-uni-cli:1.0.0-SNAPSHOT</artifact>
+                            <outputDirectory>${project.basedir}/target</outputDirectory>
+                            <stripVersion>true</stripVersion>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
 
                 <groupId>org.codehaus.mojo</groupId>
@@ -141,8 +162,9 @@
                 <!-- NOTE: We don't need a groupId specification because the group is
                     org.apache.maven.plugins ...which is assumed by default. -->
                 <artifactId>maven-assembly-plugin</artifactId>
-
+                <version>3.3.0</version>
                 <configuration>
+
                     <archive>
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
@@ -161,7 +183,9 @@
                     </descriptorRefs>
                     <appendAssemblyId>false</appendAssemblyId>
 
+
                 </configuration>
+
                 <executions>
                     <execution>
                         <id>make-assembly</id> <!-- this is used for inheritance merges -->
@@ -182,22 +206,12 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <!-- configure the plugin here -->
-                        </configuration>
-                    </execution>
-                </executions>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <classifier>dist</classifier>
+                </configuration>
             </plugin>
+
 
         </plugins>
 
@@ -262,7 +276,6 @@
             <artifactId>org.eclipse.jgit</artifactId>
             <version>6.0.0.202111291000-r</version>
         </dependency>
-
 
 
         <dependency>
@@ -343,6 +356,8 @@
             <version>5.3.1</version>
             <scope>test</scope>
         </dependency>
+
+
 
 
     </dependencies>

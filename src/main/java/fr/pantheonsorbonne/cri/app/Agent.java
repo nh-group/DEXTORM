@@ -3,6 +3,7 @@ package fr.pantheonsorbonne.cri.app;
 import java.lang.instrument.Instrumentation;
 import java.util.Set;
 
+import fr.pantheonsorbonne.cri.publisher.console.configuration.ConsolePublisherConfiguration;
 import org.eclipse.jgit.diff.DiffAlgorithm;
 
 import com.google.inject.Guice;
@@ -64,6 +65,8 @@ public class Agent {
 
 		// how do I tell the world?
 		Module publisherConfiguration = new GRPCPublisherConfiguration();
+		//Module publisherConfiguration = new ConsolePublisherConfiguration();
+
 
 		// consolidate modules
 		Module conf = Modules.combine(applicationConfiguration, requirementMappingConfiguration,
