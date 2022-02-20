@@ -6,24 +6,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
-import com.github.gumtreediff.tree.TreeContext;
-import com.github.gumtreediff.tree.TreeUtils;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
-
-import fr.pantheonsorbonne.cri.mapping.ReqMatcher;
-import fr.pantheonsorbonne.cri.mapping.impl.gumTree.Diff;
-import fr.pantheonsorbonne.cri.mapping.impl.gumTree.DiffTree;
-import fr.pantheonsorbonne.cri.mapping.impl.gumTree.PrettyBlameTreePrinter;
-import fr.pantheonsorbonne.cri.mapping.impl.gumTree.GumTreeFacade;
+import fr.pantheonsorbonne.cri.reqmapping.ReqMatcher;
+import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.Diff;
+import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.GumTreeFacade;
 
 class TestDiffBlame {
 

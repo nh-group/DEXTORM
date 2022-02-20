@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
-import fr.pantheonsorbonne.cri.configuration.variables.DemoApplicationParameters;
+import com.google.inject.name.Named;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.AgentBuilder.Identified.Extendable;
 import net.bytebuddy.description.type.TypeDescription;
@@ -16,21 +16,23 @@ import net.bytebuddy.utility.JavaModule;
 
 public class MethodExtractorProvider implements javax.inject.Provider<Extendable> {
 
-	@Inject
-	DemoApplicationParameters vars;
+    @Inject
+    @Named("instrumentedPackage")
+    String instrumentedPackage;
+    @Inject
+    MethodCallInterceptor interceptor;
 
-	@Inject
-	MethodCallInterceptor interceptor;
+    @Provides
+    @Singleton
+    @Override
+    public Extendable get() {
 
-	@Provides
-	@Singleton
-	@Override
-	public Extendable get() {
+        return new AgentBuilder.Default().type(ElementMatchers.nameStartsWith(instrumentedPackage))
+                .transform((Builder<?> builder, TypeDescription typeDescription, ClassLoader classLoader,
+                            JavaModule module) -> builder.method(ElementMatchers.any())
+                        .intercept(MethodDelegation.to(interceptor)));
+    }
 
-		return new AgentBuilder.Default().type(ElementMatchers.nameStartsWith(vars.getInstrumentedPackage()))
-				.transform((Builder<?> builder, TypeDescription typeDescription, ClassLoader classLoader,
-						JavaModule module) -> builder.method(ElementMatchers.any())
-								.intercept(MethodDelegation.to(interceptor)));
-	};
+    ;
 
 }

@@ -1,6 +1,6 @@
 package fr.pantheonsorbonne.cri.configuration;
 
-import fr.pantheonsorbonne.cri.requirements.Requirement;
+import fr.pantheonsorbonne.cri.model.requirements.Requirement;
 
 public interface RequirementIssueDecorator {
 
