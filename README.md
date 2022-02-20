@@ -22,15 +22,26 @@ cd target
 
 ## Configuration
 
-place a dextorm.properties files in the folder you are launching the JVM.
+place a dextorm.yaml files in the folder you are launching the JVM.
 
-```ini
-GRPCEndpointPort=8081
-GRPCEndpointHost=localhost
-InstrumentedPackage=fr.pantheonsorbonne.ufr27
-sourceRootDir=src/main/java
-ReqIssueDecorator=github
-RemoteRepoIssues=https://github.com/nh-group/basic-cli-uni
-RepoAddress=https://github.com/nh-group/basic-cli-uni
-diffAlgorithm=GUMTREE
+```yaml
+app:
+  instrumentedPackage: "fr.pantheonsorbonne.ufr27"
+  sourceRootDir: src/main/java
+  publisher: grpc1
+  issueCollector: github1
+  diffAlgorithm: GUMTREE
+issueCollectors:
+  github:
+    github1:
+      repo: nh-group/basic-cli-uni
+publishers:
+  grpcPublishers:
+    grpc1:
+      host: localhost
+      port: 8081
+
+  consolePublishers:
+    console1: []
+
 ```

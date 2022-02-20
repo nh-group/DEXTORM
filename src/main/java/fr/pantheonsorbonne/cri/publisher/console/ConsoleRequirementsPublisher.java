@@ -16,7 +16,7 @@ public class ConsoleRequirementsPublisher implements RequirementPublisher {
     @Override
     public void publish(Requirement req) {
         logger.info(req.getId());
-        
+
 
     }
 
