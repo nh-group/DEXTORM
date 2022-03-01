@@ -1,3 +1,5 @@
+package fr.pantheonsorbonne.cri.app;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.FileWriter;
