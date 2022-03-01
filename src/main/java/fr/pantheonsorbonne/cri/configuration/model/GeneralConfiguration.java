@@ -66,7 +66,6 @@ public class GeneralConfiguration {
         Set<Module> res = new HashSet<>(this.inheritedModules);
 
 
-
         GitRepoProviderModule gitRepoProviderModule = null;
         //how to we git?
         {
@@ -89,7 +88,11 @@ public class GeneralConfiguration {
         {
             //how we publish results?
             if (this.publishers.consolePublishers.containsKey(this.app.getPublisherName())) {
-                res.add(new ConsolePublisherConfigurationModule());
+                String filePath = this.publishers.consolePublishers.get(this.app.getPublisherName()).getFilePath();
+                if (filePath == null || filePath.isBlank()) {
+                    throw new IllegalArgumentException("you MUST specify a filePath for the console logger " + this.app.getPublisherName());
+                }
+                res.add(new ConsolePublisherConfigurationModule(filePath));
             } else if (this.publishers.grpcPublishers.containsKey(this.app.getPublisherName())) {
                 GrpcPublisherConfig grpcPublisherConfig = this.publishers.grpcPublishers.get(this.app.getPublisherName());
                 res.add(new GRPCPublisherConfigurationModule(grpcPublisherConfig.getHost(), grpcPublisherConfig.getPort()));

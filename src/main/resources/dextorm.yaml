@@ -1,7 +1,7 @@
 app:
   instrumentedPackage: "fr.pantheonsorbonne.ufr27"
   sourceRootDir: src/main/java
-  publisher: grpc1
+  publisher: console1
   issueCollector: github1
   diffAlgorithm: GUMTREE
 issueCollectors:
@@ -15,5 +15,6 @@ publishers:
       port: 8081
 
   consolePublishers:
-    console1: []
+    console1:
+      filePath: dextorm-output.log
 
