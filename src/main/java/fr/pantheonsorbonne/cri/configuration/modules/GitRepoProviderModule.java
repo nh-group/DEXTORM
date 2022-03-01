@@ -46,7 +46,6 @@ public abstract class GitRepoProviderModule extends AbstractModule {
     private Git getRepository(@Named("temp-git-repo") Path tempFolder) {
 
         try {
-            System.out.println(logger);
             logger.log(Level.INFO, "cloning repository from" + repoAddress + " to " + tempFolder);
             return Git.cloneRepository().setURI(repoAddress).setDirectory(tempFolder.toFile()).setBare(false).call();
 

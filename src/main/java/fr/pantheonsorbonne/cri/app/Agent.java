@@ -56,7 +56,7 @@ public class Agent {
         try (FileInputStream fis = new FileInputStream(configurationFile)) {
             appConfiguration = mapper.readValue(fis, GeneralConfiguration.class);
             appConfiguration.setInheritedModules(loadedModules);
-            System.out.println(appConfiguration.toString());
+
         }
 
         // consolidate modules

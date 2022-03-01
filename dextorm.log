@@ -1,0 +1,4 @@
+23:58:13.438 [main] INFO  fr.pantheonsorbonne.cri.app.Agent - using provided file for configuration: /tmp/dextorm10865111557468246649yaml
+23:58:13.441 [main] INFO  fr.pantheonsorbonne.cri.app.Agent - using provided file for configuration: /home/nherbaut/workspace/dextorm/DEXTORM/dextorm10865111557468246649yaml
+23:58:13.442 [main] INFO  fr.pantheonsorbonne.cri.app.Agent - using provided file for configuration: /tmp/dextorm10865111557468246649yaml
+23:58:13.442 [main] WARN  fr.pantheonsorbonne.cri.app.Agent - file /tmp/dextorm10865111557468246649yaml does not exist
