@@ -24,7 +24,7 @@ public class StackTraceParser {
     private static boolean match(StackTraceElement elt, ReqMatcher m) {
         return m.getFQClassName().equals(elt.getClassName())
                 && m.getMethodName().equals(elt.getMethodName().split("\\$")[0])
-                && m.getReq().stream().filter(Predicate.not(Strings::isNullOrEmpty)).count() > 0;
+                && m.getReq().stream().anyMatch(Predicate.not(Strings::isNullOrEmpty));
 
     }
 

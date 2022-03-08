@@ -5,19 +5,20 @@ import java.lang.instrument.Instrumentation;
 import com.google.inject.AbstractModule;
 
 public class InstrumentationConfigurationModule extends AbstractModule {
-	private Instrumentation instrumentation;
+    private Instrumentation instrumentation;
 
-	public InstrumentationConfigurationModule(Instrumentation instrumentation) {
-		this.instrumentation = instrumentation;
-	}
+    public InstrumentationConfigurationModule(Instrumentation instrumentation) {
+        this.instrumentation = instrumentation;
+    }
 
-	@Override
-	protected void configure() {
+    @Override
+    protected void configure() {
 
-		super.configure();
+        super.configure();
 
-		install(new BBudyConfigurationModule(this.instrumentation));
+        //install(new BBudyConfigurationModule(this.instrumentation));
+        install(new JacocoConfigurationModule(this.instrumentation));
 
-	}
+    }
 
 }
