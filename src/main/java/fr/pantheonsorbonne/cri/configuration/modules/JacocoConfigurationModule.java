@@ -14,12 +14,6 @@ import java.lang.instrument.Instrumentation;
 public class JacocoConfigurationModule extends AbstractModule {
 
 
-    private Instrumentation instrumentation;
-
-    public JacocoConfigurationModule(Instrumentation instrumentation) {
-        this.instrumentation = instrumentation;
-    }
-
     @Override
     protected void configure() {
         super.configure();
@@ -29,12 +23,7 @@ public class JacocoConfigurationModule extends AbstractModule {
         multibinder.addBinding().to(JacocoInstrumentationClient.class);
 
 
-
     }
 
-    @Provides
-    public Instrumentation getInstrumentation() {
-        return this.instrumentation;
-    }
 
 }

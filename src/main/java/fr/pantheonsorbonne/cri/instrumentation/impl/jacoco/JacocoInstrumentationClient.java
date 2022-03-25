@@ -1,14 +1,33 @@
 package fr.pantheonsorbonne.cri.instrumentation.impl.jacoco;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import fr.pantheonsorbonne.cri.instrumentation.InstrumentationClient;
+import fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model.*;
+import fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model.Class;
+import fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model.Package;
+import fr.pantheonsorbonne.cri.model.requirements.Requirement;
+import fr.pantheonsorbonne.cri.publisher.RequirementPublisher;
+import fr.pantheonsorbonne.cri.reqmapping.ReqMatcher;
+import fr.pantheonsorbonne.cri.reqmapping.RequirementMappingProvider;
+import fr.pantheonsorbonne.cri.reqmapping.StackTraceParser;
 import org.jacoco.core.analysis.*;
 import org.jacoco.core.data.*;
 import org.jacoco.core.instr.Instrumenter;
 import org.jacoco.core.runtime.*;
+import org.jacoco.report.internal.xml.ReportElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.text.html.Option;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBContextFactory;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.lang.instrument.Instrumentation;
 import java.net.InetAddress;
@@ -18,79 +37,62 @@ import java.util.*;
 
 public class JacocoInstrumentationClient implements InstrumentationClient {
 
-
-    private int getHitCount(final boolean[] data) {
-        int count = 0;
-        for (final boolean hit : data) {
-            if (hit) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(JacocoInstrumentationClient.class);
     @Inject
-    Instrumentation instrumentation;
+    @Named("jacocoReport")
+    String jacocoReport;
+
+    @Inject
+    RequirementMappingProvider mapper;
+
+    @Inject
+    @Named("instrumentedPackage")
+    String instrumentedPackage;
+
+    @Inject
+    public RequirementPublisher publisher;
 
     @Override
     public void registerClient() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    ByteArrayOutputStream os = new ByteArrayOutputStream();
-                    Socket socket = new Socket(InetAddress.getByName("localhost"), 6300);
-                    ExecutionDataStore store = new ExecutionDataStore();
-                    RemoteControlReader reader = new RemoteControlReader(socket.getInputStream());
-                    RemoteControlWriter writer = new RemoteControlWriter(socket.getOutputStream());
-                    ExecutionDataWriter localWriter = new ExecutionDataWriter(os);
-                    ExecutionDataStore executionDataStore = new ExecutionDataStore();
-                    reader.setExecutionDataVisitor(executionDataStore);
-                    reader.setSessionInfoVisitor(localWriter);
+        System.out.println("analysing" + jacocoReport);
 
-                    new Thread(() -> {
-                        try {
-                            writer.visitDumpCommand(true, true);
-                            while (reader.read()) {
-
-                                Thread.sleep(10000);
-
-
-                                final CoverageBuilder coverageBuilder = new CoverageBuilder();
-                                final Analyzer analyzer = new Analyzer(
-                                        executionDataStore, coverageBuilder);
-
-                                analyzer.analyzeAll(new File("/home/nherbaut/workspace/dextorm/basic-cli-uni/target/classes/fr/pantheonsorbonne/ufr27/action/AddTeacherAction.class"));
-
-                                for (IClassCoverage cc : coverageBuilder.getClasses()) {
-                                    for (IMethodCoverage mc : cc.getMethods()) {
-                                        for (int i = mc.getFirstLine(); i < mc.getLastLine(); i++) {
-                                            ILine line = mc.getLine(i);
-                                            LOGGER.info(line.getInstructionCounter().toString());
-                                        }
-
-                                    }
-
-                                }
-
-                                writer.visitDumpCommand(true, true);
-
-                            }
-                        } catch (Throwable t) {
-                            t.printStackTrace();
-                        }
-                        LOGGER.warn("end reading");
-
-                    }).start();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
+        Report report = getReportObjectFromXMl();
+        Collection<StackTraceElement> stackTraces = new ArrayList<>();
+        for (Package pakage : report.getPackages()) {
+            for (Class klass : pakage.getClazz()) {
+                for (Method method : klass.getMethod()) {
+                    stackTraces.add(new StackTraceElement(klass.getName(), method.getName(), klass.getSourcefilename(), Integer.parseInt(method.getLine())));
                 }
             }
-        }).start();
 
 
+        }
+        StackTraceParser parser = new StackTraceParser(stackTraces.toArray(new StackTraceElement[0]), instrumentedPackage, mapper.getReqMatcher());
+        Collection<String> resq = parser.getReqs();
+
+        parser.getReqs().stream().map((String req) -> Requirement.newBuilder().setId(req).build())
+                .forEach((Requirement req) -> publisher.publish(req));
+
+
+    }
+
+    private Report getReportObjectFromXMl() {
+        try {
+            JAXBContext jc = JAXBContext.newInstance(Report.class);
+            XMLInputFactory xif = XMLInputFactory.newFactory();
+            xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+            XMLStreamReader xsr = xif.createXMLStreamReader(new StreamSource(jacocoReport));
+            Unmarshaller unmarshaller = jc.createUnmarshaller();
+            return (Report) unmarshaller.unmarshal(xsr);
+
+
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        } catch (XMLStreamException e) {
+            e.printStackTrace();
+        }
+
+        System.exit(-1);
+        return null;
     }
 }
 

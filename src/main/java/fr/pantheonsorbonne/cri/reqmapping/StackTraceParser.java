@@ -22,7 +22,7 @@ public class StackTraceParser {
     }
 
     private static boolean match(StackTraceElement elt, ReqMatcher m) {
-        return m.getFQClassName().equals(elt.getClassName())
+        return m.getFQClassName().equals(elt.getClassName().replaceAll("/", "."))
                 && m.getMethodName().equals(elt.getMethodName().split("\\$")[0])
                 && m.getReq().stream().anyMatch(Predicate.not(Strings::isNullOrEmpty));
 
@@ -32,7 +32,7 @@ public class StackTraceParser {
 
         Collection<String> res = new HashSet<>();
         for (StackTraceElement elt : elements) {
-            if (elt.getClassName().startsWith(instrumentedPackage)) {
+            if (elt.getClassName().replaceAll("/", ".").startsWith(instrumentedPackage.replaceAll("/", "."))) {
 
                 for (ReqMatcher m : reqMatchers) {
                     if (match(elt, m)) {
