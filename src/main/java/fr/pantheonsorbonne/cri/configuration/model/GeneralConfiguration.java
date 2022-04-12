@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
-import fr.pantheonsorbonne.cri.configuration.RequirementIssueDecorator;
 import fr.pantheonsorbonne.cri.configuration.modules.*;
 import fr.pantheonsorbonne.cri.configuration.variables.DiffAlgorithm;
 
@@ -87,15 +86,22 @@ public class GeneralConfiguration {
 
         {
             //how we publish results?
-            if (this.publishers.consolePublishers.containsKey(this.app.getPublisherName())) {
+            if (this.publishers.consolePublishers != null && this.publishers.consolePublishers.containsKey(this.app.getPublisherName())) {
                 String filePath = this.publishers.consolePublishers.get(this.app.getPublisherName()).getFilePath();
                 if (filePath == null || filePath.isBlank()) {
                     throw new IllegalArgumentException("you MUST specify a filePath for the console logger " + this.app.getPublisherName());
                 }
                 res.add(new ConsolePublisherConfigurationModule(filePath));
-            } else if (this.publishers.grpcPublishers.containsKey(this.app.getPublisherName())) {
+            } else if (this.publishers.grpcPublishers != null && this.publishers.grpcPublishers.containsKey(this.app.getPublisherName())) {
                 GrpcPublisherConfig grpcPublisherConfig = this.publishers.grpcPublishers.get(this.app.getPublisherName());
                 res.add(new GRPCPublisherConfigurationModule(grpcPublisherConfig.getHost(), grpcPublisherConfig.getPort()));
+            } else if (this.publishers.dbPublishers != null && this.publishers.dbPublishers.containsKey(this.app.getPublisherName())) {
+                DBPublisherConfig dbPublisherConfig = this.publishers.dbPublishers.get(this.app.getPublisherName());
+                res.add(new DBPublisherConfigurationModule(dbPublisherConfig.getJdbc_path()));
+
+            } else if (this.publishers.restPublishers != null && this.publishers.restPublishers.containsKey(this.app.getPublisherName())) {
+                RESTPublisherConfig publisherConfig = this.publishers.restPublishers.get(this.app.getPublisherName());
+                res.add(new APIPublisherConfigurationModule(publisherConfig.getBaseUrl()));
             }
 
         }
