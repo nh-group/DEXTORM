@@ -86,8 +86,8 @@ public class GeneralConfiguration {
 
         {
             //how we publish results?
-            if (this.publishers.consolePublishers != null && this.publishers.consolePublishers.containsKey(this.app.getPublisherName())) {
-                String filePath = this.publishers.consolePublishers.get(this.app.getPublisherName()).getFilePath();
+            if (this.publishers.filePublishers != null && this.publishers.filePublishers.containsKey(this.app.getPublisherName())) {
+                String filePath = this.publishers.filePublishers.get(this.app.getPublisherName()).getFilePath();
                 if (filePath == null || filePath.isBlank()) {
                     throw new IllegalArgumentException("you MUST specify a filePath for the console logger " + this.app.getPublisherName());
                 }

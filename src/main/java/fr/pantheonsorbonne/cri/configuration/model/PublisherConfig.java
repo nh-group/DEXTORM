@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class PublisherConfig {
     Map<String, GrpcPublisherConfig> grpcPublishers;
-    Map<String, ConsolePublisherConfig> consolePublishers;
+    Map<String, FilePublisherConfig> filePublishers;
 
     public Map<String, RESTPublisherConfig> getRestPublishers() {
         return restPublishers;
@@ -26,9 +26,9 @@ public class PublisherConfig {
 
     Map<String, DBPublisherConfig> dbPublishers;
 
-    public PublisherConfig(Map<String, GrpcPublisherConfig> grpcPublishers, Map<String, ConsolePublisherConfig> consolePublishers, Map<String, DBPublisherConfig> dbPublishers, Map<String, RESTPublisherConfig> restPublishers) {
+    public PublisherConfig(Map<String, GrpcPublisherConfig> grpcPublishers, Map<String, FilePublisherConfig> consolePublishers, Map<String, DBPublisherConfig> dbPublishers, Map<String, RESTPublisherConfig> restPublishers) {
         this.grpcPublishers = grpcPublishers;
-        this.consolePublishers = consolePublishers;
+        this.filePublishers = consolePublishers;
         this.dbPublishers = dbPublishers;
         this.restPublishers = restPublishers;
     }
@@ -44,19 +44,19 @@ public class PublisherConfig {
         this.grpcPublishers = grpcPublishers;
     }
 
-    public Map<String, ConsolePublisherConfig> getConsolePublishers() {
-        return consolePublishers;
+    public Map<String, FilePublisherConfig> getFilePublishers() {
+        return filePublishers;
     }
 
-    public void setConsolePublishers(Map<String, ConsolePublisherConfig> consolePublishers) {
-        this.consolePublishers = consolePublishers;
+    public void setFilePublishers(Map<String, FilePublisherConfig> filePublishers) {
+        this.filePublishers = filePublishers;
     }
 
     @Override
     public String toString() {
         return "PublisherConfig{" +
                 "grpcPublishers=" + grpcPublishers +
-                ", consolePublishers=" + consolePublishers +
+                ", consolePublishers=" + filePublishers +
                 '}';
     }
 }

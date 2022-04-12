@@ -37,6 +37,7 @@ import java.util.*;
 
 public class JacocoInstrumentationClient implements InstrumentationClient {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JacocoInstrumentationClient.class);
     @Inject
     @Named("jacocoReport")
     String jacocoReport;
@@ -53,7 +54,7 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
 
     @Override
     public void registerClient() {
-        System.out.println("analysing" + jacocoReport);
+        LOGGER.info("analysing {}", jacocoReport);
 
         Report report = getReportObjectFromXMl();
         Collection<StackTraceElement> stackTraces = new ArrayList<>();
@@ -67,7 +68,7 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
 
         }
         StackTraceParser parser = new StackTraceParser(stackTraces.toArray(new StackTraceElement[0]), instrumentedPackage, mapper.getReqMatcher());
-        Collection<String> resq = parser.getReqs();
+
 
         parser.getReqs().stream().map((String req) -> Requirement.newBuilder().setId(req).build())
                 .forEach((Requirement req) -> publisher.publish(req));

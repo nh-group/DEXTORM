@@ -2,12 +2,12 @@ package fr.pantheonsorbonne.cri.configuration.model;
 
 import java.util.Collection;
 
-public class ConsolePublisherConfig {
-    public ConsolePublisherConfig(String filePath) {
+public class FilePublisherConfig {
+    public FilePublisherConfig(String filePath) {
         this.filePath = filePath;
     }
 
-    public ConsolePublisherConfig() {
+    public FilePublisherConfig() {
     }
 
     public String getFilePath() {
