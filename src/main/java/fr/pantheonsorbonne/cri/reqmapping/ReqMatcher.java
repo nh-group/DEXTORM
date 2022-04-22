@@ -1,5 +1,7 @@
 package fr.pantheonsorbonne.cri.reqmapping;
 
+import com.google.common.base.Strings;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,150 +11,148 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import com.google.common.base.Strings;
-
 public class ReqMatcher {
 
-	@Override
-	public String toString() {
-		Optional<String> params = this.args.stream().reduce((String a, String b) -> a + "," + b);
-		String commits = this.commits.stream().filter((String s) -> s != null)
-				.collect(Collectors.groupingBy(Function.identity(), Collectors.counting())).entrySet().stream()
-				.map((Entry<String, Long> entry) -> entry.getKey() + ":" + entry.getValue())
-				.collect(Collectors.joining(" ,"));
+    private String className;
+    private String methodName;
+    private Integer line;
+    private final ArrayList<String> commits = new ArrayList();
+    private final ArrayList<String> args = new ArrayList<>();
+    private String packageName = "";
 
-		return new StringBuilder().append(this.getFQClassName()).append("::").append(this.methodName).append(" (")
-				.append(params.isPresent() ? params.get() : " void ").append(" )").append("//").append(commits)
-				.toString();
-	}
+    protected ReqMatcher() {
 
-	public String getClassName() {
-		return this.className;
-	}
+    }
 
-	public String getFQClassName() {
-		return this.packageName.isEmpty() ? className : this.packageName + "." + className;
-	}
+    public ReqMatcher(String className, String methodName, Collection<String> args, Integer line, String... reqs) {
+        this.className = className;
+        this.methodName = methodName;
+        this.setArgs((java.util.List<String>) args);
+        this.line = line;
+        commits.addAll(Arrays.asList(reqs));
 
-	public void setClassName(String className) {
-		this.className = className;
-	}
+    }
 
-	public String getMethodName() {
-		return methodName;
-	}
+    public static ReqMatcherBuilder newBuilder() {
+        return new ReqMatcherBuilder();
+    }
 
-	public void setMethodName(String methodName) {
-		this.methodName = methodName;
-	}
+    @Override
+    public String toString() {
+        Optional<String> params = this.args.stream().reduce((String a, String b) -> a + "," + b);
+        String commits = this.commits.stream().filter((String s) -> s != null)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting())).entrySet().stream()
+                .map((Entry<String, Long> entry) -> entry.getKey() + ":" + entry.getValue())
+                .collect(Collectors.joining(" ,"));
 
-	public Integer getLine() {
-		return line;
-	}
+        return new StringBuilder().append(this.getFQClassName()).append("::").append(this.methodName).append(" (")
+                .append(params.isPresent() ? params.get() : " void ").append(" )").append("//").append(commits)
+                .toString();
+    }
 
-	public void setLine(Integer line) {
-		this.line = line;
-	}
+    public String getFQClassName() {
+        return this.packageName.isEmpty() ? className : this.packageName + "." + className;
+    }
 
-	public java.util.List<String> getReq() {
-		return commits;
-	}
+    public String getClassName() {
+        return this.className;
+    }
 
-	public void setReq(java.util.List<String> req) {
-		this.commits.clear();
-		this.commits.addAll(req);
-	}
+    public void setClassName(String className) {
+        this.className = className;
+    }
 
-	private String className;
-	private String methodName;
-	private Integer line;
-	private ArrayList<String> commits = new ArrayList();
-	private ArrayList<String> args = new ArrayList<>();
-	private String packageName = "";
+    public String getMethodName() {
+        return methodName;
+    }
 
-	public static class ReqMatcherBuilder implements Cloneable {
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
+    }
 
-		private ReqMatcher buildee = new ReqMatcher();
+    public Integer getLine() {
+        return line;
+    }
 
-		public ReqMatcherBuilder className(String name) {
-			this.buildee.setClassName(name);
-			return this;
-		}
+    public void setLine(Integer line) {
+        this.line = line;
+    }
 
-		public ReqMatcherBuilder methodName(String name) {
-			this.buildee.setMethodName(name);
-			return this;
-		}
+    public java.util.List<String> getReq() {
+        return commits;
+    }
 
-		public ReqMatcherBuilder args(java.util.List<String> args) {
-			this.buildee.setArgs(args);
-			return this;
-		}
+    public void setReq(java.util.List<String> req) {
+        this.commits.clear();
+        this.commits.addAll(req);
+    }
 
-		public ReqMatcherBuilder arg(String args) {
-			this.buildee.getArgs().add(args);
-			return this;
-		}
+    public Collection<String> getArgs() {
+        return args;
+    }
 
-		public ReqMatcherBuilder commit(String commit) {
-			if (!Strings.isNullOrEmpty(commit)) {
-				this.buildee.getReq().add(commit);
-			}
+    public void setArgs(java.util.List<String> args) {
+        this.args.clear();
+        this.args.addAll(args);
 
-			return this;
-		}
+    }
 
-		public ReqMatcher build() {
-			return buildee;
-		}
+    public static class ReqMatcherBuilder implements Cloneable {
 
-		@SuppressWarnings("unchecked")
-		@Override
-		public Object clone() {
-			return ReqMatcher.newBuilder().className(this.buildee.getClassName()).methodName(this.buildee.methodName)
-					.packageName(this.buildee.packageName).args((ArrayList<String>) this.buildee.args.clone())
-					.commits((ArrayList<String>) this.buildee.commits.clone());
-		}
+        private final ReqMatcher buildee = new ReqMatcher();
 
-		public ReqMatcherBuilder commits(Collection<String> commits) {
+        public ReqMatcherBuilder arg(String args) {
+            this.buildee.getArgs().add(args);
+            return this;
+        }
 
-			this.buildee.getReq().addAll(
-					commits.stream().filter(Predicate.not(Strings::isNullOrEmpty)).collect(Collectors.toList()));
-			return this;
-		}
+        public ReqMatcherBuilder commit(String commit) {
+            if (!Strings.isNullOrEmpty(commit)) {
+                this.buildee.getReq().add(commit);
+            }
 
-		public ReqMatcherBuilder packageName(String label) {
-			this.buildee.packageName = label;
-			return this;
+            return this;
+        }
 
-		}
-	}
+        public ReqMatcher build() {
+            return buildee;
+        }
 
-	public static ReqMatcherBuilder newBuilder() {
-		return new ReqMatcherBuilder();
-	}
+        @SuppressWarnings("unchecked")
+        @Override
+        public Object clone() {
+            return ReqMatcher.newBuilder().className(this.buildee.getClassName()).methodName(this.buildee.methodName)
+                    .packageName(this.buildee.packageName).args((ArrayList<String>) this.buildee.args.clone())
+                    .commits((ArrayList<String>) this.buildee.commits.clone());
+        }
 
-	protected ReqMatcher() {
+        public ReqMatcherBuilder commits(Collection<String> commits) {
 
-	}
+            this.buildee.getReq().addAll(
+                    commits.stream().filter(Predicate.not(Strings::isNullOrEmpty)).collect(Collectors.toList()));
+            return this;
+        }
 
-	public ReqMatcher(String className, String methodName, Collection<String> args, Integer line, String... reqs) {
-		this.className = className;
-		this.methodName = methodName;
-		this.setArgs((java.util.List<String>) args);
-		this.line = line;
-		commits.addAll(Arrays.asList(reqs));
+        public ReqMatcherBuilder args(java.util.List<String> args) {
+            this.buildee.setArgs(args);
+            return this;
+        }
 
-	}
+        public ReqMatcherBuilder packageName(String label) {
+            this.buildee.packageName = label;
+            return this;
 
-	public Collection<String> getArgs() {
-		return args;
-	}
+        }
 
-	public void setArgs(java.util.List<String> args) {
-		this.args.clear();
-		this.args.addAll(args);
+        public ReqMatcherBuilder methodName(String name) {
+            this.buildee.setMethodName(name);
+            return this;
+        }
 
-	}
+        public ReqMatcherBuilder className(String name) {
+            this.buildee.setClassName(name);
+            return this;
+        }
+    }
 
 }

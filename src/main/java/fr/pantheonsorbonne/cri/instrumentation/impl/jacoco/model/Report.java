@@ -8,18 +8,12 @@
 
 package fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model;
 
+import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
@@ -92,6 +86,10 @@ public class Report {
         return this.sessioninfo;
     }
 
+    public List<Package> getPackages() {
+        return this.getGroupOrPackage().stream().filter(c -> c instanceof Package).map(c -> (Package) c).collect(Collectors.toList());
+    }
+
     /**
      * Gets the value of the groupOrPackage property.
      *
@@ -118,10 +116,6 @@ public class Report {
             groupOrPackage = new ArrayList<Object>();
         }
         return this.groupOrPackage;
-    }
-
-    public List<Package> getPackages() {
-        return this.getGroupOrPackage().stream().filter(c -> c instanceof Package).map(c -> (Package) c).collect(Collectors.toList());
     }
 
     /**

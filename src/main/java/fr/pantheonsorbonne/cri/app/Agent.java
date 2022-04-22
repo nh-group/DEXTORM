@@ -1,30 +1,25 @@
 package fr.pantheonsorbonne.cri.app;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.google.inject.Module;
+import com.google.inject.*;
+import com.google.inject.name.Names;
+import com.google.inject.util.Modules;
+import fr.pantheonsorbonne.cri.configuration.model.GeneralConfiguration;
+import fr.pantheonsorbonne.cri.configuration.modules.InstrumentationConfigurationModule;
+import fr.pantheonsorbonne.cri.instrumentation.InstrumentationClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.google.inject.*;
-import com.google.inject.Module;
-import com.google.inject.name.Named;
-import com.google.inject.name.Names;
-import com.google.inject.util.Modules;
-
-import fr.pantheonsorbonne.cri.configuration.model.GeneralConfiguration;
-
-
-import fr.pantheonsorbonne.cri.instrumentation.InstrumentationClient;
-import fr.pantheonsorbonne.cri.configuration.modules.InstrumentationConfigurationModule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Agent {
 
@@ -74,6 +69,14 @@ public class Agent {
         Injector injector = Guice.createInjector(conf);
         Agent agent = injector.getInstance(Agent.class);
         agent.run();
+    }
+
+    private void run() {
+
+        for (InstrumentationClient ic : instrumentatinClients) {
+            ic.registerClient();
+        }
+
     }
 
     public static void premain(String agentArguments, Instrumentation instZ) throws IOException {
@@ -135,14 +138,6 @@ public class Agent {
         }
 
         return Optional.empty();
-    }
-
-    private void run() {
-
-        for (InstrumentationClient ic : instrumentatinClients) {
-            ic.registerClient();
-        }
-
     }
 
 }

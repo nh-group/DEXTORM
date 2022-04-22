@@ -8,7 +8,6 @@ import fr.pantheonsorbonne.cri.publisher.db.model.CoverageRunContext;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.persistence.PersistenceContext;
 
 @Singleton
 public class DBRequirementPublisher extends AbstractRequirementPublisher {

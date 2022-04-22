@@ -4,26 +4,28 @@
 package fr.pantheonsorbonne.cri.model.requirements;
 
 public interface AgentConfigOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:requirements.AgentConfig)
-    com.google.protobuf.MessageOrBuilder {
+        // @@protoc_insertion_point(interface_extends:requirements.AgentConfig)
+        com.google.protobuf.MessageOrBuilder {
 
-  /**
-   * <code>string projectName = 1;</code>
-   */
-  String getProjectName();
-  /**
-   * <code>string projectName = 1;</code>
-   */
-  com.google.protobuf.ByteString
-      getProjectNameBytes();
+    /**
+     * <code>string projectName = 1;</code>
+     */
+    String getProjectName();
 
-  /**
-   * <code>string projectGHPath = 2;</code>
-   */
-  String getProjectGHPath();
-  /**
-   * <code>string projectGHPath = 2;</code>
-   */
-  com.google.protobuf.ByteString
-      getProjectGHPathBytes();
+    /**
+     * <code>string projectName = 1;</code>
+     */
+    com.google.protobuf.ByteString
+    getProjectNameBytes();
+
+    /**
+     * <code>string projectGHPath = 2;</code>
+     */
+    String getProjectGHPath();
+
+    /**
+     * <code>string projectGHPath = 2;</code>
+     */
+    com.google.protobuf.ByteString
+    getProjectGHPathBytes();
 }

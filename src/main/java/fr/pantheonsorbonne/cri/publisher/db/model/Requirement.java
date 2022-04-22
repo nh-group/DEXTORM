@@ -10,6 +10,9 @@ public class Requirement {
 
     long reqId;
     String reqURL;
+    @ManyToOne
+    @JoinColumn(name = "id", nullable = false)
+    private CoverageRunContext context;
 
     public long getId() {
         return id;
@@ -34,10 +37,5 @@ public class Requirement {
     public void setReqURL(String reqURL) {
         this.reqURL = reqURL;
     }
-
-
-    @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
-    private CoverageRunContext context;
 
 }

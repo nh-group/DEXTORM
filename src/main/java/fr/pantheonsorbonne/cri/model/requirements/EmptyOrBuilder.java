@@ -4,6 +4,6 @@
 package fr.pantheonsorbonne.cri.model.requirements;
 
 public interface EmptyOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:requirements.Empty)
-    com.google.protobuf.MessageOrBuilder {
+        // @@protoc_insertion_point(interface_extends:requirements.Empty)
+        com.google.protobuf.MessageOrBuilder {
 }

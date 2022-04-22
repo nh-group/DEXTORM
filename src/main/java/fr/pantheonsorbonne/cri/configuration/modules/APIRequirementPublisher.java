@@ -4,18 +4,14 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import fr.pantheonsorbonne.cri.model.requirements.Requirement;
 import fr.pantheonsorbonne.cri.publisher.AbstractRequirementPublisher;
-import fr.pantheonsorbonne.cri.publisher.RequirementPublisher;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Response;
-import org.glassfish.jersey.client.JerseyClient;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
 
 public class APIRequirementPublisher extends AbstractRequirementPublisher {
 
@@ -38,8 +34,7 @@ public class APIRequirementPublisher extends AbstractRequirementPublisher {
             if (!resp.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
                 LOG.error("{} {}", resp.getStatusInfo().getStatusCode(), resp.getStatusInfo().getReasonPhrase());
             }
-        }
-        catch(ProcessingException pe){
+        } catch (ProcessingException pe) {
             LOG.error(pe.getMessage());
         }
 

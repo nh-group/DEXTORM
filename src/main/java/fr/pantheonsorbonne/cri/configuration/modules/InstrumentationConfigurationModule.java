@@ -1,8 +1,8 @@
 package fr.pantheonsorbonne.cri.configuration.modules;
 
-import java.lang.instrument.Instrumentation;
-
 import com.google.inject.AbstractModule;
+
+import java.lang.instrument.Instrumentation;
 
 public class InstrumentationConfigurationModule extends AbstractModule {
     private final Instrumentation instrumentation;

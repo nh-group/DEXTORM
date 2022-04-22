@@ -1,8 +1,6 @@
 package fr.pantheonsorbonne.cri.publisher.grpc;
 
 import com.google.inject.Inject;
-
-
 import fr.pantheonsorbonne.cri.configuration.RequirementIssueDecorator;
 import fr.pantheonsorbonne.cri.model.requirements.AgentConfig;
 import fr.pantheonsorbonne.cri.model.requirements.AgentConfigurationGrpc;
@@ -44,7 +42,5 @@ public class GrPCConfigurationPublisher {
 
         );
     }
-
-    ;
 
 }

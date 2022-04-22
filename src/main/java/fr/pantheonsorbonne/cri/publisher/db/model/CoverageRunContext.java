@@ -1,8 +1,10 @@
 package fr.pantheonsorbonne.cri.publisher.db.model;
 
-import javax.persistence.*;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.util.Collection;
-import java.util.Collections;
 
 public class CoverageRunContext {
 
@@ -11,6 +13,8 @@ public class CoverageRunContext {
     long id;
 
     long timestamp;
+    @OneToMany(targetEntity = Requirement.class, mappedBy = "context")
+    private Collection<Requirement> req;
 
     public Collection<Requirement> getReq() {
         return req;
@@ -19,9 +23,6 @@ public class CoverageRunContext {
     public void setReq(Collection<Requirement> req) {
         this.req = req;
     }
-
-    @OneToMany(targetEntity = Requirement.class, mappedBy = "context")
-    private Collection<Requirement> req;
 
     public long getTimestamp() {
         return timestamp;

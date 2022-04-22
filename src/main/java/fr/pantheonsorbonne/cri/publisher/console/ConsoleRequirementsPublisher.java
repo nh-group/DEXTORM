@@ -1,8 +1,5 @@
 package fr.pantheonsorbonne.cri.publisher.console;
 
-import java.util.Collection;
-
-
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
@@ -11,15 +8,17 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.OutputStreamAppender;
-import fr.pantheonsorbonne.cri.publisher.RequirementPublisher;
 import fr.pantheonsorbonne.cri.model.requirements.Requirement;
+import fr.pantheonsorbonne.cri.publisher.RequirementPublisher;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.EventRecodingLogger;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Collection;
 
 public class ConsoleRequirementsPublisher implements RequirementPublisher {
+
+    private final Logger logger;
 
     @Inject
     public ConsoleRequirementsPublisher(@Named("consolePublishers") String consoleLoggerFileName) {
@@ -50,8 +49,6 @@ public class ConsoleRequirementsPublisher implements RequirementPublisher {
 
 
     }
-
-    private final Logger logger;
 
     @Override
     public void publish(Requirement req) {

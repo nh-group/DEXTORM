@@ -8,17 +8,13 @@
 
 package fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * 
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
@@ -43,11 +39,9 @@ public class Line {
 
     /**
      * Gets the value of the nr property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getNr() {
         return nr;
@@ -55,11 +49,9 @@ public class Line {
 
     /**
      * Sets the value of the nr property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setNr(String value) {
         this.nr = value;
@@ -67,11 +59,9 @@ public class Line {
 
     /**
      * Gets the value of the mi property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getMi() {
         return mi;
@@ -79,11 +69,9 @@ public class Line {
 
     /**
      * Sets the value of the mi property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setMi(String value) {
         this.mi = value;
@@ -91,11 +79,9 @@ public class Line {
 
     /**
      * Gets the value of the ci property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getCi() {
         return ci;
@@ -103,11 +89,9 @@ public class Line {
 
     /**
      * Sets the value of the ci property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setCi(String value) {
         this.ci = value;
@@ -115,11 +99,9 @@ public class Line {
 
     /**
      * Gets the value of the mb property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getMb() {
         return mb;
@@ -127,11 +109,9 @@ public class Line {
 
     /**
      * Sets the value of the mb property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setMb(String value) {
         this.mb = value;
@@ -139,11 +119,9 @@ public class Line {
 
     /**
      * Gets the value of the cb property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getCb() {
         return cb;
@@ -151,11 +129,9 @@ public class Line {
 
     /**
      * Sets the value of the cb property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setCb(String value) {
         this.cb = value;

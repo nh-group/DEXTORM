@@ -1,18 +1,13 @@
 package fr.pantheonsorbonne.cri.configuration.modules;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
-import com.google.inject.TypeLiteral;
-
+import com.google.inject.*;
+import fr.pantheonsorbonne.cri.model.requirements.Empty;
+import fr.pantheonsorbonne.cri.model.requirements.ReqCollectorGrpc;
+import fr.pantheonsorbonne.cri.model.requirements.ReqCollectorGrpc.ReqCollectorStub;
+import fr.pantheonsorbonne.cri.model.requirements.Requirement;
 import fr.pantheonsorbonne.cri.publisher.RequirementPublisher;
 import fr.pantheonsorbonne.cri.publisher.grpc.DummyObserver;
 import fr.pantheonsorbonne.cri.publisher.grpc.GrPCRequirementPublisher;
-import fr.pantheonsorbonne.cri.model.requirements.Empty;
-import fr.pantheonsorbonne.cri.model.requirements.ReqCollectorGrpc;
-import fr.pantheonsorbonne.cri.model.requirements.Requirement;
-import fr.pantheonsorbonne.cri.model.requirements.ReqCollectorGrpc.ReqCollectorStub;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;

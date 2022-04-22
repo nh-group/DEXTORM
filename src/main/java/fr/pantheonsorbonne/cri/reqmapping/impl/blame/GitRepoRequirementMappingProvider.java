@@ -1,6 +1,12 @@
 package fr.pantheonsorbonne.cri.reqmapping.impl.blame;
 
-import static java.nio.file.FileVisitResult.CONTINUE;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import fr.pantheonsorbonne.cri.reqmapping.ReqMatcher;
+import fr.pantheonsorbonne.cri.reqmapping.RequirementMappingProvider;
+import fr.pantheonsorbonne.cri.reqmapping.impl.FileRequirementMappingProvider;
+import org.eclipse.jgit.errors.RevisionSyntaxException;
+import org.eclipse.jgit.lib.Repository;
 
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -11,27 +17,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.jgit.errors.RevisionSyntaxException;
-import org.eclipse.jgit.lib.Repository;
-
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
-import fr.pantheonsorbonne.cri.reqmapping.RequirementMappingProvider;
-import fr.pantheonsorbonne.cri.reqmapping.ReqMatcher;
-import fr.pantheonsorbonne.cri.reqmapping.impl.FileRequirementMappingProvider;
+import static java.nio.file.FileVisitResult.CONTINUE;
 
 public class GitRepoRequirementMappingProvider extends SimpleFileVisitor<Path> implements RequirementMappingProvider {
 
 
+    private final Set<ReqMatcher> repoReqMatchers = new HashSet<>();
     protected Repository repo;
     protected FileRequirementMappingProvider fileReqProvider;
-    private final Set<ReqMatcher> repoReqMatchers = new HashSet<>();
-
-    @Override
-    public Collection<ReqMatcher> getReqMatcher() {
-        return repoReqMatchers;
-    }
 
     @Inject
     public GitRepoRequirementMappingProvider(@Named("temp-git-repo") Path tempFolderGitRepo, Repository repo,
@@ -46,6 +39,11 @@ public class GitRepoRequirementMappingProvider extends SimpleFileVisitor<Path> i
             e.printStackTrace();
             System.exit(-1);
         }
+    }
+
+    @Override
+    public Collection<ReqMatcher> getReqMatcher() {
+        return repoReqMatchers;
     }
 
     @Override

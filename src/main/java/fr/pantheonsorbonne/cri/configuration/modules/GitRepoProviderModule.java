@@ -1,32 +1,30 @@
 package fr.pantheonsorbonne.cri.configuration.modules;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import fr.pantheonsorbonne.cri.configuration.RequirementIssueDecorator;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Repository;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import fr.pantheonsorbonne.cri.configuration.RequirementIssueDecorator;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Repository;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-
 
 public abstract class GitRepoProviderModule extends AbstractModule {
 
     private static final Logger logger = Logger.getLogger(GitRepoProviderModule.class.getName());
+    protected String repoAddress;
 
     public GitRepoProviderModule(String repoAddress) {
         this.repoAddress = repoAddress;
     }
-
-    protected String repoAddress;
 
     @Provides
     @Singleton

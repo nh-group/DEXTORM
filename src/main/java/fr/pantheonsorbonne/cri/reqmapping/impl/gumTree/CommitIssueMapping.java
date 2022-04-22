@@ -1,10 +1,10 @@
 package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree;
 
-import java.util.List;
-
 import org.eclipse.jgit.lib.ObjectId;
 
+import java.util.List;
+
 public class CommitIssueMapping {
-	ObjectId id;
-	List<String> issueId;
+    ObjectId id;
+    List<String> issueId;
 }

@@ -16,17 +16,15 @@ public class GeneralConfiguration {
     AppConfiguration app;
     IssueCollectorsConfig issueCollectors;
     PublisherConfig publishers;
-
-    public void setInheritedModules(Collection<Module> inheritedModules) {
-        this.inheritedModules = inheritedModules;
-    }
-
     @JsonIgnore
     Collection<Module> inheritedModules;
 
     public GeneralConfiguration() {
     }
 
+    public void setInheritedModules(Collection<Module> inheritedModules) {
+        this.inheritedModules = inheritedModules;
+    }
 
     public AppConfiguration getApp() {
         return app;

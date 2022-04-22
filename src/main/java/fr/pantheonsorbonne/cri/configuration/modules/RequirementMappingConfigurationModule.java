@@ -1,10 +1,8 @@
 package fr.pantheonsorbonne.cri.configuration.modules;
 
 import com.google.inject.AbstractModule;
-
 import fr.pantheonsorbonne.cri.configuration.RequirementIssueDecorator;
 import fr.pantheonsorbonne.cri.configuration.variables.DiffAlgorithm;
-import fr.pantheonsorbonne.cri.reqmapping.GitHubRequirementIssueDecorator;
 import fr.pantheonsorbonne.cri.reqmapping.RequirementMappingProvider;
 import fr.pantheonsorbonne.cri.reqmapping.impl.FileRequirementMappingProvider;
 import fr.pantheonsorbonne.cri.reqmapping.impl.blame.GitBlameFileRequirementProvider;

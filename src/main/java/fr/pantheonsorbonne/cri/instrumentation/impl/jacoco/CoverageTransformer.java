@@ -1,16 +1,15 @@
 package fr.pantheonsorbonne.cri.instrumentation.impl.jacoco;
 
 
-import java.io.IOException;
-import java.lang.instrument.ClassFileTransformer;
-import java.lang.instrument.IllegalClassFormatException;
-import java.security.CodeSource;
-import java.security.ProtectionDomain;
-
 import org.jacoco.core.instr.Instrumenter;
 import org.jacoco.core.runtime.AgentOptions;
 import org.jacoco.core.runtime.IRuntime;
 import org.jacoco.core.runtime.WildcardMatcher;
+
+import java.io.IOException;
+import java.lang.instrument.ClassFileTransformer;
+import java.security.CodeSource;
+import java.security.ProtectionDomain;
 
 /**
  * Class file transformer to instrument classes for code coverage analysis.
@@ -54,6 +53,10 @@ public class CoverageTransformer implements ClassFileTransformer {
         exclClassloader = new WildcardMatcher(options.getExclClassloader());
         inclBootstrapClasses = options.getInclBootstrapClasses();
         inclNoLocationClasses = options.getInclNoLocationClasses();
+    }
+
+    private static String toVMName(final String srcName) {
+        return srcName.replace('.', '/');
     }
 
     public byte[] transform(final ClassLoader loader, final String classname,
@@ -125,10 +128,6 @@ public class CoverageTransformer implements ClassFileTransformer {
             return false;
         }
         return codeSource.getLocation() != null;
-    }
-
-    private static String toVMName(final String srcName) {
-        return srcName.replace('.', '/');
     }
 
 }

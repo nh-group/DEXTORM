@@ -8,18 +8,12 @@
 
 package fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model;
 
+import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
@@ -63,6 +57,10 @@ public class Package {
         this.name = value;
     }
 
+    public List<Class> getClazz() {
+        return this.getClazzOrSourcefile().stream().filter(c -> c instanceof Class).map(c -> (Class) c).collect(Collectors.toList());
+    }
+
     /**
      * Gets the value of the clazzOrSourcefile property.
      *
@@ -89,10 +87,6 @@ public class Package {
             clazzOrSourcefile = new ArrayList<Object>();
         }
         return this.clazzOrSourcefile;
-    }
-
-    public List<Class> getClazz() {
-        return this.getClazzOrSourcefile().stream().filter(c -> c instanceof Class).map(c -> (Class) c).collect(Collectors.toList());
     }
 
     public List<Sourcefile> getSourceFile() {

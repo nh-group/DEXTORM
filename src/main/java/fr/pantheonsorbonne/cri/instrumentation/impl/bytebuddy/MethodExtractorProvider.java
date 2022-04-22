@@ -3,7 +3,6 @@ package fr.pantheonsorbonne.cri.instrumentation.impl.bytebuddy;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-
 import com.google.inject.name.Named;
 import fr.pantheonsorbonne.cri.model.requirements.Requirement;
 import fr.pantheonsorbonne.cri.publisher.RequirementPublisher;
@@ -43,8 +42,6 @@ public class MethodExtractorProvider implements javax.inject.Provider<Extendable
                             JavaModule module) -> builder.method(ElementMatchers.any())
                         .intercept(MethodDelegation.to(interceptor)));
     }
-
-    ;
 
     public static class MethodCallInterceptor {
 

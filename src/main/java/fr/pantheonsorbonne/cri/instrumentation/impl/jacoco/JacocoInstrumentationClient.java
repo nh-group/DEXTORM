@@ -3,54 +3,40 @@ package fr.pantheonsorbonne.cri.instrumentation.impl.jacoco;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import fr.pantheonsorbonne.cri.instrumentation.InstrumentationClient;
-import fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model.*;
 import fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model.Class;
+import fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model.Method;
 import fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model.Package;
+import fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model.Report;
 import fr.pantheonsorbonne.cri.model.requirements.Requirement;
 import fr.pantheonsorbonne.cri.publisher.RequirementPublisher;
-import fr.pantheonsorbonne.cri.reqmapping.ReqMatcher;
 import fr.pantheonsorbonne.cri.reqmapping.RequirementMappingProvider;
 import fr.pantheonsorbonne.cri.reqmapping.StackTraceParser;
-import org.jacoco.core.analysis.*;
-import org.jacoco.core.data.*;
-import org.jacoco.core.instr.Instrumenter;
-import org.jacoco.core.runtime.*;
-import org.jacoco.report.internal.xml.ReportElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.text.html.Option;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBContextFactory;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
-import java.io.*;
-import java.lang.instrument.Instrumentation;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class JacocoInstrumentationClient implements InstrumentationClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JacocoInstrumentationClient.class);
     @Inject
+    public RequirementPublisher publisher;
+    @Inject
     @Named("jacocoReport")
     String jacocoReport;
-
     @Inject
     RequirementMappingProvider mapper;
-
     @Inject
     @Named("instrumentedPackage")
     String instrumentedPackage;
-
-    @Inject
-    public RequirementPublisher publisher;
 
     @Override
     public void registerClient() {

@@ -4,8 +4,8 @@ import fr.pantheonsorbonne.cri.model.requirements.Requirement;
 
 public interface RequirementIssueDecorator {
 
-	public Requirement getIssueLink(Requirement req);
+    Requirement getIssueLink(Requirement req);
 
-	public String getRoot();
+    String getRoot();
 
 }

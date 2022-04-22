@@ -1,8 +1,8 @@
 package fr.pantheonsorbonne.cri.configuration.model;
 
-import java.util.Collection;
-
 public class FilePublisherConfig {
+    private String filePath;
+
     public FilePublisherConfig(String filePath) {
         this.filePath = filePath;
     }
@@ -17,8 +17,6 @@ public class FilePublisherConfig {
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
-
-    private String filePath;
 
 
 }

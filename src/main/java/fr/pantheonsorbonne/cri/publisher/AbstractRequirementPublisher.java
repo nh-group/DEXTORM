@@ -1,12 +1,10 @@
 package fr.pantheonsorbonne.cri.publisher;
 
-import java.util.Collection;
-
 import com.google.inject.Inject;
-
-
 import fr.pantheonsorbonne.cri.configuration.RequirementIssueDecorator;
 import fr.pantheonsorbonne.cri.model.requirements.Requirement;
+
+import java.util.Collection;
 
 public abstract class AbstractRequirementPublisher implements RequirementPublisher {
 

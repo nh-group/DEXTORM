@@ -4,6 +4,6 @@ import java.util.Collection;
 
 public interface RequirementMappingProvider {
 
-	Collection<ReqMatcher> getReqMatcher();
+    Collection<ReqMatcher> getReqMatcher();
 
 }
