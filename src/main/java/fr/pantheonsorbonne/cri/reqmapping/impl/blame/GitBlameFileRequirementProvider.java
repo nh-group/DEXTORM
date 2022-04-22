@@ -6,7 +6,7 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.google.common.io.CharStreams;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import fr.pantheonsorbonne.cri.reqmapping.ReqMatcher;
+import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.impl.FileRequirementMappingProvider;
 import org.eclipse.jgit.api.BlameCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -44,10 +44,10 @@ public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
     Repository repo;
 
     @Override
-    public Collection<ReqMatcher> getReqMatcher(Path p) {
+    public Collection<ReqMatch> getReqMatcher(Path p) {
 
         try {
-            Collection<ReqMatcher> res = blameUnsafeVisit(p);
+            Collection<ReqMatch> res = blameUnsafeVisit(p);
             return res;
         } catch (GitAPIException | IOException e) {
 
@@ -56,7 +56,7 @@ public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
         }
     }
 
-    private Collection<ReqMatcher> blameUnsafeVisit(Path file) throws GitAPIException, IOException {
+    private Collection<ReqMatch> blameUnsafeVisit(Path file) throws GitAPIException, IOException {
 
         BlameDataWrapper wrapper = new BlameDataWrapper();
 

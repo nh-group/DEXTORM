@@ -2,7 +2,7 @@ package fr.pantheonsorbonne.cri.reqmapping.impl.blame;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import fr.pantheonsorbonne.cri.reqmapping.ReqMatcher;
+import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.RequirementMappingProvider;
 import fr.pantheonsorbonne.cri.reqmapping.impl.FileRequirementMappingProvider;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
@@ -22,7 +22,7 @@ import static java.nio.file.FileVisitResult.CONTINUE;
 public class GitRepoRequirementMappingProvider extends SimpleFileVisitor<Path> implements RequirementMappingProvider {
 
 
-    private final Set<ReqMatcher> repoReqMatchers = new HashSet<>();
+    private final Set<ReqMatch> repoReqMatchers = new HashSet<>();
     protected Repository repo;
     protected FileRequirementMappingProvider fileReqProvider;
 
@@ -42,7 +42,7 @@ public class GitRepoRequirementMappingProvider extends SimpleFileVisitor<Path> i
     }
 
     @Override
-    public Collection<ReqMatcher> getReqMatcher() {
+    public Collection<ReqMatch> getReqMatcher() {
         return repoReqMatchers;
     }
 

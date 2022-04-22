@@ -7,7 +7,7 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import fr.pantheonsorbonne.cri.reqmapping.ReqMatcher;
+import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.impl.blame.GitBlameFileRequirementProvider.BlameDataWrapper;
 
 import java.util.*;
@@ -17,7 +17,7 @@ public class ReqMatcherJavaVisitor extends VoidVisitorAdapter<BlameDataWrapper> 
 
     private String className = "";
 
-    private final Set<ReqMatcher> reqMatchers = new HashSet<>();
+    private final Set<ReqMatch> reqMatchers = new HashSet<>();
 
     @Override
     public void visit(BlockStmt n, BlameDataWrapper arg) {
@@ -41,7 +41,7 @@ public class ReqMatcherJavaVisitor extends VoidVisitorAdapter<BlameDataWrapper> 
                 List<String> args = md.getParameters().stream().map((Parameter p) -> p.getTypeAsString())
                         .collect(Collectors.toList());
                 String commitId = wraper.blameData.get(this.className).get(pos.get().line);
-                reqMatchers.add(ReqMatcher.newBuilder().className(this.className).methodName(md.getNameAsString())
+                reqMatchers.add(ReqMatch.newBuilder().className(this.className).methodName(md.getNameAsString())
                         .args(args).commit(commitId).build());
 
             }
@@ -57,7 +57,7 @@ public class ReqMatcherJavaVisitor extends VoidVisitorAdapter<BlameDataWrapper> 
         super.visit(pakage, arg);
     }
 
-    public Collection<ReqMatcher> getMatchers() {
+    public Collection<ReqMatch> getMatchers() {
         return this.reqMatchers;
     }
 }

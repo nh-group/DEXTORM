@@ -2,7 +2,7 @@ package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor;
 
 import com.github.gumtreediff.tree.ITree;
 import com.google.common.base.Strings;
-import fr.pantheonsorbonne.cri.reqmapping.ReqMatcher.ReqMatcherBuilder;
+import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.GumTreeFacade;
 
 import java.util.Collection;

@@ -3,7 +3,7 @@ package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor;
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.TreeContext;
 import com.github.gumtreediff.tree.TreeUtils.TreeVisitor;
-import fr.pantheonsorbonne.cri.reqmapping.ReqMatcher.ReqMatcherBuilder;
+import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.GumTreeFacade;
 
 import java.util.Collection;
@@ -25,7 +25,7 @@ public abstract class JavaParserTreeVisitorComposite extends JavaParserTreeVisit
                     if (canSubvisitorHandleTree(subtreeType, subVisitorClass)) {
                         JavaParserTreeVisitor subVisitor = subVisitorClass
                                 .getDeclaredConstructor(TreeContext.class, ReqMatcherBuilder.class)
-                                .newInstance(ctx, parentMatcher.clone());
+                                .newInstance(ctx, parentMatcherBuilder.getCopy());
 
                         Collection<String> commitIds = (Collection<String>) subtree.getMetadata(GumTreeFacade.BLAME_ID);
                         //subVisitor.parentMatcher.commits(commitIds);

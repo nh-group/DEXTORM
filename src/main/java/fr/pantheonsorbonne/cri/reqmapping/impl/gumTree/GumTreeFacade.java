@@ -10,8 +10,8 @@ import com.github.gumtreediff.tree.TreeContext;
 import com.github.gumtreediff.tree.TreeUtils;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-import fr.pantheonsorbonne.cri.reqmapping.ReqMatcher;
-import fr.pantheonsorbonne.cri.reqmapping.ReqMatcher.ReqMatcherBuilder;
+import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
+import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor.CompilationUnitVisitor;
 
 import java.io.IOException;
@@ -73,9 +73,9 @@ public class GumTreeFacade {
         GumTreeFacade.appendMetadata(t, BLAME_ID, commitID, false);
     }
 
-    private static Collection<ReqMatcher> getReqMatcher(final TreeContext ctx) {
+    private static Collection<ReqMatch> getReqMatcher(final TreeContext ctx) {
 
-        CompilationUnitVisitor visitor = new CompilationUnitVisitor(ctx, ReqMatcher.newBuilder());
+        CompilationUnitVisitor visitor = new CompilationUnitVisitor(ctx, ReqMatch.newBuilder());
         TreeUtils.visitTree(ctx.getRoot(), visitor);
         return visitor.getMatchers().stream().map(ReqMatcherBuilder::build).collect(Collectors.toList());
 
@@ -98,7 +98,7 @@ public class GumTreeFacade {
         }
     }
 
-    public Collection<ReqMatcher> getReqMatcher(List<Diff> diffs) {
+    public Collection<ReqMatch> getReqMatcher(List<Diff> diffs) {
 
         TreeContext currentContext = null;
 

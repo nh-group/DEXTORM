@@ -1,7 +1,7 @@
 package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree;
 
 import com.google.inject.Inject;
-import fr.pantheonsorbonne.cri.reqmapping.ReqMatcher;
+import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.impl.FileRequirementMappingProvider;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
@@ -40,7 +40,7 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
     private final GumTreeFacade facade = new GumTreeFacade();
 
     @Override
-    public Collection<ReqMatcher> getReqMatcher(Path p) {
+    public Collection<ReqMatch> getReqMatcher(Path p) {
 
         try {
             List<Diff> diffs = this.materializeCommitDiff(p);

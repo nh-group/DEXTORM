@@ -2,7 +2,7 @@ package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor;
 
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.TreeContext;
-import fr.pantheonsorbonne.cri.reqmapping.ReqMatcher.ReqMatcherBuilder;
+import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.GumTreeFacade;
 
 import java.util.Collection;
@@ -21,10 +21,10 @@ public class MethodDeclaration extends JavaParserTreeVisitor {
         Optional<ITree> methodName = tree.getChildren().stream()
                 .filter((ITree child) -> child.toPrettyString(ctx).startsWith("SimpleName")).findFirst();
         if (methodName.isPresent()) {
-            ReqMatcherBuilder currentMethodMatcher = (ReqMatcherBuilder) this.parentMatcher
+            ReqMatcherBuilder currentMethodMatcher = this.parentMatcherBuilder
                     .methodName(methodName.get().getLabel())
                     .commits((Collection<String>) tree.getMetadata(GumTreeFacade.BLAME_ID))
-                    .clone();
+                    .getCopy();
 
             for (ITree child : tree.getChildren()) {
                 String treeType = child.toPrettyString(this.ctx);

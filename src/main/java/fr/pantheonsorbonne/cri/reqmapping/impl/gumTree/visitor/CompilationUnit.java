@@ -1,7 +1,7 @@
 package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor;
 
 import com.github.gumtreediff.tree.TreeContext;
-import fr.pantheonsorbonne.cri.reqmapping.ReqMatcher.ReqMatcherBuilder;
+import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 
 import java.util.Arrays;
 import java.util.Collection;

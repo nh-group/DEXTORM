@@ -2,7 +2,7 @@ package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor;
 
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.TreeContext;
-import fr.pantheonsorbonne.cri.reqmapping.ReqMatcher.ReqMatcherBuilder;
+import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 
 public class Parameter extends JavaParserTreeVisitor {
 
@@ -25,9 +25,9 @@ public class Parameter extends JavaParserTreeVisitor {
         }
 
         if (paramType.startsWith("ClassOrInterfaceType")) {
-            this.parentMatcher.arg(paramChild.getChild(0).getLabel() + postpand);
+            this.parentMatcherBuilder.arg(paramChild.getChild(0).getLabel() + postpand);
         } else if (paramType.startsWith("PrimitiveType")) {
-            this.parentMatcher.arg(paramChild.getLabel() + postpand);
+            this.parentMatcherBuilder.arg(paramChild.getLabel() + postpand);
 
         }
 
