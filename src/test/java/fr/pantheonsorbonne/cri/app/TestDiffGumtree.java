@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TestDiffBlame {
+class TestDiffGumtree {
 
     private static Path meterialize(String fileContent) throws IOException {
         Path f = Files.createTempFile("", ".java");

@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 
 public class ReqMatcherJavaVisitor extends VoidVisitorAdapter<BlameDataWrapper> {
 
-    private String className = "";
-
     private final Set<ReqMatch> reqMatchers = new HashSet<>();
+    private String className = "";
+    private String packageName = "";
 
     @Override
     public void visit(BlockStmt n, BlameDataWrapper arg) {
@@ -27,7 +27,7 @@ public class ReqMatcherJavaVisitor extends VoidVisitorAdapter<BlameDataWrapper> 
     @Override
     public void visit(ClassOrInterfaceDeclaration cd, BlameDataWrapper arg) {
 
-        className += "." + cd.getNameAsString();
+        className = cd.getNameAsString();
         super.visit(cd, arg);
     }
 
@@ -35,14 +35,21 @@ public class ReqMatcherJavaVisitor extends VoidVisitorAdapter<BlameDataWrapper> 
     public void visit(MethodDeclaration md, BlameDataWrapper wraper) {
         super.visit(md, wraper);
         Optional<Position> pos = md.getBegin();
+        String fqClassName = this.packageName + "." + this.className;
         if ((pos).isPresent()) {
-            if (wraper.blameData.containsKey(this.className)) {
+            if (wraper.blameData.containsKey(fqClassName)) {
 
                 List<String> args = md.getParameters().stream().map((Parameter p) -> p.getTypeAsString())
                         .collect(Collectors.toList());
-                String commitId = wraper.blameData.get(this.className).get(pos.get().line);
-                reqMatchers.add(ReqMatch.newBuilder().className(this.className).methodName(md.getNameAsString())
-                        .args(args).commit(commitId).build());
+                Collection<String> commitId = wraper.blameData.get(fqClassName).get(pos.get().line);
+                if (commitId != null) {
+                    reqMatchers.add(ReqMatch.newBuilder()
+                            .className(this.className)
+                            .packageName(this.packageName)
+                            .methodName(md.getNameAsString())
+                            .line(pos.get().line)
+                            .args(args).commits(commitId).build());
+                }
 
             }
 
@@ -52,8 +59,7 @@ public class ReqMatcherJavaVisitor extends VoidVisitorAdapter<BlameDataWrapper> 
 
     @Override
     public void visit(PackageDeclaration pakage, BlameDataWrapper arg) {
-
-        className += pakage.getNameAsString();
+        this.packageName = pakage.getNameAsString();
         super.visit(pakage, arg);
     }
 

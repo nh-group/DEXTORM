@@ -2,39 +2,39 @@ package fr.pantheonsorbonne.cri.reqmapping;
 
 import com.google.common.base.Strings;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.function.Predicate;
 
-public class LineReqMatch extends ReqMatch {
-    private final ArrayList<String> args = new ArrayList<>();
+public class LineReqMatch extends MethodReqMatch {
     private final Integer line;
 
-
-    public LineReqMatch(String className, String packageName, Integer line, String... reqs) {
-        super(className, packageName, reqs);
+    public LineReqMatch(String className, String packageName, String methodName, List<String> args, Integer line, String... reqs) {
+        super(className, packageName, methodName, args, reqs);
         this.line = line;
-
-    }
-
-    public Collection<String> getArgs() {
-        return args;
-    }
-
-    public void setArgs(java.util.List<String> args) {
-        this.args.clear();
-        this.args.addAll(args);
-
     }
 
     @Override
     public boolean isMatch(StackTraceElement elt) {
-        return this.getFQClassName().equals(elt.getClassName().replaceAll("/", "."))
-                && elt.getLineNumber() == this.getLine()
-                && this.getReq().stream().anyMatch(Predicate.not(Strings::isNullOrEmpty));
+        if (this.getFQClassName().equals(elt.getClassName().replaceAll("/", "."))) {
+            if (elt.getLineNumber() == this.getLine()) {
+                System.out.println("Match!");
+                return this.getReq().stream().anyMatch(Predicate.not(Strings::isNullOrEmpty));
+            }
+
+
+        }
+        return false;
     }
 
     public Integer getLine() {
         return line;
+    }
+
+
+    @Override
+    public String toString() {
+        return "LineReqMatch{" +
+                "line=" + line + super.toString() +
+                '}';
     }
 }

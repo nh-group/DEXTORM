@@ -9,8 +9,6 @@
 package fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model;
 
 import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
@@ -22,119 +20,54 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 public class Line {
 
     @XmlAttribute(name = "nr", required = true)
-    @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
-    protected String nr;
+    protected Integer nr;
     @XmlAttribute(name = "mi")
-    @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
-    protected String mi;
+    protected Integer mi;
     @XmlAttribute(name = "ci")
-    @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
-    protected String ci;
+    protected Integer ci;
     @XmlAttribute(name = "mb")
-    @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
-    protected String mb;
+    protected Integer mb;
     @XmlAttribute(name = "cb")
-    @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
-    protected String cb;
+    protected Integer cb;
 
-    /**
-     * Gets the value of the nr property.
-     *
-     * @return possible object is
-     * {@link String }
-     */
-    public String getNr() {
+
+    public Integer getNr() {
         return nr;
     }
 
-    /**
-     * Sets the value of the nr property.
-     *
-     * @param value allowed object is
-     *              {@link String }
-     */
-    public void setNr(String value) {
-        this.nr = value;
+    public void setNr(Integer nr) {
+        this.nr = nr;
     }
 
-    /**
-     * Gets the value of the mi property.
-     *
-     * @return possible object is
-     * {@link String }
-     */
-    public String getMi() {
+    public Integer getMi() {
         return mi;
     }
 
-    /**
-     * Sets the value of the mi property.
-     *
-     * @param value allowed object is
-     *              {@link String }
-     */
-    public void setMi(String value) {
-        this.mi = value;
+    public void setMi(Integer mi) {
+        this.mi = mi;
     }
 
-    /**
-     * Gets the value of the ci property.
-     *
-     * @return possible object is
-     * {@link String }
-     */
-    public String getCi() {
+    public Integer getCi() {
         return ci;
     }
 
-    /**
-     * Sets the value of the ci property.
-     *
-     * @param value allowed object is
-     *              {@link String }
-     */
-    public void setCi(String value) {
-        this.ci = value;
+    public void setCi(Integer ci) {
+        this.ci = ci;
     }
 
-    /**
-     * Gets the value of the mb property.
-     *
-     * @return possible object is
-     * {@link String }
-     */
-    public String getMb() {
+    public Integer getMb() {
         return mb;
     }
 
-    /**
-     * Sets the value of the mb property.
-     *
-     * @param value allowed object is
-     *              {@link String }
-     */
-    public void setMb(String value) {
-        this.mb = value;
+    public void setMb(Integer mb) {
+        this.mb = mb;
     }
 
-    /**
-     * Gets the value of the cb property.
-     *
-     * @return possible object is
-     * {@link String }
-     */
-    public String getCb() {
+    public Integer getCb() {
         return cb;
     }
 
-    /**
-     * Sets the value of the cb property.
-     *
-     * @param value allowed object is
-     *              {@link String }
-     */
-    public void setCb(String value) {
-        this.cb = value;
+    public void setCb(Integer cb) {
+        this.cb = cb;
     }
-
 }

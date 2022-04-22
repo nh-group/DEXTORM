@@ -12,11 +12,10 @@ public class ReqMatcherBuilder implements Cloneable {
 
     private final List<String> args = new ArrayList<>();
     private final List<String> reqs = new ArrayList<>();
-    private final List<String> commits = new ArrayList<>();
     private String packageName = null;
     private String methodName = null;
     private String className = null;
-    private int line;
+    private Integer line;
 
     public ReqMatcherBuilder arg(String arg) {
         this.args.add(arg);
@@ -33,10 +32,10 @@ public class ReqMatcherBuilder implements Cloneable {
 
     public ReqMatch build() {
 
-        if (methodName != null) {
-            return new MethodReqMatch(this.className, this.packageName, this.methodName, this.args, this.commits.toArray(new String[0]));
+        if (line == null) {
+            return new MethodReqMatch(this.className, this.packageName, this.methodName, this.args, this.reqs.toArray(new String[0]));
         } else {
-            return new LineReqMatch(this.className, this.packageName, this.line, this.commits.toArray(new String[0]));
+            return new LineReqMatch(this.className, this.packageName, this.methodName, this.args, this.line, this.reqs.toArray(new String[0]));
         }
 
     }
@@ -44,7 +43,7 @@ public class ReqMatcherBuilder implements Cloneable {
 
     public ReqMatcherBuilder commits(Collection<String> commits) {
 
-        this.commits.addAll(
+        this.reqs.addAll(
                 commits.stream().filter(Predicate.not(Strings::isNullOrEmpty)).collect(Collectors.toList()));
         return this;
     }
@@ -78,7 +77,7 @@ public class ReqMatcherBuilder implements Cloneable {
     public ReqMatcherBuilder getCopy() {
         ReqMatcherBuilder res = new ReqMatcherBuilder();
         res.args.addAll(this.args);
-        res.commits.addAll(this.commits);
+        res.reqs.addAll(this.reqs);
         res.className = this.className;
         res.line = this.line;
         res.methodName = this.methodName;

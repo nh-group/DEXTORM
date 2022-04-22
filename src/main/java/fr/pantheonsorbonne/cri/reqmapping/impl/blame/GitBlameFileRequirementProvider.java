@@ -34,14 +34,18 @@ import java.util.regex.Pattern;
 
 public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
         implements FileRequirementMappingProvider {
-    String className = "";
-    @Inject
     Logger log;
-    @Inject
-    @Named("sourceRootDir")
     String sourceRootDir;
-    @Inject
+
     Repository repo;
+
+
+    @Inject
+    public GitBlameFileRequirementProvider(Logger log, @Named("sourceRootDir") String sourceRootDir, Repository repo) {
+        this.log = log;
+        this.sourceRootDir = sourceRootDir;
+        this.repo = repo;
+    }
 
     @Override
     public Collection<ReqMatch> getReqMatcher(Path p) {
@@ -73,12 +77,16 @@ public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
 
             int lines = countLinesOfFileInCommit(this.repo, commitID, relativeFilePath.toString());
             final Pattern p = Pattern.compile(".*#([0-9]+)");
-            Map<Integer, String> fileBlameData = new HashMap<>();
+            Map<Integer, Collection<String>> fileBlameData = new HashMap<>();
             for (int i = 0; i < lines; i++) {
                 RevCommit commit = blamed.getSourceCommit(i);
                 Matcher m = p.matcher(commit.getShortMessage());
                 if (m.matches()) {
-                    fileBlameData.put(i, m.group(1));
+                    Collection<String> matchingIssueId = new HashSet<>();
+                    for (int j = 1; j < m.groupCount() + 1; j++) {
+                        matchingIssueId.add(m.group(j));
+                    }
+                    fileBlameData.put(i, matchingIssueId);
                 }
 
             }
@@ -134,6 +142,6 @@ public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
     }
 
     public class BlameDataWrapper {
-        public Map<String, Map<Integer, String>> blameData = new HashMap<>();
+        public Map<String, Map<Integer, Collection<String>>> blameData = new HashMap<>();
     }
 }

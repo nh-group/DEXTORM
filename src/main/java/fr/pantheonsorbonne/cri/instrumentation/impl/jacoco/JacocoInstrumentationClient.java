@@ -4,9 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import fr.pantheonsorbonne.cri.instrumentation.InstrumentationClient;
 import fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model.Class;
-import fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model.Method;
 import fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model.Package;
-import fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model.Report;
+import fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model.*;
 import fr.pantheonsorbonne.cri.model.requirements.Requirement;
 import fr.pantheonsorbonne.cri.publisher.RequirementPublisher;
 import fr.pantheonsorbonne.cri.reqmapping.RequirementMappingProvider;
@@ -23,6 +22,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 
 public class JacocoInstrumentationClient implements InstrumentationClient {
 
@@ -47,7 +47,38 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
         for (Package pakage : report.getPackages()) {
             for (Class klass : pakage.getClazz()) {
                 for (Method method : klass.getMethod()) {
-                    stackTraces.add(new StackTraceElement(klass.getName(), method.getName(), klass.getSourcefilename(), Integer.parseInt(method.getLine())));
+                    stackTraces.add(new StackTraceElement(klass.getName(), method.getName(), klass.getSourcefilename(), method.getLine()));
+                }
+                for (Sourcefile sourcefile : pakage.getSourceFile()) {
+                    for (Line line : sourcefile.getLine()) {
+                        //https://stackoverflow.com/questions/33868761/how-to-interpret-the-jacoco-xml-file
+                        /*
+                        mi = missed instructions (statements)
+                        ci = covered instructions (statements)
+                        mb = missed branches
+                        cb = covered branches
+
+                        When mb or cb is greater then 0 the line is a branch.
+                        When mb and cb are 0 the line is a statement.
+                        cb / (mb+cb) (line 11) is 2/4 partial hit
+                        When not a branch and mi == 0 the line is hit
+
+                        cb>0||ci>0 => hit
+
+                         */
+                        if (line.getCb() > 0 || line.getCi() > 0) {
+
+                            Optional<Method> method = klass.getMethod().stream().filter(m -> m.getLine() >= line.getNr()).findFirst();
+                            if (method.isPresent()) {
+                                stackTraces.add(
+                                        new StackTraceElement(
+                                                klass.getName(),
+                                                method.get().getName(),
+                                                klass.getSourcefilename(),
+                                                line.getNr()));
+                            }
+                        }
+                    }
                 }
             }
 

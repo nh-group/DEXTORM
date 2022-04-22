@@ -32,4 +32,12 @@ public class MethodReqMatch extends ReqMatch {
     public String getMethodName() {
         return methodName;
     }
+
+    @Override
+    public String toString() {
+        return "MethodReqMatch{" +
+                "args=" + args +
+                ", methodName='" + methodName + '\'' + super.toString() +
+                '}';
+    }
 }

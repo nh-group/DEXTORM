@@ -29,7 +29,7 @@ public abstract class ReqMatch {
         return this.className;
     }
 
- 
+
     public java.util.List<String> getReq() {
         return commits;
     }
@@ -40,4 +40,13 @@ public abstract class ReqMatch {
     }
 
     public abstract boolean isMatch(StackTraceElement elt);
+
+    @Override
+    public String toString() {
+        return "ReqMatch{" +
+                "commits=" + commits +
+                ", packageName='" + packageName + '\'' +
+                ", className='" + className + '\'' +
+                '}';
+    }
 }

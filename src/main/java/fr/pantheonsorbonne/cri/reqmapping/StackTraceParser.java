@@ -22,22 +22,20 @@ public class StackTraceParser {
 
         Collection<String> res = new HashSet<>();
         for (StackTraceElement elt : elements) {
+            //System.out.println(elt);
             if (elt.getClassName().replaceAll("/", ".").startsWith(instrumentedPackage.replaceAll("/", "."))) {
-
                 for (ReqMatch m : reqMatchers) {
                     if (match(elt, m)) {
                         res.addAll(m.getReq());
                     }
                 }
-
             }
         }
         return res;
-
     }
 
     private static boolean match(StackTraceElement elt, ReqMatch m) {
+        //System.out.println(m.toString());
         return m.isMatch(elt);
-
     }
 }

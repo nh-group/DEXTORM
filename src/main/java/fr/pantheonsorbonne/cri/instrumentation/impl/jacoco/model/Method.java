@@ -32,8 +32,8 @@ public class Method {
     @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
     protected String desc;
     @XmlAttribute(name = "line")
-    @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
-    protected String line;
+
+    protected Integer line;
     protected List<Counter> counter;
 
     /**
@@ -76,25 +76,6 @@ public class Method {
         this.desc = value;
     }
 
-    /**
-     * Gets the value of the line property.
-     *
-     * @return possible object is
-     * {@link String }
-     */
-    public String getLine() {
-        return line;
-    }
-
-    /**
-     * Sets the value of the line property.
-     *
-     * @param value allowed object is
-     *              {@link String }
-     */
-    public void setLine(String value) {
-        this.line = value;
-    }
 
     /**
      * Gets the value of the counter property.
@@ -123,4 +104,11 @@ public class Method {
         return this.counter;
     }
 
+    public Integer getLine() {
+        return line;
+    }
+
+    public void setLine(Integer line) {
+        this.line = line;
+    }
 }
