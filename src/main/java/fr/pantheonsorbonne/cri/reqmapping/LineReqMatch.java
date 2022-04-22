@@ -17,11 +17,6 @@ public class LineReqMatch extends ReqMatch {
 
     }
 
-    public Integer getLine() {
-        return line;
-    }
-
-
     public Collection<String> getArgs() {
         return args;
     }
@@ -35,7 +30,11 @@ public class LineReqMatch extends ReqMatch {
     @Override
     public boolean isMatch(StackTraceElement elt) {
         return this.getFQClassName().equals(elt.getClassName().replaceAll("/", "."))
-                && elt.getLineNumber() == this.line
+                && elt.getLineNumber() == this.getLine()
                 && this.getReq().stream().anyMatch(Predicate.not(Strings::isNullOrEmpty));
+    }
+
+    public Integer getLine() {
+        return line;
     }
 }
