@@ -19,6 +19,8 @@ import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -28,21 +30,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
         implements FileRequirementMappingProvider {
-    Logger log;
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitBlameFileRequirementProvider.class);
     String sourceRootDir;
-
     Repository repo;
 
 
     @Inject
-    public GitBlameFileRequirementProvider(Logger log, @Named("sourceRootDir") String sourceRootDir, Repository repo) {
-        this.log = log;
+    public GitBlameFileRequirementProvider(@Named("sourceRootDir") String sourceRootDir, Repository repo) {
+
         this.sourceRootDir = sourceRootDir;
         this.repo = repo;
     }
@@ -55,7 +55,7 @@ public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
             return res;
         } catch (GitAPIException | IOException e) {
 
-            log.fine("fatal erreor");
+            LOGGER.error("fatal error " + e.getMessage());
             throw new RuntimeException(e);
         }
     }

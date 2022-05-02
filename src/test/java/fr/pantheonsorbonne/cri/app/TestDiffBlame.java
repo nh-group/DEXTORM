@@ -2,16 +2,16 @@ package fr.pantheonsorbonne.cri.app;
 
 import fr.pantheonsorbonne.cri.reqmapping.MethodReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
-import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.Diff;
-import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.GumTreeFacade;
+import fr.pantheonsorbonne.cri.reqmapping.impl.blame.GitBlameFileRequirementProvider;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.jupiter.api.Test;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,60 +20,49 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TestDiffBlame {
 
-    private static Path meterialize(String fileContent) throws IOException {
-        Path f = Files.createTempFile("", ".java");
-        FileWriter fw = new FileWriter(f.toFile());
-        fw.write(fileContent.toCharArray());
-        fw.close();
-        return f;
-
-    }
 
     @Test
-    void test() throws IOException {
-        CommitFileMaterialization f1 = new CommitFileMaterialization(Paths.get("src/test/resources/A1.java"),
-                "commit1");
-        CommitFileMaterialization f2 = new CommitFileMaterialization(Paths.get("src/test/resources/A2.java"),
-                "commit2");
-        CommitFileMaterialization f3 = new CommitFileMaterialization(Paths.get("src/test/resources/A3.java"),
-                "commit3");
-        CommitFileMaterialization f4 = new CommitFileMaterialization(Paths.get("src/test/resources/A4.java"),
-                "commit4");
+    void test() throws IOException, GitAPIException {
+        Path tmpDir = Files.createTempDirectory("");
+        Files.createDirectory(Path.of(tmpDir.toAbsolutePath().toString(), "toto"));
+        Git git = Git.init().setDirectory(tmpDir.toFile()).call();
+        System.out.println(tmpDir);
+        Files.copy(Paths.get("src/test/resources/A1.java"), Path.of(tmpDir.toAbsolutePath().toString(), "toto/A.java"), StandardCopyOption.REPLACE_EXISTING);
+        git.add().addFilepattern("toto/A.java").call();
+        git.commit().setMessage("commit1 #1").call();
+        Files.copy(Paths.get("src/test/resources/A2.java"), Path.of(tmpDir.toAbsolutePath().toString(), "toto/A.java"), StandardCopyOption.REPLACE_EXISTING);
+        git.add().addFilepattern("toto/A.java").call();
+        git.commit().setMessage("commit2 #2").call();
+        Files.copy(Paths.get("src/test/resources/A3.java"), Path.of(tmpDir.toAbsolutePath().toString(), "toto/A.java"), StandardCopyOption.REPLACE_EXISTING);
+        git.add().addFilepattern("toto/A.java").call();
+        git.commit().setMessage("commit3 #3").call();
+        Files.copy(Paths.get("src/test/resources/A4.java"), Path.of(tmpDir.toAbsolutePath().toString(), "toto/A.java"), StandardCopyOption.REPLACE_EXISTING);
+        git.add().addFilepattern("toto/A.java").call();
+        git.commit().setMessage("commit4 #4").call();
 
-        List<Diff> diffs = new ArrayList<>();
-        diffs.add(new Diff(null, f1.file, f1.commitId));
-        diffs.add(new Diff(f1.file, f2.file, f2.commitId));
-        diffs.add(new Diff(f2.file, f3.file, f3.commitId));
-        diffs.add(new Diff(f3.file, f4.file, f4.commitId));
+        GitBlameFileRequirementProvider blame = new GitBlameFileRequirementProvider("", git.getRepository());
+        Collection<ReqMatch> reqs = blame.getReqMatcher(Path.of(tmpDir.toString(), "toto/A.java"));
 
-        GumTreeFacade facade = new GumTreeFacade();
+        //reqs.stream().forEach(System.out::println);
 
-        Collection<ReqMatch> reqMatchers = facade.getReqMatcher(diffs);
-
-        //DiffTree dt = diffs.get(3).toDiffTree();
-        //TreeUtils.visitTree(dt.dst.getRoot(), new PrettyBlameTreePrinter(dt.dst));
-
-        assertEquals(3, reqMatchers.size());
+        assertEquals(3, reqs.size());
         boolean[] assertions = new boolean[]{false, false, false};
 
-        for (ReqMatch m : reqMatchers) {
+        for (ReqMatch m : reqs) {
             MethodReqMatch mrm = (MethodReqMatch) m;
             if (m.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("main")) {
                 assertEquals(1, m.getReq().stream().distinct().count());
-                assertTrue(m.getReq().get(0).equals("commit1"));
+                assertTrue(m.getReq().get(0).equals("1"));
                 assertions[0] = true;
-
             } else if (m.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("sum2")) {
-                assertEquals(3, m.getReq().stream().distinct().count());
+                assertEquals(1, m.getReq().stream().distinct().count());
                 List<String> commits = m.getReq().stream().distinct().collect(Collectors.toList());
-                assertTrue(commits.contains("commit4"));
-                assertTrue(commits.contains("commit3"));
-                assertTrue(commits.contains("commit2"));
+                assertTrue(commits.contains("4"));
                 assertions[1] = true;
             } else if (m.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("toto")) {
                 assertEquals(1, m.getReq().stream().distinct().count());
                 List<String> commits = m.getReq().stream().distinct().collect(Collectors.toList());
-                assertTrue(commits.contains("commit2"));
+                assertTrue(commits.contains("3"));
                 assertions[2] = true;
             } else {
                 fail();
@@ -81,18 +70,7 @@ class TestDiffBlame {
 
         }
         assertArrayEquals(new boolean[]{true, true, true}, assertions);
-
     }
 
-    class CommitFileMaterialization {
-
-        public Path file;
-        public String commitId;
-
-        public CommitFileMaterialization(Path file, String commitId) {
-            this.file = file;
-            this.commitId = commitId;
-        }
-    }
 
 }
