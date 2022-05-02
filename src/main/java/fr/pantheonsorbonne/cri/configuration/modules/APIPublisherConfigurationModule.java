@@ -3,6 +3,7 @@ package fr.pantheonsorbonne.cri.configuration.modules;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import fr.pantheonsorbonne.cri.publisher.RequirementPublisher;
+import fr.pantheonsorbonne.cri.publisher.rest.APIRequirementPublisher;
 
 public class APIPublisherConfigurationModule extends AbstractModule {
     String baseUrl;

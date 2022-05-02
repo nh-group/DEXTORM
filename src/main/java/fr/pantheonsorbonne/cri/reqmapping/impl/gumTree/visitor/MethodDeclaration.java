@@ -47,6 +47,9 @@ public class MethodDeclaration extends JavaParserTreeVisitor {
             for (List<ITree> parameter : parameters) {
 
                 int analyserIndex = 0;
+                if (parameter.get(analyserIndex).toPrettyString(ctx).equals("SingleMemberAnnotationExpr")) {
+                    analyserIndex += 3;
+                }
                 if (parameter.get(analyserIndex).toPrettyString(ctx).equals("ArrayType")) {
                     strParameter.append("[");
                     analyserIndex++;

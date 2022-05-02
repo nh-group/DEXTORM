@@ -1,9 +1,11 @@
 app:
   instrumentedPackage: "fr.pantheonsorbonne.ufr27"
   sourceRootDir: src/main/java
-  publisher: console1
+  publisher: rest1
   issueCollector: github1
   diffAlgorithm: GUMTREE
+  #diffAlgorithm: GUMTREE|BLAME
+
 issueCollectors:
   github:
     github1:
@@ -18,6 +20,6 @@ publishers:
       filePath: stdout
   restPublishers:
     rest1:
-      baseUrl: http://localhost:8080
+      baseUrl: http://localhost:3000/coverage/issue/all
 
 
