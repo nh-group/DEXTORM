@@ -20,8 +20,8 @@ public class CompilationUnitVisitor extends JavaParserTreeVisitorComposite imple
     public void startTree(Tree tree) {
 
         for (Tree child : tree.getChildren()) {
-            if (child.toTreeString().startsWith("PackageDeclaration")) {
-                this.parentMatcherBuilder.packageName(child.getChildren().get(0).getLabel());
+            if (child.getType().name.equals("PackageDeclaration")) {
+                this.parentMatcherBuilder.packageName(child.getLabel());
 
             }
         }

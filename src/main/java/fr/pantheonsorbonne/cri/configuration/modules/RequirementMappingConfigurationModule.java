@@ -1,5 +1,6 @@
 package fr.pantheonsorbonne.cri.configuration.modules;
 
+import com.github.gumtreediff.client.Run;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import fr.pantheonsorbonne.cri.configuration.RequirementIssueDecorator;
@@ -41,6 +42,7 @@ public class RequirementMappingConfigurationModule extends AbstractModule {
                 break;
             case GUMTREE:
                 bind(FileRequirementMappingProvider.class).to(GumTreeFileRequirementMappingProvider.class);
+                Run.initGenerators();
                 break;
             default:
                 throw new RuntimeException("Fail to load diffalgorithm, check your configuration file");
