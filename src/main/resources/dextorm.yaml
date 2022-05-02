@@ -3,7 +3,7 @@ app:
   sourceRootDir: src/main/java
   publisher: console1
   issueCollector: github1
-  diffAlgorithm: BLAME
+  diffAlgorithm: GUMTREE
 issueCollectors:
   github:
     github1:

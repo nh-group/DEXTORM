@@ -141,7 +141,4 @@ public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
         }
     }
 
-    public class BlameDataWrapper {
-        public Map<String, Map<Integer, Collection<String>>> blameData = new HashMap<>();
-    }
 }

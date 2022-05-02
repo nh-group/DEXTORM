@@ -1,7 +1,7 @@
 package fr.pantheonsorbonne.cri.reqmapping;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 
 
 public class StackTraceParser {
@@ -20,7 +20,7 @@ public class StackTraceParser {
 
     public Collection<String> getReqs() {
 
-        Collection<String> res = new HashSet<>();
+        Collection<String> res = new ArrayList<>();
         for (StackTraceElement elt : elements) {
             //System.out.println(elt);
             if (elt.getClassName().replaceAll("/", ".").startsWith(instrumentedPackage.replaceAll("/", "."))) {

@@ -9,6 +9,7 @@ import fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model.*;
 import fr.pantheonsorbonne.cri.model.requirements.Requirement;
 import fr.pantheonsorbonne.cri.publisher.RequirementPublisher;
 import fr.pantheonsorbonne.cri.reqmapping.RequirementMappingProvider;
+import fr.pantheonsorbonne.cri.reqmapping.StackTraceElement;
 import fr.pantheonsorbonne.cri.reqmapping.StackTraceParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,8 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
         for (Package pakage : report.getPackages()) {
             for (Class klass : pakage.getClazz()) {
                 for (Method method : klass.getMethod()) {
-                    stackTraces.add(new StackTraceElement(klass.getName(), method.getName(), klass.getSourcefilename(), method.getLine()));
+                    stackTraces.add(new StackTraceElement(klass.getSourcefilename(),
+                            pakage.getName(), klass.getName(), method.getName(), method.getDesc(), method.getLine()));
                 }
                 for (Sourcefile sourcefile : pakage.getSourceFile()) {
                     for (Line line : sourcefile.getLine()) {
@@ -72,9 +74,11 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
                             if (method.isPresent()) {
                                 stackTraces.add(
                                         new StackTraceElement(
+                                                klass.getSourcefilename(),
+                                                pakage.getName(),
                                                 klass.getName(),
                                                 method.get().getName(),
-                                                klass.getSourcefilename(),
+                                                method.get().getDesc(),
                                                 line.getNr()));
                             }
                         }

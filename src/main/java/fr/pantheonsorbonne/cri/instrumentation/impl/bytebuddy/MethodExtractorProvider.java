@@ -7,6 +7,7 @@ import com.google.inject.name.Named;
 import fr.pantheonsorbonne.cri.model.requirements.Requirement;
 import fr.pantheonsorbonne.cri.publisher.RequirementPublisher;
 import fr.pantheonsorbonne.cri.reqmapping.RequirementMappingProvider;
+import fr.pantheonsorbonne.cri.reqmapping.StackTraceElement;
 import fr.pantheonsorbonne.cri.reqmapping.StackTraceParser;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.AgentBuilder.Identified.Extendable;
@@ -19,7 +20,9 @@ import net.bytebuddy.implementation.bind.annotation.SuperCall;
 import net.bytebuddy.matcher.ElementMatchers;
 import net.bytebuddy.utility.JavaModule;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -55,13 +58,18 @@ public class MethodExtractorProvider implements javax.inject.Provider<Extendable
 
         @RuntimeType
         public Object intercept(@SuperCall Callable<?> zuper, @AllArguments Object... args) throws Exception {
-            Collection<String> reqs = new StackTraceParser(Thread.getAllStackTraces().get(Thread.currentThread()), instrumentedPackage,
+            //I don't know how to get the params from the stacktrace, but it's not used at the moment I'll put a deadly exception to remind me of this
+            System.out.println("check the problem in the code and read the comment");
+            System.exit(-1);
+            List<StackTraceElement> ste = Arrays.stream(Thread.getAllStackTraces().get(Thread.currentThread())).map(e -> new StackTraceElement(e.getFileName(), instrumentedPackage
+                    , e.getClassName(), e.getMethodName(), "", e.getLineNumber())).collect(Collectors.toList());
+
+            Collection<String> reqs = new StackTraceParser(ste.toArray(new StackTraceElement[0]), instrumentedPackage,
                     mapper.getReqMatcher()).getReqs();
 
             reqs.stream().collect(Collectors.toSet()).stream()
                     .map((String req) -> Requirement.newBuilder().setId(req).build())
                     .forEach((Requirement req) -> publisher.publish(req));
-
 
             return zuper.call();
         }

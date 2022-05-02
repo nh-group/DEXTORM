@@ -3,7 +3,6 @@ package fr.pantheonsorbonne.cri.reqmapping;
 import com.google.common.base.Strings;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -17,7 +16,7 @@ public class MethodReqMatch extends ReqMatch {
         this.args.addAll(args);
     }
 
-    public Collection<String> getArgs() {
+    public List<String> getArgs() {
         return args;
     }
 
@@ -25,6 +24,7 @@ public class MethodReqMatch extends ReqMatch {
     public boolean isMatch(StackTraceElement elt) {
         return this.getFQClassName().equals(elt.getClassName().replaceAll("/", "."))
                 && this.getMethodName().equals(elt.getMethodName().split("\\$")[0])
+
                 //how do we take method args into account in this one?
                 && this.getReq().stream().anyMatch(Predicate.not(Strings::isNullOrEmpty));
     }

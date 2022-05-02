@@ -6,12 +6,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class ReqMatcherBuilder implements Cloneable {
 
     private final List<String> args = new ArrayList<>();
     private final List<String> reqs = new ArrayList<>();
+    private final Pattern methodSignaturePattern = Pattern.compile("\\(((?:[^;]*;)*)\\)(\\[?[ZBCSIJFDLV].*)");
+    private final Pattern methodParamsPattern = Pattern.compile("(\\[)?([ZBCSIJFDL])?([^;]*)?;");
     private String packageName = null;
     private String methodName = null;
     private String className = null;
@@ -19,6 +23,36 @@ public class ReqMatcherBuilder implements Cloneable {
 
     public ReqMatcherBuilder arg(String arg) {
         this.args.add(arg);
+        return this;
+    }
+
+    public ReqMatcherBuilder args(List<String> args) {
+        this.args.addAll(args);
+        return this;
+    }
+
+    public ReqMatcherBuilder args(String argsList) {
+        //https://stackoverflow.com/questions/8066253/compute-a-java-functions-signature
+        Matcher matcher = methodSignaturePattern.matcher(argsList);
+        if (matcher.matches()) {
+            String params = matcher.group(1);
+            System.out.println(params);
+            Matcher matcher2 = methodParamsPattern.matcher(params);
+            while (matcher2.find()) {
+                StringBuilder sb = new StringBuilder();
+                var array = matcher2.group(1);
+                var type = matcher2.group(2);
+                var classType = matcher2.group(3);
+                if (array != null) {
+                    sb.append(array);
+                }
+                sb.append(type);
+                if (classType != null) {
+                    sb.append(classType);
+                }
+                this.args.add(sb.toString());
+            }
+        }
         return this;
     }
 
@@ -48,10 +82,6 @@ public class ReqMatcherBuilder implements Cloneable {
         return this;
     }
 
-    public ReqMatcherBuilder args(List<String> args) {
-        this.args.addAll(args);
-        return this;
-    }
 
     public ReqMatcherBuilder packageName(String label) {
         this.packageName = label;

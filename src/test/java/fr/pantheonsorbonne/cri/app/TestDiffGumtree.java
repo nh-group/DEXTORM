@@ -6,10 +6,7 @@ import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.Diff;
 import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.GumTreeFacade;
 import org.junit.jupiter.api.Test;
 
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,15 +16,6 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TestDiffGumtree {
-
-    private static Path meterialize(String fileContent) throws IOException {
-        Path f = Files.createTempFile("", ".java");
-        FileWriter fw = new FileWriter(f.toFile());
-        fw.write(fileContent.toCharArray());
-        fw.close();
-        return f;
-
-    }
 
     @Test
     void test() throws IOException {
@@ -82,17 +70,6 @@ class TestDiffGumtree {
         }
         assertArrayEquals(new boolean[]{true, true, true}, assertions);
 
-    }
-
-    class CommitFileMaterialization {
-
-        public Path file;
-        public String commitId;
-
-        public CommitFileMaterialization(Path file, String commitId) {
-            this.file = file;
-            this.commitId = commitId;
-        }
     }
 
 }

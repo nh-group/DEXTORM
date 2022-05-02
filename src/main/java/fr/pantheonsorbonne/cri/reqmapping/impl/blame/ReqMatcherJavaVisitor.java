@@ -4,11 +4,12 @@ import com.github.javaparser.Position;
 import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
-import fr.pantheonsorbonne.cri.reqmapping.impl.blame.GitBlameFileRequirementProvider.BlameDataWrapper;
+import fr.pantheonsorbonne.cri.reqmapping.impl.Utils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,7 +40,25 @@ public class ReqMatcherJavaVisitor extends VoidVisitorAdapter<BlameDataWrapper> 
         if ((pos).isPresent()) {
             if (wraper.blameData.containsKey(fqClassName)) {
 
-                List<String> args = md.getParameters().stream().map((Parameter p) -> p.getTypeAsString())
+                List<String> args = md.getParameters().stream().map(parameter -> {
+                            Type type = null;
+                            StringBuilder sb = new StringBuilder();
+                            if (parameter.getType().isArrayType()) {
+                                sb.append("[");
+                                type = parameter.getType().getElementType();
+                            } else {
+                                type = parameter.getType();
+                            }
+
+                            if (type.isClassOrInterfaceType()) {
+                                sb.append("L");
+
+                                sb.append(((ClassOrInterfaceType) type).getName());
+                            } else {
+                                sb.append(Utils.typeToCodeJVM(type.toString()));
+                            }
+                            return sb.toString();
+                        })
                         .collect(Collectors.toList());
                 Collection<String> commitId = wraper.blameData.get(fqClassName).get(pos.get().line);
                 if (commitId != null) {

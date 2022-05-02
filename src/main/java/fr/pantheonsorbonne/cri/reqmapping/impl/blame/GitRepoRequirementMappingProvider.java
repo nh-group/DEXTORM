@@ -50,7 +50,7 @@ public class GitRepoRequirementMappingProvider extends SimpleFileVisitor<Path> i
     public FileVisitResult visitFile(Path file, BasicFileAttributes attr) {
 
         try {
-
+            System.out.println("analyzing from " + file);
             if (com.google.common.io.Files.getFileExtension(file.toString()).equals("java")) {
                 this.repoReqMatchers.addAll(fileReqProvider.getReqMatcher(file));
             }
