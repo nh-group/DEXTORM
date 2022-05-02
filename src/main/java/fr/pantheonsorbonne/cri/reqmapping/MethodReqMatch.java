@@ -15,6 +15,7 @@ public class MethodReqMatch extends ReqMatch {
         super(className, packageName, reqs);
         this.methodName = methodName;
         this.args.addAll(args);
+        System.out.println(this);
     }
 
     @Override

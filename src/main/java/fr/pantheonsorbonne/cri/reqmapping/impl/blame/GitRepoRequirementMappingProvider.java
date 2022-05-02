@@ -7,13 +7,14 @@ import fr.pantheonsorbonne.cri.reqmapping.RequirementMappingProvider;
 import fr.pantheonsorbonne.cri.reqmapping.impl.FileRequirementMappingProvider;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.lib.Repository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ import static java.nio.file.FileVisitResult.CONTINUE;
 
 public class GitRepoRequirementMappingProvider extends SimpleFileVisitor<Path> implements RequirementMappingProvider {
 
-
+    private final static Logger LOGGER = LoggerFactory.getLogger(GitRepoRequirementMappingProvider.class);
     private final Set<ReqMatch> repoReqMatchers = new HashSet<>();
     protected Repository repo;
     protected FileRequirementMappingProvider fileReqProvider;
@@ -42,16 +43,22 @@ public class GitRepoRequirementMappingProvider extends SimpleFileVisitor<Path> i
     }
 
     @Override
-    public Collection<ReqMatch> getReqMatcher() {
+    public Set<ReqMatch> getReqMatcher() {
         return repoReqMatchers;
+    }
+
+    @Override
+    public int countReqMatchers() {
+        return this.repoReqMatchers.size();
     }
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attr) {
 
         try {
-            System.out.println("analyzing from " + file);
+
             if (com.google.common.io.Files.getFileExtension(file.toString()).equals("java")) {
+                LOGGER.debug("analyzing from {}", file);
                 this.repoReqMatchers.addAll(fileReqProvider.getReqMatcher(file));
             }
 

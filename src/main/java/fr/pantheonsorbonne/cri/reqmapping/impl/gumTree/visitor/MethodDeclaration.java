@@ -42,7 +42,6 @@ public class MethodDeclaration extends JavaParserTreeVisitor {
 
 
         if (methodName.isPresent()) {
-            System.out.print(methodName.get().getLabel());
             StringBuilder strParameter = new StringBuilder("(");
             for (List<ITree> parameter : parameters) {
 

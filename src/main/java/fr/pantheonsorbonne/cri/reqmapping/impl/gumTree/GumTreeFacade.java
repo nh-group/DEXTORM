@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class GumTreeFacade {
@@ -73,11 +74,11 @@ public class GumTreeFacade {
         GumTreeFacade.appendMetadata(t, BLAME_ID, commitID, false);
     }
 
-    private static Collection<ReqMatch> getReqMatcher(final TreeContext ctx) {
+    private static Set<ReqMatch> getReqMatcher(final TreeContext ctx) {
 
         CompilationUnitVisitor visitor = new CompilationUnitVisitor(ctx, ReqMatch.newBuilder());
         TreeUtils.visitTree(ctx.getRoot(), visitor);
-        return visitor.getMatchers().stream().map(ReqMatcherBuilder::build).collect(Collectors.toList());
+        return visitor.getMatchers().stream().map(ReqMatcherBuilder::build).collect(Collectors.toSet());
 
     }
 

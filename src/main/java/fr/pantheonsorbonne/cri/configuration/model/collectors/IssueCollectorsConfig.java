@@ -1,9 +1,9 @@
-package fr.pantheonsorbonne.cri.configuration.model;
+package fr.pantheonsorbonne.cri.configuration.model.collectors;
 
 import java.util.Map;
 
 public class IssueCollectorsConfig {
-    Map<String, GitHubIssueCollectorConfig> github;
+    public Map<String, GitHubIssueCollectorConfig> github;
 
     public IssueCollectorsConfig() {
     }

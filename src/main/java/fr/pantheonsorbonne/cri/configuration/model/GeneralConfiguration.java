@@ -4,22 +4,37 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
+import fr.pantheonsorbonne.cri.configuration.model.collectors.IssueCollectorsConfig;
+import fr.pantheonsorbonne.cri.configuration.model.differ.DifferAlgorithmConfig;
+import fr.pantheonsorbonne.cri.configuration.model.publisher.DBPublisherConfig;
+import fr.pantheonsorbonne.cri.configuration.model.publisher.GrpcPublisherConfig;
+import fr.pantheonsorbonne.cri.configuration.model.publisher.PublisherConfig;
+import fr.pantheonsorbonne.cri.configuration.model.publisher.RESTPublisherConfig;
 import fr.pantheonsorbonne.cri.configuration.modules.*;
-import fr.pantheonsorbonne.cri.configuration.variables.DiffAlgorithm;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class GeneralConfiguration {
-    AppConfiguration app;
-    IssueCollectorsConfig issueCollectors;
-    PublisherConfig publishers;
+    public AppConfiguration app;
+    public IssueCollectorsConfig issueCollectors;
+    public PublisherConfig publishers;
+    public Map<String, DifferAlgorithmConfig> differs;
     @JsonIgnore
-    Collection<Module> inheritedModules;
+    public Collection<Module> inheritedModules;
 
     public GeneralConfiguration() {
+    }
+
+    public Map<String, DifferAlgorithmConfig> getDiffers() {
+        return differs;
+    }
+
+    public void setDiffers(Map<String, DifferAlgorithmConfig> differs) {
+        this.differs = differs;
     }
 
     public void setInheritedModules(Collection<Module> inheritedModules) {
@@ -56,6 +71,8 @@ public class GeneralConfiguration {
                 "app=" + app +
                 ", issueCollectors=" + issueCollectors +
                 ", publishers=" + publishers +
+                ", differConfig=" + differs +
+
                 '}';
     }
 
@@ -79,8 +96,14 @@ public class GeneralConfiguration {
 
         {
             //who to we diff?
-            res.add(new RequirementMappingConfigurationModule(DiffAlgorithm.valueOf(this.app.getDiffAlgorithmName()), gitRepoProviderModule.getRequirementIssueDecorator()));
+            if (this.differs != null && this.differs.containsKey(this.app.getDiffAlgorithmName())) {
+                DifferAlgorithmConfig config = this.differs.get(this.app.getDiffAlgorithmName());
+                res.add(new RequirementMappingConfigurationModule(config.getDiffAlgorithm(), config.methods, config.instructions, gitRepoProviderModule.getRequirementIssueDecorator()));
+
+
+            }
         }
+
 
         {
             //how we publish results?

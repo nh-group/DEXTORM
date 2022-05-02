@@ -1,4 +1,4 @@
-package fr.pantheonsorbonne.cri.configuration.model;
+package fr.pantheonsorbonne.cri.configuration.model.publisher;
 
 public class GrpcPublisherConfig {
     String host;

@@ -1,12 +1,12 @@
-package fr.pantheonsorbonne.cri.configuration.model;
+package fr.pantheonsorbonne.cri.configuration.model.publisher;
 
 import java.util.Map;
 
 public class PublisherConfig {
-    Map<String, GrpcPublisherConfig> grpcPublishers;
-    Map<String, FilePublisherConfig> filePublishers;
-    Map<String, RESTPublisherConfig> restPublishers;
-    Map<String, DBPublisherConfig> dbPublishers;
+    public Map<String, GrpcPublisherConfig> grpcPublishers;
+    public Map<String, FilePublisherConfig> filePublishers;
+    public Map<String, RESTPublisherConfig> restPublishers;
+    public Map<String, DBPublisherConfig> dbPublishers;
 
     public PublisherConfig(Map<String, GrpcPublisherConfig> grpcPublishers, Map<String, FilePublisherConfig> consolePublishers, Map<String, DBPublisherConfig> dbPublishers, Map<String, RESTPublisherConfig> restPublishers) {
         this.grpcPublishers = grpcPublishers;

@@ -14,6 +14,7 @@ public class AppConfiguration {
     @JsonProperty("diffAlgorithm")
     String diffAlgorithmName;
 
+
     @Override
     public String toString() {
         return "AppConfiguration{" +

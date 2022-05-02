@@ -44,4 +44,9 @@ public class StackTraceElement {
     public Integer getLine() {
         return line;
     }
+
+    @Override
+    public String toString() {
+        return packageName + "." + className + "." + methodName + "(" + line + "): ";
+    }
 }

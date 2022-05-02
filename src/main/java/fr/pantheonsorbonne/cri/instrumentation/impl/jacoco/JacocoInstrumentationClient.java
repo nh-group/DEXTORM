@@ -22,8 +22,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class JacocoInstrumentationClient implements InstrumentationClient {
 
@@ -38,22 +39,32 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
     @Inject
     @Named("instrumentedPackage")
     String instrumentedPackage;
+    @Inject
+    @Named("DoMethodsDiff")
+    Boolean doMethods;
+    @Inject
+    @Named("DoInstructionsDiff")
+    Boolean doInstructions;
 
     @Override
     public void registerClient() {
         LOGGER.info("analysing {}", jacocoReport);
 
         Report report = getReportObjectFromXMl();
-        Collection<StackTraceElement> stackTraces = new ArrayList<>();
+        List<StackTraceElement> stackTraces = new ArrayList<>();
         for (Package pakage : report.getPackages()) {
             for (Class klass : pakage.getClazz()) {
-                for (Method method : klass.getMethod()) {
-                    stackTraces.add(new StackTraceElement(klass.getSourcefilename(),
-                            pakage.getName(), klass.getName(), method.getName(), method.getDesc(), method.getLine()));
+                if (doMethods) {
+                    for (Method method : klass.getMethod()) {
+                        stackTraces.add(new StackTraceElement(klass.getSourcefilename(),
+                                pakage.getName(), klass.getName(), method.getName(), method.getDesc(), method.getLine()));
+                    }
                 }
-                for (Sourcefile sourcefile : pakage.getSourceFile()) {
-                    for (Line line : sourcefile.getLine()) {
-                        //https://stackoverflow.com/questions/33868761/how-to-interpret-the-jacoco-xml-file
+                if (doInstructions) {
+                    for (Sourcefile sourcefile : pakage.getSourceFile()) {
+
+                        for (Line line : sourcefile.getLine()) {
+                            //https://stackoverflow.com/questions/33868761/how-to-interpret-the-jacoco-xml-file
                         /*
                         mi = missed instructions (statements)
                         ci = covered instructions (statements)
@@ -68,18 +79,19 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
                         cb>0||ci>0 => hit
 
                          */
-                        if (line.getCb() > 0 || line.getCi() > 0) {
+                            if (line.getCb() > 0 || line.getCi() > 0) {
 
-                            Optional<Method> method = klass.getMethod().stream().filter(m -> m.getLine() >= line.getNr()).findFirst();
-                            if (method.isPresent()) {
-                                stackTraces.add(
-                                        new StackTraceElement(
-                                                klass.getSourcefilename(),
-                                                pakage.getName(),
-                                                klass.getName(),
-                                                method.get().getName(),
-                                                method.get().getDesc(),
-                                                line.getNr()));
+                                Optional<Method> method = klass.getMethod().stream().filter(m -> m.getLine() >= line.getNr()).findFirst();
+                                if (method.isPresent()) {
+                                    stackTraces.add(
+                                            new StackTraceElement(
+                                                    klass.getSourcefilename(),
+                                                    pakage.getName(),
+                                                    klass.getName(),
+                                                    method.get().getName(),
+                                                    method.get().getDesc(),
+                                                    line.getNr()));
+                                }
                             }
                         }
                     }
@@ -89,6 +101,12 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
 
         }
         StackTraceParser parser = new StackTraceParser(stackTraces.toArray(new StackTraceElement[0]), instrumentedPackage, mapper.getReqMatcher());
+        for (StackTraceElement ste : stackTraces) {
+
+            StackTraceParser p = new StackTraceParser(new StackTraceElement[]{ste}, instrumentedPackage, mapper.getReqMatcher());
+            if (p.getReqs().size() > 0)
+                System.out.println(ste.toString() + " " + p.getReqs().stream().sorted().collect(Collectors.joining(",")));
+        }
 
 
         parser.getReqs().stream().map((String req) -> Requirement.newBuilder().setId(req).build())

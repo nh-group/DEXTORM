@@ -35,6 +35,14 @@ public class MethodExtractorProvider implements javax.inject.Provider<Extendable
     @Inject
     MethodCallInterceptor interceptor;
 
+    //TODO: use those from jacoco
+    @Inject
+    @Named("DoMethodsDiff")
+    Boolean doMethods;
+    @Inject
+    @Named("DoInstructionsDiff")
+    Boolean doInstructions;
+
     @Provides
     @Singleton
     @Override

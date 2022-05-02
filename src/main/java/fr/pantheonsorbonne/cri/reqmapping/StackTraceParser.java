@@ -1,7 +1,7 @@
 package fr.pantheonsorbonne.cri.reqmapping;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class StackTraceParser {
@@ -10,17 +10,17 @@ public class StackTraceParser {
     private final String instrumentedPackage;
     private final StackTraceElement[] elements;
 
-    private final Collection<ReqMatch> reqMatchers;
+    private final Set<ReqMatch> reqMatchers;
 
-    public StackTraceParser(StackTraceElement[] elements, String instrumentedPackage, Collection<ReqMatch> reqMatchers) {
+    public StackTraceParser(StackTraceElement[] elements, String instrumentedPackage, Set<ReqMatch> reqMatchers) {
         this.elements = elements;
         this.reqMatchers = reqMatchers;
         this.instrumentedPackage = instrumentedPackage;
     }
 
-    public Collection<String> getReqs() {
+    public Set<String> getReqs() {
 
-        Collection<String> res = new ArrayList<>();
+        Set<String> res = new HashSet<>();
         for (StackTraceElement elt : elements) {
             //System.out.println(elt);
             if (elt.getClassName().replaceAll("/", ".").startsWith(instrumentedPackage.replaceAll("/", "."))) {

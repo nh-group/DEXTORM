@@ -26,7 +26,7 @@ public class ConsoleRequirementsPublisher implements RequirementPublisher {
 
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
         PatternLayoutEncoder ple = new PatternLayoutEncoder();
-        ple.setPattern("%date %level [%thread] %logger{10} [%file:%line] %msg%n");
+        ple.setPattern("%date %level [%thread] %logger{10} %msg%n");
         ple.setContext(lc);
         ple.start();
         OutputStreamAppender<ILoggingEvent> appender;

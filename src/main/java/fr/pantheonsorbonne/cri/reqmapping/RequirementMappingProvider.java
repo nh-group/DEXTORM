@@ -1,9 +1,11 @@
 package fr.pantheonsorbonne.cri.reqmapping;
 
-import java.util.Collection;
+import java.util.Set;
 
 public interface RequirementMappingProvider {
 
-    Collection<ReqMatch> getReqMatcher();
+    Set<ReqMatch> getReqMatcher();
+
+    int countReqMatchers();
 
 }
