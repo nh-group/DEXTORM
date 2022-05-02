@@ -12,10 +12,10 @@ import java.util.stream.Collectors;
 
 public class ReqMatcherBuilder implements Cloneable {
 
+    private static final Pattern methodSignaturePattern = Pattern.compile("\\(((?:[^;]*;)*)\\)(\\[?[ZBCSIJFDLV].*)");
+    private static final Pattern methodParamsPattern = Pattern.compile("(\\[)?([ZBCSIJFDL])?([^;]*)?;");
     private final List<String> args = new ArrayList<>();
     private final List<String> reqs = new ArrayList<>();
-    private final Pattern methodSignaturePattern = Pattern.compile("\\(((?:[^;]*;)*)\\)(\\[?[ZBCSIJFDLV].*)");
-    private final Pattern methodParamsPattern = Pattern.compile("(\\[)?([ZBCSIJFDL])?([^;]*)?;");
     private String packageName = null;
     private String methodName = null;
     private String className = null;
@@ -32,11 +32,17 @@ public class ReqMatcherBuilder implements Cloneable {
     }
 
     public ReqMatcherBuilder args(String argsList) {
+        this.args.addAll(strArgsToList(argsList));
+        return this;
+
+    }
+
+    public static List<String> strArgsToList(String argsList) {
         //https://stackoverflow.com/questions/8066253/compute-a-java-functions-signature
+        List<String> res = new ArrayList<>();
         Matcher matcher = methodSignaturePattern.matcher(argsList);
         if (matcher.matches()) {
             String params = matcher.group(1);
-            System.out.println(params);
             Matcher matcher2 = methodParamsPattern.matcher(params);
             while (matcher2.find()) {
                 StringBuilder sb = new StringBuilder();
@@ -50,10 +56,10 @@ public class ReqMatcherBuilder implements Cloneable {
                 if (classType != null) {
                     sb.append(classType);
                 }
-                this.args.add(sb.toString());
+                res.add(sb.toString());
             }
         }
-        return this;
+        return res;
     }
 
     public ReqMatcherBuilder commit(String commit) {

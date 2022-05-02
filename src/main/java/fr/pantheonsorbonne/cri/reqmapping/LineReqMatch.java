@@ -15,7 +15,7 @@ public class LineReqMatch extends MethodReqMatch {
 
     @Override
     public boolean isMatch(StackTraceElement elt) {
-        if (this.getFQClassName().equals(elt.getClassName().replaceAll("/", "."))) {
+        if (super.isMatch(elt)) {
             if (elt.getLine() == this.getLine()) {
                 return this.getReq().stream().anyMatch(Predicate.not(Strings::isNullOrEmpty));
             }

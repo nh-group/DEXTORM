@@ -32,7 +32,7 @@ public class MethodDeclaration extends JavaParserTreeVisitor {
     @Override
     public void startTree(ITree tree) {
 
-        showTree(tree, "");
+        //showTree(tree, "");
 
         Optional<ITree> methodName = tree.getChildren().stream()
                 .filter((ITree child) -> child.toPrettyString(ctx).startsWith("SimpleName")).findFirst();
@@ -60,7 +60,7 @@ public class MethodDeclaration extends JavaParserTreeVisitor {
                 }
 
                 strParameter.append(";");
-                System.out.println("\t" + strParameter);
+                //System.out.println("\t" + strParameter);
 
 
             }
