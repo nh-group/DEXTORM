@@ -48,7 +48,8 @@ class TestDiffGumtree {
             MethodReqMatch mrm = (MethodReqMatch) m;
             if (m.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("main")) {
                 assertEquals(1, m.getReq().stream().distinct().count());
-                assertTrue(m.getReq().get(0).equals("commit1"));
+                List<String> commits = m.getReq().stream().distinct().collect(Collectors.toList());
+                assertTrue(commits.contains("commit1"));
                 assertions[0] = true;
             } else if (m.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("sum2")) {
                 assertEquals(1, m.getReq().stream().distinct().count());

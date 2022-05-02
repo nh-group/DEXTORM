@@ -1,10 +1,13 @@
 package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor;
 
-import com.github.gumtreediff.tree.ITree;
+
+import com.github.gumtreediff.tree.Tree;
 import com.github.gumtreediff.tree.TreeContext;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 import fr.pantheonsorbonne.cri.reqmapping.impl.Utils;
 import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.GumTreeFacade;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,16 +16,18 @@ import java.util.stream.Collectors;
 
 public class MethodDeclaration extends JavaParserTreeVisitor {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodDeclaration.class);
+
     public MethodDeclaration(TreeContext ctx, ReqMatcherBuilder treeBuilder) {
         super(ctx, treeBuilder);
 
     }
 
-    private void showTree(ITree tree, String offset) {
-        System.out.println(offset + tree.toShortString() + " " + tree.getLabel() + " " + tree.toPrettyString(ctx));
+    private void showTree(Tree tree, String offset) {
+        System.out.println(offset + tree.toTreeString() + " " + tree.getLabel() + " " + tree);
         offset += "\t";
-        for (ITree subtree : tree.getChildren()) {
-            if (!"BlockStmt".equals(subtree.toPrettyString(ctx))) {
+        for (Tree subtree : tree.getChildren()) {
+            if (!"BlockStmt".equals(subtree.getType())) {
                 showTree(subtree, offset);
             }
         }
@@ -30,30 +35,30 @@ public class MethodDeclaration extends JavaParserTreeVisitor {
     }
 
     @Override
-    public void startTree(ITree tree) {
+    public void startTree(Tree tree) {
 
         //showTree(tree, "");
 
-        Optional<ITree> methodName = tree.getChildren().stream()
-                .filter((ITree child) -> child.toPrettyString(ctx).startsWith("SimpleName")).findFirst();
-        List<List<ITree>> parameters = tree.getChildren().stream()
-                .filter((ITree child) -> child.toPrettyString(ctx).equals("Parameter"))
+        Optional<Tree> methodName = tree.getChildren().stream()
+                .filter((Tree child) -> child.getType().name.startsWith("SimpleName")).findFirst();
+        List<List<Tree>> parameters = tree.getChildren().stream()
+                .filter((Tree child) -> child.getType().name.equals("Parameter"))
                 .map(p -> p.getDescendants()).collect(Collectors.toList());
 
 
         if (methodName.isPresent()) {
             StringBuilder strParameter = new StringBuilder("(");
-            for (List<ITree> parameter : parameters) {
+            for (List<Tree> parameter : parameters) {
 
                 int analyserIndex = 0;
-                if (parameter.get(analyserIndex).toPrettyString(ctx).equals("SingleMemberAnnotationExpr")) {
+                if (parameter.get(analyserIndex).getType().name.equals("SingleMemberAnnotationExpr")) {
                     analyserIndex += 3;
                 }
-                if (parameter.get(analyserIndex).toPrettyString(ctx).equals("ArrayType")) {
+                if (parameter.get(analyserIndex).getType().name.equals("ArrayType")) {
                     strParameter.append("[");
                     analyserIndex++;
                 }
-                if ("ClassOrInterfaceType".equals(parameter.get(analyserIndex).toPrettyString(ctx))) {
+                if ("ClassOrInterfaceType".equals(parameter.get(analyserIndex).getType().name)) {
                     strParameter.append("L");
                     strParameter.append(parameter.get(++analyserIndex).getLabel());
 
@@ -67,7 +72,8 @@ public class MethodDeclaration extends JavaParserTreeVisitor {
 
             }
             strParameter.append(")V");
-
+            String trace = this.parentMatcherBuilder.getPackageName() + "." + this.parentMatcherBuilder.getClassName() + "." + methodName.get().getLabel() + "(" + strParameter + ")" + ((Collection<String>) tree.getMetadata(GumTreeFacade.BLAME_ID)).stream().collect(Collectors.joining("-"));
+            System.out.println("#" + trace);
 
             ReqMatcherBuilder currentMethodMatcher = this.parentMatcherBuilder
                     .methodName(methodName.get().getLabel())
@@ -90,7 +96,7 @@ public class MethodDeclaration extends JavaParserTreeVisitor {
     }
 
     @Override
-    public void endTree(ITree tree) {
+    public void endTree(Tree tree) {
 
     }
 

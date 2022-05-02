@@ -1,13 +1,13 @@
 package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree;
 
-import com.github.gumtreediff.gen.Generators;
+import com.github.gumtreediff.gen.TreeGenerators;
 import com.github.gumtreediff.gen.javaparser.JavaParserGenerator;
 import com.github.gumtreediff.matchers.MappingStore;
 import com.github.gumtreediff.matchers.Matcher;
 import com.github.gumtreediff.matchers.Matchers;
-import com.github.gumtreediff.tree.ITree;
+import com.github.gumtreediff.tree.Tree;
 import com.github.gumtreediff.tree.TreeContext;
-import com.github.gumtreediff.tree.TreeUtils;
+import com.github.gumtreediff.tree.TreeVisitor;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
@@ -30,21 +30,13 @@ public class GumTreeFacade {
         Arrays.asList(JavaParserGenerator.class).forEach(gen -> {
             com.github.gumtreediff.gen.Register a = gen.getAnnotation(com.github.gumtreediff.gen.Register.class);
             if (a != null)
-                Generators.getInstance().install(gen, a);
+                TreeGenerators.getInstance().install(gen, a);
         });
     }
 
-    public static String dump(TreeContext ct) {
-        StringBuilder sb = new StringBuilder();
-        for (ITree tr : ct.getRoot().getTrees()) {
-            sb.append(tr.toPrettyString(ct)).append("//").append(tr.getMetadata(BLAME_ID)).append("\n");
-        }
-
-        return sb.toString();
-    }
 
     @SuppressWarnings("unchecked")
-    public static void appendMetadata(ITree t, String key, Object value, boolean recursive) {
+    public static void appendMetadata(Tree t, String key, Object value, boolean recursive) {
 
         Collection<Object> existingValue = (Collection<Object>) t.getMetadata(key);
         if (existingValue == null) {
@@ -58,40 +50,41 @@ public class GumTreeFacade {
             existingValue.add(value);
         }
 
-        if (recursive && t.getHeight() > 0) {
-            for (ITree tt : t.getChildren()) {
-                appendMetadata(tt, key, value, recursive);
-            }
+
+        for (Tree tt : t.getChildren()) {
+            appendMetadata(tt, key, value, recursive);
         }
+
 
     }
 
-    public static void addCommitMetadataToTreeRecursive(ITree t, String commitID) {
+    public static void addCommitMetadataToTreeRecursive(Tree t, String commitID) {
         GumTreeFacade.appendMetadata(t, BLAME_ID, commitID, true);
     }
 
-    public static void addCommitMetadataToTree(ITree t, String commitID) {
+    public static void addCommitMetadataToTree(Tree t, String commitID) {
         GumTreeFacade.appendMetadata(t, BLAME_ID, commitID, false);
     }
 
     private static Set<ReqMatch> getReqMatcher(final TreeContext ctx) {
 
         CompilationUnitVisitor visitor = new CompilationUnitVisitor(ctx, ReqMatch.newBuilder());
-        TreeUtils.visitTree(ctx.getRoot(), visitor);
+        TreeVisitor.visitTree(ctx.getRoot(), visitor);
+
         return visitor.getMatchers().stream().map(ReqMatcherBuilder::build).collect(Collectors.toSet());
 
     }
 
     public void labelDestWithCommit(DiffTree d) {
 
-        Matcher m = Matchers.getInstance().getMatcher(d.src.getRoot(), d.dst.getRoot()); // retrieve the default matcher
-        m.match();
-        MappingStore store = m.getMappings();
+        Matcher m = Matchers.getInstance().getMatcher(); // retrieve the default matcher
+        MappingStore store = m.match(d.src, d.dst);
 
-        for (ITree t : d.dst.getRoot().getTrees()) {
 
-            if (store.getSrc(t) != null) {
-                GumTreeFacade.appendMetadata(t, BLAME_ID, store.getSrc(t).getMetadata(BLAME_ID), false);
+        for (Tree t : d.dst.getChildren()) {
+
+            if (store.getSrcForDst(t) != null) {
+                GumTreeFacade.appendMetadata(t, BLAME_ID, store.getSrcForDst(t).getMetadata(BLAME_ID), false);
             } else {
                 GumTreeFacade.appendMetadata(t, BLAME_ID, d.commitId, false);
             }
@@ -110,13 +103,14 @@ public class GumTreeFacade {
                 currentDiff = diff.toDiffTree();
 
                 if (currentContext == null) {
-                    GumTreeFacade.appendMetadata(currentDiff.dst.getRoot(), GumTreeFacade.BLAME_ID,
+                    GumTreeFacade.appendMetadata(currentDiff.dst, GumTreeFacade.BLAME_ID,
                             currentDiff.commitId, true);
                 } else {
-                    currentDiff.src = currentContext;
+                    currentDiff.src = currentContext.getRoot();
                     this.labelDestWithCommit(currentDiff);
                 }
-                currentContext = currentDiff.dst;
+                currentContext = new TreeContext();
+                currentContext.setRoot(currentDiff.dst);
             } catch (UnsupportedOperationException | IOException e) {
 
                 e.printStackTrace();

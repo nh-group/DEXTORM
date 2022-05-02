@@ -121,4 +121,44 @@ public class ReqMatcherBuilder implements Cloneable {
         res.reqs.addAll(this.reqs);
         return res;
     }
+
+    public List<String> getArgs() {
+        return args;
+    }
+
+    public List<String> getReqs() {
+        return reqs;
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
+    }
+
+    public String getMethodName() {
+        return methodName;
+    }
+
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public Integer getLine() {
+        return line;
+    }
+
+    public void setLine(Integer line) {
+        this.line = line;
+    }
 }

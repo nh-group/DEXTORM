@@ -1,10 +1,10 @@
 package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor;
 
-import com.github.gumtreediff.tree.ITree;
+
+import com.github.gumtreediff.tree.Tree;
 import com.github.gumtreediff.tree.TreeContext;
-import com.github.gumtreediff.tree.TreeUtils.TreeVisitor;
+import com.github.gumtreediff.tree.TreeVisitor;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
-import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.GumTreeFacade;
 
 import java.util.Collection;
 
@@ -16,10 +16,10 @@ public abstract class JavaParserTreeVisitorComposite extends JavaParserTreeVisit
     }
 
     @Override
-    public void startTree(ITree tree) {
+    public void startTree(Tree tree) {
         try {
-            for (ITree subtree : tree.getChildren()) {
-                String subtreeType = subtree.toPrettyString(ctx);
+            for (Tree subtree : tree.getChildren()) {
+                String subtreeType = subtree.toTreeString();
                 for (Class<? extends JavaParserTreeVisitor> subVisitorClass : this.getChildVisitors()) {
 
                     if (canSubvisitorHandleTree(subtreeType, subVisitorClass)) {
@@ -27,8 +27,6 @@ public abstract class JavaParserTreeVisitorComposite extends JavaParserTreeVisit
                                 .getDeclaredConstructor(TreeContext.class, ReqMatcherBuilder.class)
                                 .newInstance(ctx, parentMatcherBuilder.getCopy());
 
-                        Collection<String> commitIds = (Collection<String>) subtree.getMetadata(GumTreeFacade.BLAME_ID);
-                        //subVisitor.parentMatcher.commits(commitIds);
                         subVisitor.startTree(subtree);
                         subVisitor.endTree(subtree);
                         matchers.addAll(subVisitor.getMatchers());
@@ -50,7 +48,7 @@ public abstract class JavaParserTreeVisitorComposite extends JavaParserTreeVisit
     }
 
     @Override
-    public void endTree(ITree tree) {
+    public void endTree(Tree tree) {
 
     }
 

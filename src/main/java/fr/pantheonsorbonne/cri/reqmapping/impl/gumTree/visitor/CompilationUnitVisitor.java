@@ -1,8 +1,9 @@
 package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor;
 
-import com.github.gumtreediff.tree.ITree;
+
+import com.github.gumtreediff.tree.Tree;
 import com.github.gumtreediff.tree.TreeContext;
-import com.github.gumtreediff.tree.TreeUtils.TreeVisitor;
+import com.github.gumtreediff.tree.TreeVisitor;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 
 import java.util.Arrays;
@@ -16,10 +17,10 @@ public class CompilationUnitVisitor extends JavaParserTreeVisitorComposite imple
     }
 
     @Override
-    public void startTree(ITree tree) {
+    public void startTree(Tree tree) {
 
-        for (ITree child : tree.getChildren()) {
-            if (child.toPrettyString(this.ctx).startsWith("PackageDeclaration")) {
+        for (Tree child : tree.getChildren()) {
+            if (child.toTreeString().startsWith("PackageDeclaration")) {
                 this.parentMatcherBuilder.packageName(child.getChildren().get(0).getLabel());
 
             }

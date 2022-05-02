@@ -1,13 +1,14 @@
 package fr.pantheonsorbonne.cri.reqmapping;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public abstract class ReqMatch {
 
-    private final ArrayList<String> commits = new ArrayList();
-    private final String packageName;
-    private final String className;
+    protected final Set<String> commits = new HashSet<>();
+    protected final String packageName;
+    protected final String className;
 
     public ReqMatch(String className, String packageName, String... reqs) {
         this.className = className;
@@ -30,7 +31,7 @@ public abstract class ReqMatch {
     }
 
 
-    public java.util.List<String> getReq() {
+    public Set<String> getReq() {
         return commits;
     }
 

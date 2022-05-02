@@ -1,6 +1,6 @@
 package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor;
 
-import com.github.gumtreediff.tree.ITree;
+import com.github.gumtreediff.tree.Tree;
 import com.github.gumtreediff.tree.TreeContext;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 
@@ -12,16 +12,16 @@ public class Parameter extends JavaParserTreeVisitor {
     }
 
     @Override
-    public void startTree(ITree tree) {
+    public void startTree(Tree tree) {
 
 
-        ITree paramChild = tree.getChild(0);
-        String paramType = paramChild.toPrettyString(ctx);
+        Tree paramChild = tree.getChild(0);
+        String paramType = paramChild.getType().name;
         String postpand = "";
         if (paramType.startsWith("ArrayType")) {
             postpand = "[]";
             paramChild = paramChild.getChild(0);
-            paramType = paramChild.toPrettyString(ctx);
+            paramType = paramChild.getType().name;
         }
 
         if (paramType.startsWith("ClassOrInterfaceType")) {
@@ -35,7 +35,7 @@ public class Parameter extends JavaParserTreeVisitor {
     }
 
     @Override
-    public void endTree(ITree tree) {
+    public void endTree(Tree tree) {
         // TODO Auto-generated method stub
 
     }

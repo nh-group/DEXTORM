@@ -1,12 +1,14 @@
 package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor;
 
-import com.github.gumtreediff.tree.ITree;
+
+import com.github.gumtreediff.tree.Tree;
 import com.github.gumtreediff.tree.TreeContext;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
+
 
 public class ClassOrInterfaceDeclaration extends JavaParserTreeVisitorComposite {
 
@@ -16,10 +18,10 @@ public class ClassOrInterfaceDeclaration extends JavaParserTreeVisitorComposite 
     }
 
     @Override
-    public void startTree(ITree tree) {
+    public void startTree(Tree tree) {
 
-        Optional<ITree> classNameLeaf = tree.getChildren().stream()
-                .filter((ITree t) -> t.toPrettyString(ctx).startsWith("SimpleName")).findFirst();
+        Optional<Tree> classNameLeaf = tree.getChildren().stream()
+                .filter((Tree t) -> t.toTreeString().startsWith("SimpleName")).findFirst();
 
         if (classNameLeaf.isPresent()) {
             this.parentMatcherBuilder.className(classNameLeaf.get().getLabel());

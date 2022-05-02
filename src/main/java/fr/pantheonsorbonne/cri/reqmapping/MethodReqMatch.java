@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class MethodReqMatch extends ReqMatch {
     private final List<String> args = new ArrayList<>();
@@ -36,9 +37,6 @@ public class MethodReqMatch extends ReqMatch {
 
     @Override
     public String toString() {
-        return "MethodReqMatch{" +
-                "args=" + args +
-                ", methodName='" + methodName + '\'' + super.toString() +
-                '}';
+        return this.packageName + "." + this.className + "." + this.methodName + "(" + this.args.stream().collect(Collectors.joining(",")) + ") :" + this.commits.stream().collect(Collectors.joining(","));
     }
 }

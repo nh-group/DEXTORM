@@ -1,13 +1,13 @@
 package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor;
 
 import com.github.gumtreediff.tree.TreeContext;
-import com.github.gumtreediff.tree.TreeUtils.TreeVisitor;
+import com.github.gumtreediff.tree.TreeVisitor;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public abstract class JavaParserTreeVisitor implements TreeVisitor {
+public abstract class JavaParserTreeVisitor extends TreeVisitor.DefaultTreeVisitor {
     protected final ReqMatcherBuilder parentMatcherBuilder;
     protected TreeContext ctx;
     protected Collection<ReqMatcherBuilder> matchers = new ArrayList<>();

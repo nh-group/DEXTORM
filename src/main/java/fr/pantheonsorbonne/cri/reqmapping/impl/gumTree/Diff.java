@@ -1,7 +1,7 @@
 package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree;
 
-import com.github.gumtreediff.gen.Generators;
-import com.github.gumtreediff.tree.TreeContext;
+import com.github.gumtreediff.gen.TreeGenerators;
+import com.github.gumtreediff.tree.Tree;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -19,12 +19,12 @@ public class Diff {
     }
 
     public DiffTree toDiffTree() throws UnsupportedOperationException, IOException {
-
-        TreeContext srcTreeContext = null;
+        Tree src = null;
         if (this.src != null) {
-            srcTreeContext = Generators.getInstance().getTree(this.src.toString());
+            src = TreeGenerators.getInstance().getTree(this.src.toString()).getRoot();
         }
-        TreeContext dstTreeContext = Generators.getInstance().getTree(this.dst.toString());
-        return new DiffTree(srcTreeContext, dstTreeContext, this.commitId);
+        var dst = TreeGenerators.getInstance().getTree(this.dst.toString()).getRoot();
+
+        return new DiffTree(src, dst, this.commitId);
     }
 }
