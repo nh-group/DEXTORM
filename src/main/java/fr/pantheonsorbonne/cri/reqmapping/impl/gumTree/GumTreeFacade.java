@@ -8,7 +8,6 @@ import com.github.gumtreediff.matchers.Matchers;
 import com.github.gumtreediff.tree.Tree;
 import com.github.gumtreediff.tree.TreeVisitor;
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor.CompilationUnitVisitor;
@@ -35,14 +34,14 @@ public class GumTreeFacade {
     @SuppressWarnings("unchecked")
     public static void appendMetadata(Tree t, String key, Object value, boolean recursive) {
 
-        Collection<Object> existingValue = (Collection<Object>) t.getMetadata(key);
+        List<Object> existingValue = (List<Object>) t.getMetadata(key);
         if (existingValue == null) {
-            existingValue = Sets.newHashSet();
+            existingValue = new ArrayList<>();
             t.setMetadata(key, existingValue);
         }
 
         if (value instanceof Collection) {
-            existingValue.addAll((Collection<Object>) value);
+            existingValue.addAll((List<Object>) value);
         } else if (value instanceof String && !Strings.isNullOrEmpty(((String) value))) {
             existingValue.add(value);
         }
@@ -64,12 +63,12 @@ public class GumTreeFacade {
         GumTreeFacade.appendMetadata(t, BLAME_ID, commitID, false);
     }
 
-    private static Set<ReqMatch> getReqMatcher(final Tree tree) {
+    private static List<ReqMatch> getReqMatcher(final Tree tree) {
 
         CompilationUnitVisitor visitor = new CompilationUnitVisitor(tree, ReqMatch.newBuilder());
         TreeVisitor.visitTree(tree, visitor);
 
-        return visitor.getMatchers().stream().map(ReqMatcherBuilder::build).collect(Collectors.toSet());
+        return visitor.getMatchers().stream().map(ReqMatcherBuilder::build).collect(Collectors.toList());
 
     }
 
