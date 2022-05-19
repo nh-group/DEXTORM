@@ -1,5 +1,6 @@
 package fr.pantheonsorbonne.cri.app;
 
+import com.github.gumtreediff.client.Run;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import fr.pantheonsorbonne.cri.reqmapping.MethodReqMatch;
@@ -20,18 +21,14 @@ public class TestMethodSignature {
 
     @Test
     public void testGT() {
+        Run.initGenerators();
         CommitFileMaterialization f1 = new CommitFileMaterialization(Paths.get("src/test/resources/A5.java"),
                 "commit1");
 
-        List<Diff> diffs = new ArrayList<>();
-        diffs.add(new Diff(null, f1.file, f1.commitId));
-
+        List<Diff> diffs = Diff.getBuilder().add(f1.file, f1.commitId).build();
         GumTreeFacade facade = new GumTreeFacade();
-
         Collection<ReqMatch> reqMatchers = facade.getReqMatcher(diffs);
-
         List<ReqMatch> reqMatchersList = new ArrayList<>(reqMatchers);
-
         methodSignatureExtraction(reqMatchersList);
 
     }

@@ -6,7 +6,6 @@ import com.github.gumtreediff.matchers.MappingStore;
 import com.github.gumtreediff.matchers.Matcher;
 import com.github.gumtreediff.matchers.Matchers;
 import com.github.gumtreediff.tree.Tree;
-import com.github.gumtreediff.tree.TreeContext;
 import com.github.gumtreediff.tree.TreeVisitor;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -14,12 +13,10 @@ import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor.CompilationUnitVisitor;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.io.PrintStream;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class GumTreeFacade {
 
@@ -50,9 +47,10 @@ public class GumTreeFacade {
             existingValue.add(value);
         }
 
-
-        for (Tree tt : t.getChildren()) {
-            appendMetadata(tt, key, value, recursive);
+        if (recursive) {
+            for (Tree tt : t.getChildren()) {
+                appendMetadata(tt, key, value, true);
+            }
         }
 
 
@@ -66,60 +64,73 @@ public class GumTreeFacade {
         GumTreeFacade.appendMetadata(t, BLAME_ID, commitID, false);
     }
 
-    private static Set<ReqMatch> getReqMatcher(final TreeContext ctx) {
+    private static Set<ReqMatch> getReqMatcher(final Tree tree) {
 
-        CompilationUnitVisitor visitor = new CompilationUnitVisitor(ctx, ReqMatch.newBuilder());
-        TreeVisitor.visitTree(ctx.getRoot(), visitor);
+        CompilationUnitVisitor visitor = new CompilationUnitVisitor(tree, ReqMatch.newBuilder());
+        TreeVisitor.visitTree(tree, visitor);
 
         return visitor.getMatchers().stream().map(ReqMatcherBuilder::build).collect(Collectors.toSet());
 
     }
 
-    public void labelDestWithCommit(DiffTree d) {
+    public static void showTree(Tree father, String offset, PrintStream ps) {
+        String metadata = StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(
+                        father.getMetadata(),
+                        Spliterator.ORDERED)
+                , false).map(e -> e.getKey() + ":" + e.getValue().toString()).collect(Collectors.joining(" "));
+        ps.println(offset + " " + father.getType().toString() + " " + father.getLabel() + " " + metadata);
+        for (Tree t : father.getChildren()) {
+            showTree(t, offset + "\t", ps);
+        }
+    }
+
+    public void labelDestWithCommit(Tree src, Tree dst, String commitId) {
 
         Matcher m = Matchers.getInstance().getMatcher(); // retrieve the default matcher
-        MappingStore store = m.match(d.src, d.dst);
+        MappingStore store = m.match(src, dst);
 
 
-        for (Tree t : d.dst.getChildren()) {
+        for (Tree t : dst.breadthFirst()) {
 
-            if (store.getSrcForDst(t) != null) {
-                GumTreeFacade.appendMetadata(t, BLAME_ID, store.getSrcForDst(t).getMetadata(BLAME_ID), false);
+            var srcTree = store.getSrcForDst(t);
+            if (store.getSrcForDst(t) == null) {
+                //that's new stuff in dst that wasn't in sources, apply the new commiId
+                GumTreeFacade.appendMetadata(t, BLAME_ID, commitId, false);
+
             } else {
-                GumTreeFacade.appendMetadata(t, BLAME_ID, d.commitId, false);
+                GumTreeFacade.appendMetadata(t, BLAME_ID, srcTree.getMetadata(BLAME_ID), false);
             }
+            GumTreeFacade.showTree(dst, "[final]", System.out);
+
 
         }
+        GumTreeFacade.showTree(dst, "[final]", System.out);
     }
 
     public Collection<ReqMatch> getReqMatcher(List<Diff> diffs) {
 
-        TreeContext currentContext = null;
-
+        Tree currentTree = null;
         for (Diff diff : diffs) {
-
-            DiffTree currentDiff;
             try {
-                currentDiff = diff.toDiffTree();
-
-                if (currentContext == null) {
-                    GumTreeFacade.appendMetadata(currentDiff.dst, GumTreeFacade.BLAME_ID,
-                            currentDiff.commitId, true);
+                if (diff.src == null) {
+                    GumTreeFacade.appendMetadata(diff.dst, GumTreeFacade.BLAME_ID,
+                            diff.commitId, true);
                 } else {
-                    currentDiff.src = currentContext.getRoot();
-                    this.labelDestWithCommit(currentDiff);
+                    this.labelDestWithCommit(diff.src, diff.dst, diff.commitId);
                 }
-                currentContext = new TreeContext();
-                currentContext.setRoot(currentDiff.dst);
-            } catch (UnsupportedOperationException | IOException e) {
+                //showTree(diff.dst, "", System.out);
+                currentTree = diff.dst;
+            } catch (UnsupportedOperationException e) {
 
                 e.printStackTrace();
                 System.exit(-2);
             }
 
+            GumTreeFacade.showTree(currentTree, "", System.out);
         }
 
-        return GumTreeFacade.getReqMatcher(currentContext);
+        return GumTreeFacade.getReqMatcher(currentTree);
 
     }
 

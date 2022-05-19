@@ -2,7 +2,6 @@ package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor;
 
 
 import com.github.gumtreediff.tree.Tree;
-import com.github.gumtreediff.tree.TreeContext;
 import com.github.gumtreediff.tree.TreeVisitor;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 
@@ -10,8 +9,8 @@ import java.util.Collection;
 
 public abstract class JavaParserTreeVisitorComposite extends JavaParserTreeVisitor implements TreeVisitor {
 
-    public JavaParserTreeVisitorComposite(TreeContext ctx, ReqMatcherBuilder treeBuilder) {
-        super(ctx, treeBuilder);
+    public JavaParserTreeVisitorComposite(Tree tree, ReqMatcherBuilder treeBuilder) {
+        super(tree, treeBuilder);
 
     }
 
@@ -24,8 +23,8 @@ public abstract class JavaParserTreeVisitorComposite extends JavaParserTreeVisit
 
                     if (canSubvisitorHandleTree(subtreeType, subVisitorClass)) {
                         JavaParserTreeVisitor subVisitor = subVisitorClass
-                                .getDeclaredConstructor(TreeContext.class, ReqMatcherBuilder.class)
-                                .newInstance(ctx, parentMatcherBuilder.getCopy());
+                                .getDeclaredConstructor(Tree.class, ReqMatcherBuilder.class)
+                                .newInstance(this.tree, parentMatcherBuilder.getCopy());
 
                         subVisitor.startTree(subtree);
                         subVisitor.endTree(subtree);

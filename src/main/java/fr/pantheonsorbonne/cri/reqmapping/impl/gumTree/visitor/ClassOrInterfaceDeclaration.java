@@ -2,7 +2,6 @@ package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor;
 
 
 import com.github.gumtreediff.tree.Tree;
-import com.github.gumtreediff.tree.TreeContext;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 
 import java.util.Arrays;
@@ -12,8 +11,8 @@ import java.util.Optional;
 
 public class ClassOrInterfaceDeclaration extends JavaParserTreeVisitorComposite {
 
-    public ClassOrInterfaceDeclaration(TreeContext ctx, ReqMatcherBuilder treeBuilder) {
-        super(ctx, treeBuilder);
+    public ClassOrInterfaceDeclaration(Tree tree, ReqMatcherBuilder treeBuilder) {
+        super(tree, treeBuilder);
 
     }
 

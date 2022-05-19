@@ -2,13 +2,12 @@ package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor;
 
 
 import com.github.gumtreediff.tree.Tree;
-import com.github.gumtreediff.tree.TreeContext;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 
 public class JavaParserTreeVisitorHelper extends JavaParserTreeVisitor {
 
-    public JavaParserTreeVisitorHelper(TreeContext ctx, ReqMatcherBuilder treeBuilder) {
-        super(ctx, treeBuilder);
+    public JavaParserTreeVisitorHelper(Tree tree, ReqMatcherBuilder treeBuilder) {
+        super(tree, treeBuilder);
         // TODO Auto-generated constructor stub
     }
 

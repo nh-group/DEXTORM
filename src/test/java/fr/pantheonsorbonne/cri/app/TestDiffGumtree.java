@@ -1,5 +1,6 @@
 package fr.pantheonsorbonne.cri.app;
 
+import com.github.gumtreediff.client.Run;
 import fr.pantheonsorbonne.cri.reqmapping.MethodReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.Diff;
@@ -8,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,16 +27,17 @@ class TestDiffGumtree {
                 "commit3");
         CommitFileMaterialization f4 = new CommitFileMaterialization(Paths.get("src/test/resources/A4.java"),
                 "commit4");
+        Run.initGenerators();
+        Diff.DiffBuilder builder = Diff.getBuilder();
+        builder.add(f1.file, f1.commitId);
+        builder.add(f2.file, f2.commitId);
+        builder.add(f3.file, f3.commitId);
+        builder.add(f4.file, f4.commitId);
 
-        List<Diff> diffs = new ArrayList<>();
-        diffs.add(new Diff(null, f1.file, f1.commitId));
-        diffs.add(new Diff(f1.file, f2.file, f2.commitId));
-        diffs.add(new Diff(f2.file, f3.file, f3.commitId));
-        diffs.add(new Diff(f3.file, f4.file, f4.commitId));
 
         GumTreeFacade facade = new GumTreeFacade();
 
-        Collection<ReqMatch> reqMatchers = facade.getReqMatcher(diffs);
+        Collection<ReqMatch> reqMatchers = facade.getReqMatcher(builder.build());
 
         //DiffTree dt = diffs.get(3).toDiffTree();
         //TreeUtils.visitTree(dt.dst.getRoot(), new PrettyBlameTreePrinter(dt.dst));

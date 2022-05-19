@@ -2,7 +2,6 @@ package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor;
 
 
 import com.github.gumtreediff.tree.Tree;
-import com.github.gumtreediff.tree.TreeContext;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 import fr.pantheonsorbonne.cri.reqmapping.impl.Utils;
 import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.GumTreeFacade;
@@ -18,8 +17,8 @@ public class MethodDeclaration extends JavaParserTreeVisitor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodDeclaration.class);
 
-    public MethodDeclaration(TreeContext ctx, ReqMatcherBuilder treeBuilder) {
-        super(ctx, treeBuilder);
+    public MethodDeclaration(Tree tree, ReqMatcherBuilder treeBuilder) {
+        super(tree, treeBuilder);
 
     }
 
@@ -37,7 +36,7 @@ public class MethodDeclaration extends JavaParserTreeVisitor {
     @Override
     public void startTree(Tree tree) {
 
-        //showTree(tree, "");
+        GumTreeFacade.showTree(tree, "", System.out);
 
         Optional<Tree> methodName = tree.getChildren().stream()
                 .filter((Tree child) -> child.getType().name.startsWith("SimpleName")).findFirst();

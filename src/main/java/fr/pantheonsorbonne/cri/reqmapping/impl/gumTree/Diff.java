@@ -5,26 +5,65 @@ import com.github.gumtreediff.tree.Tree;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Diff {
 
-    public Path src;
-    public Path dst;
+    public Tree src;
+    public Tree dst;
     public String commitId;
 
-    public Diff(Path src, Path dst, String commitId) {
+    private Diff(Tree src, Tree dst, String commitId) {
         this.src = src;
         this.dst = dst;
         this.commitId = commitId;
+
     }
 
-    public DiffTree toDiffTree() throws UnsupportedOperationException, IOException {
-        Tree src = null;
-        if (this.src != null) {
-            src = TreeGenerators.getInstance().getTree(this.src.toString()).getRoot();
+    public static DiffBuilder getBuilder() {
+        return new DiffBuilder();
+    }
+
+    public static class DiffBuilder {
+        private final List<DiffAtom> atoms = new ArrayList<>();
+
+        protected DiffBuilder() {
         }
-        var dst = TreeGenerators.getInstance().getTree(this.dst.toString()).getRoot();
 
-        return new DiffTree(src, dst, this.commitId);
+        public DiffBuilder add(Path file, String commitId) {
+            atoms.add(new DiffAtom(file, commitId));
+            return this;
+        }
+
+        public List<Diff> build() {
+            List<Diff> res = new LinkedList<>();
+            try {
+
+                DiffAtom lastAtom = new DiffAtom(null, null);
+                for (DiffAtom atom : this.atoms) {
+                    var treeDst = TreeGenerators.getInstance().getTree(atom.src.toString()).getRoot();
+                    Tree treeSrc = res.size() > 0 ? res.get(res.size() - 1).dst : null;
+                    res.add(new Diff(treeSrc, treeDst, atom.commit));
+                }
+            } catch (IOException exp) {
+                throw new RuntimeException(exp);
+            }
+            return res;
+        }
+
     }
+
+    static class DiffAtom {
+        public Path src;
+        public String commit;
+
+        public DiffAtom(Path src, String commit) {
+            this.src = src;
+            this.commit = commit;
+        }
+    }
+
+
 }

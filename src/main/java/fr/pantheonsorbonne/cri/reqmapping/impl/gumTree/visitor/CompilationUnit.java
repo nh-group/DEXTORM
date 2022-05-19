@@ -1,6 +1,6 @@
 package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor;
 
-import com.github.gumtreediff.tree.TreeContext;
+import com.github.gumtreediff.tree.Tree;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 
 import java.util.Arrays;
@@ -8,8 +8,8 @@ import java.util.Collection;
 
 public class CompilationUnit extends JavaParserTreeVisitorComposite {
 
-    public CompilationUnit(TreeContext ctx, ReqMatcherBuilder parentMatcher) {
-        super(ctx, parentMatcher);
+    public CompilationUnit(Tree tree, ReqMatcherBuilder parentMatcher) {
+        super(tree, parentMatcher);
 
 
     }

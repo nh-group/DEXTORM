@@ -31,13 +31,11 @@ import java.util.stream.Collectors;
 
 public class GumTreeFileRequirementMappingProvider implements FileRequirementMappingProvider {
 
+    private final GumTreeFacade facade = new GumTreeFacade();
     @Inject
     private Repository repo;
-
     @Inject
     private Git git;
-
-    private final GumTreeFacade facade = new GumTreeFacade();
 
     @Override
     public Collection<ReqMatch> getReqMatcher(Path p) {
@@ -72,18 +70,14 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
                 commitIssueMappings.add(mapping);
 
             }
-
+            Diff.DiffBuilder builder = Diff.getBuilder();
             for (CommitIssueMapping mapping : commitIssueMappings) {
                 Path path = materializeFileFromCommit(this.repo, mapping.id, relativeFilePath.toString());
+                builder.add(path, mapping.issueId.stream().collect(Collectors.joining(" ")));
 
-                diffs.add(new Diff(null, path, mapping.issueId.stream().collect(Collectors.joining(" "))));
             }
 
-            for (int i = 1; i < diffs.size() - 1; i++) {
-                diffs.get(i).src = diffs.get(i - 1).dst;
-            }
-
-            return diffs;
+            return builder.build();
 
         }
 

@@ -1,13 +1,12 @@
 package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor;
 
 import com.github.gumtreediff.tree.Tree;
-import com.github.gumtreediff.tree.TreeContext;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 
 public class Parameter extends JavaParserTreeVisitor {
 
-    public Parameter(TreeContext ctx, ReqMatcherBuilder treeBuilder) {
-        super(ctx, treeBuilder);
+    public Parameter(Tree tree, ReqMatcherBuilder treeBuilder) {
+        super(tree, treeBuilder);
 
     }
 
