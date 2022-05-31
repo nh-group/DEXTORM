@@ -9,6 +9,7 @@ import com.github.gumtreediff.tree.Tree;
 import com.github.gumtreediff.tree.TreeVisitor;
 import com.google.common.base.Strings;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
+import fr.pantheonsorbonne.cri.reqmapping.ReqMatchImpl;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor.CompilationUnitVisitor;
 
@@ -65,10 +66,10 @@ public class GumTreeFacade {
 
     private static List<ReqMatch> getReqMatcher(final Tree tree) {
 
-        CompilationUnitVisitor visitor = new CompilationUnitVisitor(tree, ReqMatch.newBuilder());
+        CompilationUnitVisitor visitor = new CompilationUnitVisitor(tree, ReqMatchImpl.newBuilder());
         TreeVisitor.visitTree(tree, visitor);
 
-        return visitor.getMatchers().stream().map(ReqMatcherBuilder::build).collect(Collectors.toList());
+        return visitor.getMatchersBuilders().stream().map(ReqMatcherBuilder::build).collect(Collectors.toList());
 
     }
 
@@ -100,14 +101,14 @@ public class GumTreeFacade {
             } else {
                 GumTreeFacade.appendMetadata(t, BLAME_ID, srcTree.getMetadata(BLAME_ID), false);
             }
-            GumTreeFacade.showTree(dst, "[final]", System.out);
+            //GumTreeFacade.showTree(dst, "[final]", System.out);
 
 
         }
-        GumTreeFacade.showTree(dst, "[final]", System.out);
+        //GumTreeFacade.showTree(dst, "[final]", System.out);
     }
 
-    public Collection<ReqMatch> getReqMatcher(List<Diff> diffs) {
+    public List<ReqMatch> getReqMatcher(List<Diff> diffs) {
 
         Tree currentTree = null;
         for (Diff diff : diffs) {
@@ -126,7 +127,7 @@ public class GumTreeFacade {
                 System.exit(-2);
             }
 
-            GumTreeFacade.showTree(currentTree, "", System.out);
+            //GumTreeFacade.showTree(currentTree, "", System.out);
         }
 
         return GumTreeFacade.getReqMatcher(currentTree);

@@ -10,7 +10,7 @@ a4b1c11b src/main/java/fr/pantheonsorbonne/cri/mapping/impl/gumTree/GumTreeFacad
 ec228f86 src/main/java/fr/pantheonsorbonne/cri/mapping/impl/gumTree/GumTreeFacade.java    (Nicolas Herbaut 2019-03-29 15:31:29 +0100  10) import com.github.gumtreediff.tree.TreeUtils;
 b3ec6f54 src/main/java/fr/pantheonsorbonne/cri/mapping/impl/gumTree/GumTreeFacade.java    (Nicolas Herbaut 2019-03-30 18:24:33 +0100  11) import com.google.common.base.Strings;
 54ea5929 src/main/java/fr/pantheonsorbonne/cri/mapping/impl/gumTree/GumTreeFacade.java    (Nicolas Herbaut 2019-03-30 09:48:47 +0100  12) import com.google.common.collect.Sets;
-078daead src/main/java/fr/pantheonsorbonne/cri/reqmapping/impl/gumTree/GumTreeFacade.java (Nicolas Herbaut 2022-04-22 09:08:57 +0200  13) import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
+078daead src/main/java/fr/pantheonsorbonne/cri/reqmapping/impl/gumTree/GumTreeFacade.java (Nicolas Herbaut 2022-04-22 09:08:57 +0200  13) import fr.pantheonsorbonne.cri.reqmapping.ReqMatchImpl;
 078daead src/main/java/fr/pantheonsorbonne/cri/reqmapping/impl/gumTree/GumTreeFacade.java (Nicolas Herbaut 2022-04-22 09:08:57 +0200  14) import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 f0736eb7 src/main/java/fr/pantheonsorbonne/cri/reqmapping/impl/gumTree/GumTreeFacade.java (Nicolas Herbaut 2022-02-21 00:40:39 +0100  15) import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor.CompilationUnitVisitor;
 a4b1c11b src/main/java/fr/pantheonsorbonne/cri/mapping/impl/gumTree/GumTreeFacade.java    (Nicolas Herbaut 2019-03-27 10:14:06 +0100  16) 

@@ -8,7 +8,7 @@ differs:
   g:
     diffAlgorithm: GUMTREE
     methods: true
-    instructions: false
+    instructions: true
   b:
     diffAlgorithm: BLAME
     methods: true

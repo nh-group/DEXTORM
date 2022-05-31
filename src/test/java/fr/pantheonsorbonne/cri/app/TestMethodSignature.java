@@ -3,7 +3,7 @@ package fr.pantheonsorbonne.cri.app;
 import com.github.gumtreediff.client.Run;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
-import fr.pantheonsorbonne.cri.reqmapping.MethodReqMatch;
+import fr.pantheonsorbonne.cri.reqmapping.MethodReqMatchImpl;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.impl.blame.BlameDataWrapper;
 import fr.pantheonsorbonne.cri.reqmapping.impl.blame.ReqMatcherJavaVisitor;
@@ -27,32 +27,32 @@ public class TestMethodSignature {
 
         List<Diff> diffs = Diff.getBuilder().add(f1.file, f1.commitId).build();
         GumTreeFacade facade = new GumTreeFacade();
-        Collection<ReqMatch> reqMatchers = facade.getReqMatcher(diffs);
-        List<ReqMatch> reqMatchersList = new ArrayList<>(reqMatchers);
-        methodSignatureExtraction(reqMatchersList);
+        Collection<ReqMatch> reqMatcherImpls = facade.getReqMatcher(diffs);
+        List<ReqMatch> reqMatchersListImpl = new ArrayList<>(reqMatcherImpls);
+        methodSignatureExtraction(reqMatchersListImpl);
 
     }
 
-    private void methodSignatureExtraction(List<ReqMatch> reqMatchersList) {
+    private void methodSignatureExtraction(List<ReqMatch> reqMatchersListImpl) {
         {
-            ReqMatch m1 = reqMatchersList.get(0);
-            MethodReqMatch mrm = (MethodReqMatch) m1;
+            ReqMatch m1 = reqMatchersListImpl.get(0);
+            MethodReqMatchImpl mrm = (MethodReqMatchImpl) m1;
             assertEquals("main", mrm.getMethodName());
             assertEquals("[LString", mrm.getArgs().get(0));
             assertEquals(1, mrm.getArgs().size());
         }
 
         {
-            ReqMatch m1 = reqMatchersList.get(1);
-            MethodReqMatch mrm = (MethodReqMatch) m1;
+            ReqMatch m1 = reqMatchersListImpl.get(1);
+            MethodReqMatchImpl mrm = (MethodReqMatchImpl) m1;
             assertEquals("toto", mrm.getMethodName());
             assertEquals("I", mrm.getArgs().get(0));
             assertEquals(1, mrm.getArgs().size());
         }
 
         {
-            ReqMatch m1 = reqMatchersList.get(2);
-            MethodReqMatch mrm = (MethodReqMatch) m1;
+            ReqMatch m1 = reqMatchersListImpl.get(2);
+            MethodReqMatchImpl mrm = (MethodReqMatchImpl) m1;
             assertEquals("toto2", mrm.getMethodName());
             assertEquals("I", mrm.getArgs().get(0));
             assertEquals("LList", mrm.getArgs().get(1));
@@ -60,31 +60,31 @@ public class TestMethodSignature {
         }
 
         {
-            ReqMatch m1 = reqMatchersList.get(3);
-            MethodReqMatch mrm = (MethodReqMatch) m1;
+            ReqMatch m1 = reqMatchersListImpl.get(3);
+            MethodReqMatchImpl mrm = (MethodReqMatchImpl) m1;
             assertEquals("toto3", mrm.getMethodName());
             assertEquals(0, mrm.getArgs().size());
         }
 
         {
-            ReqMatch m1 = reqMatchersList.get(4);
-            MethodReqMatch mrm = (MethodReqMatch) m1;
+            ReqMatch m1 = reqMatchersListImpl.get(4);
+            MethodReqMatchImpl mrm = (MethodReqMatchImpl) m1;
             assertEquals("toto4", mrm.getMethodName());
             assertEquals(1, mrm.getArgs().size());
             assertEquals("D", mrm.getArgs().get(0));
         }
 
         {
-            ReqMatch m1 = reqMatchersList.get(5);
-            MethodReqMatch mrm = (MethodReqMatch) m1;
+            ReqMatch m1 = reqMatchersListImpl.get(5);
+            MethodReqMatchImpl mrm = (MethodReqMatchImpl) m1;
             assertEquals("toto5", mrm.getMethodName());
             assertEquals(1, mrm.getArgs().size());
             assertEquals("[D", mrm.getArgs().get(0));
         }
 
         {
-            ReqMatch m1 = reqMatchersList.get(6);
-            MethodReqMatch mrm = (MethodReqMatch) m1;
+            ReqMatch m1 = reqMatchersListImpl.get(6);
+            MethodReqMatchImpl mrm = (MethodReqMatchImpl) m1;
             assertEquals("toto6", mrm.getMethodName());
             assertEquals(1, mrm.getArgs().size());
             assertEquals("[LDouble", mrm.getArgs().get(0));
@@ -109,15 +109,15 @@ public class TestMethodSignature {
 
         cu.get().accept(blameVisitor, wrapper);
 
-        List<ReqMatch> reqMatchersList = new ArrayList<>(blameVisitor.getMatchers());
-        reqMatchersList.sort(new Comparator<ReqMatch>() {
+        List<ReqMatch> reqMatchersListImpl = new ArrayList<>(blameVisitor.getMatchers());
+        reqMatchersListImpl.sort(new Comparator<ReqMatch>() {
             @Override
-            public int compare(ReqMatch reqMatch, ReqMatch t1) {
-                return ((MethodReqMatch) reqMatch).getMethodName().compareTo(((MethodReqMatch) t1).getMethodName());
+            public int compare(ReqMatch reqMatchImpl, ReqMatch t1) {
+                return ((MethodReqMatchImpl) reqMatchImpl).getMethodName().compareTo(((MethodReqMatchImpl) t1).getMethodName());
             }
         });
 
-        methodSignatureExtraction(reqMatchersList);
+        methodSignatureExtraction(reqMatchersListImpl);
 
     }
 

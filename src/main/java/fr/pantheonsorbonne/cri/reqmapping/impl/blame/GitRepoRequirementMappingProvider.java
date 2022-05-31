@@ -23,7 +23,7 @@ import static java.nio.file.FileVisitResult.CONTINUE;
 public class GitRepoRequirementMappingProvider extends SimpleFileVisitor<Path> implements RequirementMappingProvider {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(GitRepoRequirementMappingProvider.class);
-    private final Set<ReqMatch> repoReqMatchers = new HashSet<>();
+    private final Set<ReqMatch> repoReqMatcherImpls = new HashSet<>();
     protected Repository repo;
     protected FileRequirementMappingProvider fileReqProvider;
 
@@ -44,12 +44,12 @@ public class GitRepoRequirementMappingProvider extends SimpleFileVisitor<Path> i
 
     @Override
     public Set<ReqMatch> getReqMatcher() {
-        return repoReqMatchers;
+        return repoReqMatcherImpls;
     }
 
     @Override
     public int countReqMatchers() {
-        return this.repoReqMatchers.size();
+        return this.repoReqMatcherImpls.size();
     }
 
     @Override
@@ -59,7 +59,7 @@ public class GitRepoRequirementMappingProvider extends SimpleFileVisitor<Path> i
 
             if (com.google.common.io.Files.getFileExtension(file.toString()).equals("java")) {
                 LOGGER.debug("analyzing from {}", file);
-                this.repoReqMatchers.addAll(fileReqProvider.getReqMatcher(file));
+                this.repoReqMatcherImpls.addAll(fileReqProvider.getReqMatcher(file));
             }
 
         } catch (RevisionSyntaxException e) {

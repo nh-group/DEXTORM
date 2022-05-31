@@ -1,7 +1,7 @@
 package fr.pantheonsorbonne.cri.app;
 
 import com.github.gumtreediff.client.Run;
-import fr.pantheonsorbonne.cri.reqmapping.MethodReqMatch;
+import fr.pantheonsorbonne.cri.reqmapping.MethodReqMatchImpl;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.Diff;
 import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.GumTreeFacade;
@@ -37,27 +37,27 @@ class TestDiffGumtree {
 
         GumTreeFacade facade = new GumTreeFacade();
 
-        Collection<ReqMatch> reqMatchers = facade.getReqMatcher(builder.build());
+        Collection<ReqMatch> reqMatcherImpls = facade.getReqMatcher(builder.build());
 
         //DiffTree dt = diffs.get(3).toDiffTree();
         //TreeUtils.visitTree(dt.dst.getRoot(), new PrettyBlameTreePrinter(dt.dst));
 
-        assertEquals(3, reqMatchers.size());
+        assertEquals(3, reqMatcherImpls.size());
         boolean[] assertions = new boolean[]{false, false, false};
 
-        for (ReqMatch m : reqMatchers) {
-            MethodReqMatch mrm = (MethodReqMatch) m;
-            if (m.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("main")) {
+        for (ReqMatch m : reqMatcherImpls) {
+            MethodReqMatchImpl mrm = (MethodReqMatchImpl) m;
+            if (mrm.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("main")) {
                 assertEquals(1, m.getReq().stream().distinct().count());
                 List<String> commits = m.getReq().stream().distinct().collect(Collectors.toList());
                 assertTrue(commits.contains("commit1"));
                 assertions[0] = true;
-            } else if (m.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("sum2")) {
+            } else if (mrm.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("sum2")) {
                 assertEquals(1, m.getReq().stream().distinct().count());
                 List<String> commits = m.getReq().stream().distinct().collect(Collectors.toList());
                 assertTrue(commits.contains("commit2"));
                 assertions[1] = true;
-            } else if (m.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("toto")) {
+            } else if (mrm.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("toto")) {
                 assertEquals(1, m.getReq().stream().distinct().count());
                 List<String> commits = m.getReq().stream().distinct().collect(Collectors.toList());
                 assertTrue(commits.contains("commit2"));

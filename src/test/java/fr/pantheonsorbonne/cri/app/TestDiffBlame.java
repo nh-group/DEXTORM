@@ -1,6 +1,6 @@
 package fr.pantheonsorbonne.cri.app;
 
-import fr.pantheonsorbonne.cri.reqmapping.MethodReqMatch;
+import fr.pantheonsorbonne.cri.reqmapping.MethodReqMatchImpl;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.impl.blame.GitBlameFileRequirementProvider;
 import org.eclipse.jgit.api.Git;
@@ -26,7 +26,7 @@ class TestDiffBlame {
         Path tmpDir = Files.createTempDirectory("");
         Files.createDirectory(Path.of(tmpDir.toAbsolutePath().toString(), "toto"));
         Git git = Git.init().setDirectory(tmpDir.toFile()).call();
-        System.out.println(tmpDir);
+        //System.out.println(tmpDir);
         Files.copy(Paths.get("src/test/resources/A1.java"), Path.of(tmpDir.toAbsolutePath().toString(), "toto/A.java"), StandardCopyOption.REPLACE_EXISTING);
         git.add().addFilepattern("toto/A.java").call();
         git.commit().setMessage("commit1 #1").call();
@@ -49,18 +49,18 @@ class TestDiffBlame {
         boolean[] assertions = new boolean[]{false, false, false};
 
         for (ReqMatch m : reqs) {
-            MethodReqMatch mrm = (MethodReqMatch) m;
-            if (m.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("main")) {
+            MethodReqMatchImpl mrm = (MethodReqMatchImpl) m;
+            if (mrm.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("main")) {
                 assertEquals(1, m.getReq().stream().distinct().count());
                 List<String> commits = m.getReq().stream().distinct().collect(Collectors.toList());
                 assertTrue(commits.contains("1"));
                 assertions[0] = true;
-            } else if (m.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("sum2")) {
+            } else if (mrm.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("sum2")) {
                 assertEquals(1, m.getReq().stream().distinct().count());
                 List<String> commits = m.getReq().stream().distinct().collect(Collectors.toList());
                 assertTrue(commits.contains("4"));
                 assertions[1] = true;
-            } else if (m.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("toto")) {
+            } else if (mrm.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("toto")) {
                 assertEquals(1, m.getReq().stream().distinct().count());
                 List<String> commits = m.getReq().stream().distinct().collect(Collectors.toList());
                 assertTrue(commits.contains("3"));

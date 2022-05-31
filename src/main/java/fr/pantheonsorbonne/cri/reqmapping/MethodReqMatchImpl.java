@@ -8,20 +8,20 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class MethodReqMatch extends ReqMatch {
+public class MethodReqMatchImpl extends ReqMatchImpl {
     private final List<String> args = new ArrayList<>();
     private final String methodName;
 
-    public MethodReqMatch(String className, String packageName, String methodName, List<String> args, String... reqs) {
+    public MethodReqMatchImpl(String className, String packageName, String methodName, List<String> args, String... reqs) {
         super(className, packageName, reqs);
         this.methodName = methodName;
         this.args.addAll(args);
-        System.out.println(this);
+        //System.out.println(this);
     }
 
     @Override
     public boolean isMatch(StackTraceElement elt) {
-        return this.getFQClassName().equals(elt.getClassName().replaceAll("/", "."))
+        return super.isMatchClass(elt)
                 && this.getMethodName().equals(elt.getMethodName().split("\\$")[0])
                 && Arrays.equals(this.getArgs().toArray(), ReqMatcherBuilder.strArgsToList(elt.getMethodArgs()).toArray())
                 && this.getReq().stream().anyMatch(Predicate.not(Strings::isNullOrEmpty));

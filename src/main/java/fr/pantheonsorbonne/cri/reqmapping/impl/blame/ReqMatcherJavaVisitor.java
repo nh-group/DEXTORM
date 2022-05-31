@@ -9,6 +9,7 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
+import fr.pantheonsorbonne.cri.reqmapping.ReqMatchImpl;
 import fr.pantheonsorbonne.cri.reqmapping.impl.Utils;
 
 import java.util.*;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class ReqMatcherJavaVisitor extends VoidVisitorAdapter<BlameDataWrapper> {
 
-    private final Set<ReqMatch> reqMatchers = new HashSet<>();
+    private final Set<ReqMatch> reqMatcherImpls = new HashSet<>();
     private String className = "";
     private String packageName = "";
 
@@ -62,7 +63,7 @@ public class ReqMatcherJavaVisitor extends VoidVisitorAdapter<BlameDataWrapper> 
                         .collect(Collectors.toList());
                 Collection<String> commitId = wraper.blameData.get(fqClassName).get(pos.get().line);
                 if (commitId != null) {
-                    reqMatchers.add(ReqMatch.newBuilder()
+                    reqMatcherImpls.add(ReqMatchImpl.newBuilder()
                             .className(this.className)
                             .packageName(this.packageName)
                             .methodName(md.getNameAsString())
@@ -83,6 +84,6 @@ public class ReqMatcherJavaVisitor extends VoidVisitorAdapter<BlameDataWrapper> 
     }
 
     public Collection<ReqMatch> getMatchers() {
-        return this.reqMatchers;
+        return this.reqMatcherImpls;
     }
 }

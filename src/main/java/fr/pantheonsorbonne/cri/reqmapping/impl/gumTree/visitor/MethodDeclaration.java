@@ -8,12 +8,10 @@ import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.GumTreeFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class MethodDeclaration extends JavaParserTreeVisitor {
+public class MethodDeclaration extends JavaParserTreeVisitorComposite {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodDeclaration.class);
 
@@ -23,7 +21,7 @@ public class MethodDeclaration extends JavaParserTreeVisitor {
     }
 
     private void showTree(Tree tree, String offset) {
-        System.out.println(offset + tree.toTreeString() + " " + tree.getLabel() + " " + tree);
+        //System.out.println(offset + tree.toTreeString() + " " + tree.getLabel() + " " + tree);
         offset += "\t";
         for (Tree subtree : tree.getChildren()) {
             if (!"BlockStmt".equals(subtree.getType())) {
@@ -36,7 +34,7 @@ public class MethodDeclaration extends JavaParserTreeVisitor {
     @Override
     public void startTree(Tree tree) {
 
-        GumTreeFacade.showTree(tree, "", System.out);
+        //GumTreeFacade.showTree(tree, "", System.out);
 
         Optional<Tree> methodName = tree.getChildren().stream()
                 .filter((Tree child) -> child.getType().name.startsWith("SimpleName")).findFirst();
@@ -72,7 +70,7 @@ public class MethodDeclaration extends JavaParserTreeVisitor {
             }
             strParameter.append(")V");
             String trace = this.parentMatcherBuilder.getPackageName() + "." + this.parentMatcherBuilder.getClassName() + "." + methodName.get().getLabel() + "(" + strParameter + ")" + ((Collection<String>) tree.getMetadata(GumTreeFacade.BLAME_ID)).stream().collect(Collectors.joining("-"));
-            System.out.println("#" + trace);
+            //System.out.println("#" + trace);
 
             ReqMatcherBuilder currentMethodMatcher = this.parentMatcherBuilder
                     .methodName(methodName.get().getLabel())
@@ -80,18 +78,24 @@ public class MethodDeclaration extends JavaParserTreeVisitor {
                     .args(strParameter.toString())
                     .getCopy();
 
-            /**
-             for (ITree child : tree.getChildren()) {
-             String treeType = child.toPrettyString(this.ctx);
-             if (treeType.equals(Parameter.class.getSimpleName())) {
-             new Parameter(ctx, currentMethodMatcher).startTree(child);
-             } else if (treeType.equals("BlockStmt")) {
-             new SimpleRequirementGrabberCompositeVisitor(currentMethodMatcher).startTree(child);
-             }
-             }*/
-            this.matchers.add(currentMethodMatcher);
+            List<ReqMatcherBuilder> statementBuilder = new ArrayList<>();
+            for (Tree child : tree.getChildren()) {
+                if (child.getType().name.equals("BlockStmt")) {
+                    //here the issue is that the line in the block statement and its children are relative to the line of the the parent an not relative to the file.
+                    var visitor = new SimpleRequirementGrabberCompositeVisitor(currentMethodMatcher);
+                    //visitor.startTree(child);
+                    statementBuilder.addAll(visitor.collect());
+                }
+            }
+            this.matchersBuilders.add(currentMethodMatcher);
+            this.matchersBuilders.addAll(statementBuilder);
         }
 
+    }
+
+    @Override
+    public Collection<Class<? extends JavaParserTreeVisitor>> getChildVisitors() {
+        return Arrays.asList(CodeBlockVisitor.class);
     }
 
     @Override

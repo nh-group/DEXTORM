@@ -28,7 +28,7 @@ public abstract class JavaParserTreeVisitorComposite extends JavaParserTreeVisit
 
                         subVisitor.startTree(subtree);
                         subVisitor.endTree(subtree);
-                        matchers.addAll(subVisitor.getMatchers());
+                        matchersBuilders.addAll(subVisitor.getMatchersBuilders());
                     }
                 }
             }

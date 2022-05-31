@@ -73,9 +73,11 @@ public class ReqMatcherBuilder implements Cloneable {
     public ReqMatch build() {
 
         if (line == null) {
-            return new MethodReqMatch(this.className, this.packageName, this.methodName, this.args, this.reqs.toArray(new String[0]));
+            return new MethodReqMatchImpl(this.className, this.packageName, this.methodName, this.args, this.reqs.toArray(new String[0]));
+        } else if (this.methodName == null) {
+            return new LineReqMatchImpl(this.className, this.packageName, this.line, this.reqs.toArray(new String[0]));
         } else {
-            return new LineReqMatch(this.className, this.packageName, this.methodName, this.args, this.line, this.reqs.toArray(new String[0]));
+            return new CompositeReqMatchImpl(new MethodReqMatchImpl(this.className, this.packageName, this.methodName, this.args, this.reqs.toArray(new String[0])), new LineReqMatchImpl(this.className, this.packageName, this.line, this.reqs.toArray(new String[0])));
         }
 
     }

@@ -24,7 +24,6 @@ import javax.xml.transform.stream.StreamSource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class JacocoInstrumentationClient implements InstrumentationClient {
 
@@ -104,8 +103,8 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
         for (StackTraceElement ste : stackTraces) {
 
             StackTraceParser p = new StackTraceParser(new StackTraceElement[]{ste}, instrumentedPackage, mapper.getReqMatcher());
-            if (p.getReqs().size() > 0)
-                System.out.println(ste.toString() + " " + p.getReqs().stream().sorted().collect(Collectors.joining(",")));
+            //if (p.getReqs().size() > 0)
+            //System.out.println(ste.toString() + " " + p.getReqs().stream().sorted().collect(Collectors.joining(",")));
         }
 
 

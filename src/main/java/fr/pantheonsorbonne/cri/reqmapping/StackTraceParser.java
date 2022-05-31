@@ -10,11 +10,11 @@ public class StackTraceParser {
     private final String instrumentedPackage;
     private final StackTraceElement[] elements;
 
-    private final Set<ReqMatch> reqMatchers;
+    private final Set<ReqMatch> reqMatcherImpls;
 
-    public StackTraceParser(StackTraceElement[] elements, String instrumentedPackage, Set<ReqMatch> reqMatchers) {
+    public StackTraceParser(StackTraceElement[] elements, String instrumentedPackage, Set<ReqMatch> reqMatcherImpls) {
         this.elements = elements;
-        this.reqMatchers = reqMatchers;
+        this.reqMatcherImpls = reqMatcherImpls;
         this.instrumentedPackage = instrumentedPackage;
     }
 
@@ -24,7 +24,7 @@ public class StackTraceParser {
         for (StackTraceElement elt : elements) {
             //System.out.println(elt);
             if (elt.getClassName().replaceAll("/", ".").startsWith(instrumentedPackage.replaceAll("/", "."))) {
-                for (ReqMatch m : reqMatchers) {
+                for (ReqMatch m : reqMatcherImpls) {
                     if (match(elt, m)) {
                         res.addAll(m.getReq());
                     }
