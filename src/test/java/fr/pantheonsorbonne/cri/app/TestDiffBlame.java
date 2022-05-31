@@ -1,5 +1,6 @@
 package fr.pantheonsorbonne.cri.app;
 
+import fr.pantheonsorbonne.cri.reqmapping.CompositeReqMatchImpl;
 import fr.pantheonsorbonne.cri.reqmapping.MethodReqMatchImpl;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.impl.blame.GitBlameFileRequirementProvider;
@@ -49,7 +50,7 @@ class TestDiffBlame {
         boolean[] assertions = new boolean[]{false, false, false};
 
         for (ReqMatch m : reqs) {
-            MethodReqMatchImpl mrm = (MethodReqMatchImpl) m;
+            MethodReqMatchImpl mrm = ((CompositeReqMatchImpl) m).getComponent(MethodReqMatchImpl.class).get();
             if (mrm.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("main")) {
                 assertEquals(1, m.getReq().stream().distinct().count());
                 List<String> commits = m.getReq().stream().distinct().collect(Collectors.toList());

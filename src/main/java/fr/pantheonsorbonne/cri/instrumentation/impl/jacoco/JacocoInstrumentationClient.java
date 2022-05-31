@@ -55,8 +55,10 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
             for (Class klass : pakage.getClazz()) {
                 if (doMethods) {
                     for (Method method : klass.getMethod()) {
+                        String[] klassBits = klass.getName().replaceAll("/", ".").split("\\.");
+                        String klassName = klassBits[klassBits.length - 1];
                         stackTraces.add(new StackTraceElement(klass.getSourcefilename(),
-                                pakage.getName(), klass.getName(), method.getName(), method.getDesc(), method.getLine()));
+                                pakage.getName().replaceAll("/", "."), klassName, method.getName(), method.getDesc(), method.getLine()));
                     }
                 }
                 if (doInstructions) {

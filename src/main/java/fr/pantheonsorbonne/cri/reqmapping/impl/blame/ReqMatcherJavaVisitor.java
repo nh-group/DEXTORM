@@ -67,8 +67,9 @@ public class ReqMatcherJavaVisitor extends VoidVisitorAdapter<BlameDataWrapper> 
                             .className(this.className)
                             .packageName(this.packageName)
                             .methodName(md.getNameAsString())
-                            //.line(pos.get().line) //no line info required for method declaration
-                            .args(args).commits(commitId).build());
+                            .line(pos.get().line) //no line info required for method declaration
+                            .args(args)
+                            .commits(commitId).build());
                 }
 
             }

@@ -21,14 +21,6 @@ public class StackTraceElement {
         return new StackTraceElement(e.getFileName(), e.getModuleName(), e.getClassName(), e.getMethodName(), "", e.getLineNumber());
     }
 
-    public String getClassName() {
-        return className;
-    }
-
-    public String getPackageName() {
-        return packageName;
-    }
-
     public String getMethodName() {
         return methodName;
     }
@@ -48,5 +40,17 @@ public class StackTraceElement {
     @Override
     public String toString() {
         return packageName + "." + className + "." + methodName + "(" + line + "): ";
+    }
+
+    public String getFQClassName() {
+        return this.getPackageName() + "." + this.getClassName();
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public String getClassName() {
+        return className;
     }
 }

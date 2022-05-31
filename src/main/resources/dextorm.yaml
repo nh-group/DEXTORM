@@ -3,7 +3,7 @@ app:
   sourceRootDir: src/main/java
   publisher: console1
   issueCollector: github1
-  diffAlgorithm: g
+  diffAlgorithm: b
 differs:
   g:
     diffAlgorithm: GUMTREE
@@ -12,7 +12,7 @@ differs:
   b:
     diffAlgorithm: BLAME
     methods: true
-    instructions: false
+    instructions: true
 issueCollectors:
   github:
     github1:

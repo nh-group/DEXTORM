@@ -34,8 +34,8 @@ public abstract class ReqMatchImpl implements ReqMatch {
         this.commits.addAll(req);
     }
 
-    protected boolean isMatchClass(StackTraceElement elt) {
-        return this.getFQClassName().equals(elt.getPackageName() + "." + elt.getClassName().replaceAll("/", "."));
+    protected boolean isMatchFQClass(StackTraceElement elt) {
+        return this.getFQClassName().equals(elt.getFQClassName());
     }
 
     public String getFQClassName() {

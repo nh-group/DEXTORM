@@ -23,7 +23,7 @@ public class StackTraceParser {
         Set<String> res = new HashSet<>();
         for (StackTraceElement elt : elements) {
             //System.out.println(elt);
-            if (elt.getClassName().replaceAll("/", ".").startsWith(instrumentedPackage.replaceAll("/", "."))) {
+            if (elt.getPackageName().startsWith(this.instrumentedPackage)) {
                 for (ReqMatch m : reqMatcherImpls) {
                     if (match(elt, m)) {
                         res.addAll(m.getReq());

@@ -21,7 +21,7 @@ public class MethodReqMatchImpl extends ReqMatchImpl {
 
     @Override
     public boolean isMatch(StackTraceElement elt) {
-        return super.isMatchClass(elt)
+        return super.isMatchFQClass(elt)
                 && this.getMethodName().equals(elt.getMethodName().split("\\$")[0])
                 && Arrays.equals(this.getArgs().toArray(), ReqMatcherBuilder.strArgsToList(elt.getMethodArgs()).toArray())
                 && this.getReq().stream().anyMatch(Predicate.not(Strings::isNullOrEmpty));

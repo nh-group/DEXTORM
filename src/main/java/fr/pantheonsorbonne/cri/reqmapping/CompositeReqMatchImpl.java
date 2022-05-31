@@ -1,9 +1,6 @@
 package fr.pantheonsorbonne.cri.reqmapping;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class CompositeReqMatchImpl implements ReqMatch {
     final List<ReqMatch> matches;
@@ -15,12 +12,13 @@ public class CompositeReqMatchImpl implements ReqMatch {
     @Override
     public boolean isMatch(StackTraceElement elt) {
         for (ReqMatch reqMatch : this.matches) {
-            if (!reqMatch.isMatch(elt)) {
-                return false;
+            if (reqMatch.isMatch(elt)) {
+                //System.out.println(elt.toString() + " no match with" + reqMatch);
+                return true;
             }
         }
 
-        return true;
+        return false;
 
     }
 
@@ -32,5 +30,9 @@ public class CompositeReqMatchImpl implements ReqMatch {
         }
         return res;
 
+    }
+
+    public <T extends ReqMatch> Optional<T> getComponent(Class<T> klass) {
+        return (Optional<T>) this.matches.stream().filter(m -> m.getClass().equals(klass)).findFirst();
     }
 }
