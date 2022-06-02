@@ -12,13 +12,13 @@ public class CompositeReqMatchImpl implements ReqMatch {
     @Override
     public boolean isMatch(StackTraceElement elt) {
         for (ReqMatch reqMatch : this.matches) {
-            if (reqMatch.isMatch(elt)) {
+            if (!reqMatch.isMatch(elt)) {
                 //System.out.println(elt.toString() + " no match with" + reqMatch);
-                return true;
+                return false;
             }
         }
 
-        return false;
+        return true;
 
     }
 
