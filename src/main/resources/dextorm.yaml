@@ -3,7 +3,7 @@ app:
   sourceRootDir: src/main/java
   publisher: console1
   issueCollector: dummy
-  diffAlgorithm: g
+  diffAlgorithm: b
 differs:
   g:
     diffAlgorithm: GUMTREE

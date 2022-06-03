@@ -25,6 +25,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,6 +62,7 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
                     .addPath(relativeFilePath.toString());
 
             List<CommitIssueMapping> commitIssueMappings = new ArrayList<>();
+            //start from head to the begining of time
             for (RevCommit revCommit : logCommand.call()) {
 
                 CommitIssueMapping mapping = new CommitIssueMapping();
@@ -69,6 +71,8 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
                 commitIssueMappings.add(mapping);
 
             }
+            //we need to start from the begining of time toward HEAD, so we reverse the list
+            Collections.reverse(commitIssueMappings);
             Diff.DiffBuilder builder = Diff.getBuilder();
             for (CommitIssueMapping mapping : commitIssueMappings) {
                 Path path = materializeFileFromCommit(this.repo, mapping.id, relativeFilePath.toString());
