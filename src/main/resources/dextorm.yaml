@@ -3,7 +3,7 @@ app:
   sourceRootDir: src/main/java
   publisher: console1
   issueCollector: dummy
-  diffAlgorithm: b
+  diffAlgorithm: g
 differs:
   g:
     diffAlgorithm: GUMTREE
@@ -17,11 +17,11 @@ issueCollectors:
   github:
     basic-cli-uni:
       gitHubRepoName: nh-group/basic-cli-uni
-      branch: master
+      branch: test1
     dummy:
       gitHubRepoName: nherbaut/dextorm-dummy-project
       repoAddress: file:///home/nherbaut/tmp/dextorm-dummy-project.git
-      branch: master
+      branch: test1
 
 publishers:
   grpcPublishers:

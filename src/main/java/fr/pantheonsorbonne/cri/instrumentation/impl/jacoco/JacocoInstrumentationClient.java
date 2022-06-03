@@ -89,14 +89,12 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
 
         //update the map to get the ratio between covered and all
         var coveredReqIdList = parserCovered.getMatchingRequirementsIdList();
-        for (String reqId : Sets.newHashSet(coveredReqIdList.iterator())) {
-            Double countElements = coverageInfo.get(reqId);
-            countElements = Double.valueOf(coveredReqIdList.stream().filter(req -> req.equals(reqId)).count()) / countElements;
-            coverageInfo.put(reqId, countElements);
-        }
-
-        for (String req : new TreeSet<>(coverageInfo.keySet())) {
-            System.out.println("Coverage " + req + " : " + 100 * coverageInfo.get(req));
+        for (String reqId : Sets.newTreeSet(coveredReqIdList)) {
+            Double countTotal = coverageInfo.get(reqId);
+            Double countCovered = Double.valueOf(coveredReqIdList.stream().filter(req -> req.equals(reqId)).count());
+            Double ratio = countCovered / countTotal;
+            coverageInfo.put(reqId, ratio);
+            System.out.println("Coverage " + reqId + " : " + 100 * ratio + " (" + countCovered + "/" + countTotal + ")");
         }
 
 
