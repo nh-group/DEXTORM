@@ -3,8 +3,8 @@ package fr.pantheonsorbonne.cri.configuration.model.collectors;
 public class GitHubIssueCollectorConfig {
     String gitHubRepoName;
     String repoAddress;
+    String branch;
 
-   
     public GitHubIssueCollectorConfig() {
     }
 
@@ -27,5 +27,15 @@ public class GitHubIssueCollectorConfig {
         this.gitHubRepoName = gitHubRepoName;
     }
 
+    public String getBranch() {
+        if (branch != null) {
+            return branch;
+        } else {
+            return "master";
+        }
+    }
 
+    public void setBranch(String branch) {
+        this.branch = branch;
+    }
 }

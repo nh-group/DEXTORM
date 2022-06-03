@@ -22,11 +22,28 @@ public abstract class GitRepoProviderModule extends AbstractModule {
     private static final Logger logger = Logger.getLogger(GitRepoProviderModule.class.getName());
     protected String issueCollectorAddress;
     protected String repoAddress;
+    protected String branch;
 
-
-    public GitRepoProviderModule(String isseCollectorAddress, String repoAddress) {
+    public GitRepoProviderModule(String isseCollectorAddress, String repoAddress, String branch) {
         this.issueCollectorAddress = isseCollectorAddress;
         this.repoAddress = repoAddress;
+        this.branch = branch;
+    }
+
+    public String getBranch() {
+        return branch;
+    }
+
+    public void setBranch(String branch) {
+        this.branch = branch;
+    }
+
+
+    @Provides
+    @Singleton
+    @Named("git-branch")
+    private String getBranchName() {
+        return this.branch;
     }
 
     @Provides
@@ -48,7 +65,7 @@ public abstract class GitRepoProviderModule extends AbstractModule {
 
         try {
             logger.log(Level.INFO, "cloning repository from" + repoAddress + " to " + tempFolder);
-            return Git.cloneRepository().setURI(repoAddress).setDirectory(tempFolder.toFile()).setBare(false).call();
+            return Git.cloneRepository().setURI(repoAddress).setBranch(this.branch).setDirectory(tempFolder.toFile()).setBare(false).call();
 
         } catch (GitAPIException e) {
 

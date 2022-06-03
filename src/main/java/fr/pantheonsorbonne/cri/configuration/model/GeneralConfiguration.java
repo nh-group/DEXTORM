@@ -87,7 +87,7 @@ public class GeneralConfiguration {
 
             if ((this.issueCollectors.github.containsKey(this.app.getIssueCollectorName()))) {
                 GitHubIssueCollectorConfig gitHubConfig = this.issueCollectors.github.get(this.app.getIssueCollectorName());
-                gitRepoProviderModule = new GitHubRepoProviderModule(gitHubConfig.getGitHubRepoName(), gitHubConfig.getRepoAddress());
+                gitRepoProviderModule = new GitHubRepoProviderModule(gitHubConfig.getGitHubRepoName(), gitHubConfig.getRepoAddress(), gitHubConfig.getBranch());
 
 
             } else {

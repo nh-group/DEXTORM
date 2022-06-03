@@ -17,9 +17,11 @@ issueCollectors:
   github:
     basic-cli-uni:
       gitHubRepoName: nh-group/basic-cli-uni
+      branch: master
     dummy:
       gitHubRepoName: nherbaut/dextorm-dummy-project
       repoAddress: file:///home/nherbaut/tmp/dextorm-dummy-project.git
+      branch: master
 
 publishers:
   grpcPublishers:

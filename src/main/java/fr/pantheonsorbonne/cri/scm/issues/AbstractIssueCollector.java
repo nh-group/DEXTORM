@@ -1,10 +1,10 @@
 package fr.pantheonsorbonne.cri.scm.issues;
 
 public abstract class AbstractIssueCollector implements IssueCollector {
-    protected String repo;
+    protected String collectorName;
 
-    public AbstractIssueCollector(String repo) {
-        this.repo = repo;
+    public AbstractIssueCollector(String collectorName) {
+        this.collectorName = collectorName;
     }
 
 }
