@@ -1,5 +1,6 @@
 package fr.pantheonsorbonne.cri.instrumentation.impl.jacoco;
 
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import fr.pantheonsorbonne.cri.instrumentation.InstrumentationClient;
@@ -8,9 +9,10 @@ import fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model.Package;
 import fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model.*;
 import fr.pantheonsorbonne.cri.model.requirements.Requirement;
 import fr.pantheonsorbonne.cri.publisher.RequirementPublisher;
+import fr.pantheonsorbonne.cri.reqmapping.ElementMapper;
+import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.RequirementMappingProvider;
 import fr.pantheonsorbonne.cri.reqmapping.StackTraceElement;
-import fr.pantheonsorbonne.cri.reqmapping.StackTraceParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,9 +23,8 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Predicate;
 
 public class JacocoInstrumentationClient implements InstrumentationClient {
 
@@ -49,68 +50,59 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
     public void registerClient() {
         LOGGER.info("analysing {}", jacocoReport);
 
+        //get Jacoco Data
         Report report = getReportObjectFromXMl();
-        List<StackTraceElement> stackTraces = new ArrayList<>();
-        for (Package pakage : report.getPackages()) {
-            for (Class klass : pakage.getClazz()) {
-                if (doMethods) {
-                    for (Method method : klass.getMethod()) {
-                        String[] klassBits = klass.getName().replaceAll("/", ".").split("\\.");
-                        String klassName = klassBits[klassBits.length - 1];
-                        stackTraces.add(new StackTraceElement(klass.getSourcefilename(),
-                                pakage.getName().replaceAll("/", "."), klassName, method.getName(), method.getDesc(), method.getLine()));
-                    }
-                }
-                if (doInstructions) {
-                    for (Sourcefile sourcefile : pakage.getSourceFile()) {
+        //get the covered elements
+        List<StackTraceElement> stackTracesCovered = extractStackTraceElement(report, this.doMethods, true, this.doInstructions, true);
+        //get all the elements
+        List<StackTraceElement> stackTracesAll = extractStackTraceElement(report, this.doMethods, false, this.doInstructions, false);
 
-                        for (Line line : sourcefile.getLine()) {
-                            //https://stackoverflow.com/questions/33868761/how-to-interpret-the-jacoco-xml-file
-                        /*
-                        mi = missed instructions (statements)
-                        ci = covered instructions (statements)
-                        mb = missed branches
-                        cb = covered branches
+        //get the matcher from the code<->req mapper
+        Set<ReqMatch> requirementsMatchers = mapper.getReqMatcher();
 
-                        When mb or cb is greater then 0 the line is a branch.
-                        When mb and cb are 0 the line is a statement.
-                        cb / (mb+cb) (line 11) is 2/4 partial hit
-                        When not a branch and mi == 0 the line is hit
-
-                        cb>0||ci>0 => hit
-
-                         */
-                            if (line.getCb() > 0 || line.getCi() > 0) {
-
-                                Optional<Method> method = klass.getMethod().stream().filter(m -> m.getLine() >= line.getNr()).findFirst();
-                                if (method.isPresent()) {
-                                    stackTraces.add(
-                                            new StackTraceElement(
-                                                    klass.getSourcefilename(),
-                                                    pakage.getName(),
-                                                    klass.getName(),
-                                                    method.get().getName(),
-                                                    method.get().getDesc(),
-                                                    line.getNr()));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        //Matches elements with the mapper
+        ElementMapper parserCovered = new ElementMapper(stackTracesCovered.toArray(new StackTraceElement[0]), instrumentedPackage, requirementsMatchers);
+        ElementMapper parserAll = new ElementMapper(stackTracesAll.toArray(new StackTraceElement[0]), instrumentedPackage, requirementsMatchers);
 
 
+        //only covered
+        var covered = parserCovered.getMatchedElements();
+        //every element
+        var all = parserAll.getMatchedElements();
+        var uncovered = new HashSet<>(all);
+        uncovered.removeAll(covered);
+
+        //mapp uncovered element
+        var parseUncovered = new ElementMapper(uncovered.toArray(new StackTraceElement[0]), instrumentedPackage, requirementsMatchers);
+
+        //for each element, the correspondings reqId
+        var uncoveredReqIdList = parseUncovered.getMatchingRequirementsIdList();
+
+        //map collecting coverage info
+        Map<String, Double> coverageInfo = new HashMap<>();
+
+        //fill the map with all the id from all element
+        var allReqIdList = parserAll.getMatchingRequirementsIdList();
+        for (String reqId : Sets.newHashSet(allReqIdList.iterator())) {
+            coverageInfo.put(reqId, Double.valueOf(allReqIdList.stream().filter(req -> req.equals(reqId)).count()));
         }
-        StackTraceParser parser = new StackTraceParser(stackTraces.toArray(new StackTraceElement[0]), instrumentedPackage, mapper.getReqMatcher());
-        for (StackTraceElement ste : stackTraces) {
 
-            StackTraceParser p = new StackTraceParser(new StackTraceElement[]{ste}, instrumentedPackage, mapper.getReqMatcher());
-            //if (p.getReqs().size() > 0)
-            //System.out.println(ste.toString() + " " + p.getReqs().stream().sorted().collect(Collectors.joining(",")));
+        //update the map to get the ratio between covered and all
+        var coveredReqIdList = parserCovered.getMatchingRequirementsIdList();
+        for (String reqId : Sets.newHashSet(coveredReqIdList.iterator())) {
+            Double countElements = coverageInfo.get(reqId);
+            countElements = Double.valueOf(coveredReqIdList.stream().filter(req -> req.equals(reqId)).count()) / countElements;
+            coverageInfo.put(reqId, countElements);
+        }
+
+        for (String req : new TreeSet<>(coverageInfo.keySet())) {
+            System.out.println("Coverage " + req + " : " + 100 * coverageInfo.get(req));
         }
 
 
-        parser.getReqs().stream().map((String req) -> Requirement.newBuilder().setId(req).build())
+        parserCovered.getMatchingRequirementsIdSet()
+                .stream()
+                .map((String req) -> Requirement.newBuilder().setId(req).build())
                 .forEach((Requirement req) -> publisher.publish(req));
 
 
@@ -134,6 +126,78 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
 
         System.exit(-1);
         return null;
+    }
+
+    private static List<StackTraceElement> extractStackTraceElement(Report report, boolean doMethods, boolean onlyCoveredMethods, boolean doInstructions, boolean onlyCoveredInstructions) {
+        Predicate<Counter> methodPredicate;
+        if (onlyCoveredMethods) {
+            methodPredicate = c -> c.getCovered().equals("1");
+        } else {
+            methodPredicate = c -> true;
+        }
+
+        Predicate<Line> linePredicate;
+        if (onlyCoveredInstructions) {
+            linePredicate = line -> line.getCb() > 0 || line.getCi() > 0;
+        } else {
+            linePredicate = l -> true;
+        }
+
+
+        List<StackTraceElement> stackTraces = new ArrayList<>();
+        for (Package pakage : report.getPackages()) {
+            for (Class klass : pakage.getClazz()) {
+                if (doMethods) {
+                    for (Method method : klass.getMethod()) {
+                        String[] klassBits = klass.getName().replaceAll("/", ".").split("\\.");
+                        String klassName = klassBits[klassBits.length - 1];
+                        if (method.getCounter().stream().anyMatch(methodPredicate)) {
+                            stackTraces.add(new StackTraceElement(klass.getSourcefilename(),
+                                    pakage.getName().replaceAll("/", "."), klassName, method.getName(), method.getDesc(), method.getLine()));
+                        }
+                    }
+                }
+                if (doInstructions) {
+                    for (Sourcefile sourcefile : pakage.getSourceFile()) {
+
+                        for (Line line : sourcefile.getLine()) {
+                            //https://stackoverflow.com/questions/33868761/how-to-interpret-the-jacoco-xml-file
+                        /*
+                        mi = missed instructions (statements)
+                        ci = covered instructions (statements)
+                        mb = missed branches
+                        cb = covered branches
+
+                        When mb or cb is greater then 0 the line is a branch.
+                        When mb and cb are 0 the line is a statement.
+                        cb / (mb+cb) (line 11) is 2/4 partial hit
+                        When not a branch and mi == 0 the line is hit
+
+                        cb>0||ci>0 => hit
+
+                         */
+                            if (linePredicate.test(line)) {
+
+                                Optional<Method> method = klass.getMethod().stream().filter(m -> m.getLine() >= line.getNr()).findFirst();
+                                if (method.isPresent()) {
+                                    stackTraces.add(
+                                            new StackTraceElement(
+                                                    klass.getSourcefilename(),
+                                                    pakage.getName(),
+                                                    klass.getName(),
+                                                    method.get().getName(),
+                                                    method.get().getDesc(),
+                                                    line.getNr()));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+        }
+        return stackTraces;
     }
 }
 

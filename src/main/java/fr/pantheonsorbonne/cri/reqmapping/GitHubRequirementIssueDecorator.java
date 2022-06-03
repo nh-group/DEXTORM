@@ -11,18 +11,18 @@ import java.net.URI;
 public class GitHubRequirementIssueDecorator implements RequirementIssueDecorator {
 
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(GitHubRequirementIssueDecorator.class);
-    String baseGithubURI;
+    String gitHubRepoName;
 
     @Inject
-    public GitHubRequirementIssueDecorator(@Named("github-repo") String baseGithubURI) {
-        this.baseGithubURI = baseGithubURI;
+    public GitHubRequirementIssueDecorator(@Named("gitHubRepoName") String gitHubRepoName) {
+        this.gitHubRepoName = gitHubRepoName;
     }
 
     @Override
     public Requirement getIssueLink(Requirement req) {
         try {
             Integer issue = Integer.parseInt(req.getId());
-            return Requirement.newBuilder(req).setIssueURI(URI.create(baseGithubURI + "/" + issue).toString()).build();
+            return Requirement.newBuilder(req).setIssueURI(URI.create("https://github.com/" + gitHubRepoName + "/" + issue).toString()).build();
         } catch (java.lang.NumberFormatException e) {
             LOG.warn("failed to find github issue for req" + req);
             return req;
@@ -32,7 +32,7 @@ public class GitHubRequirementIssueDecorator implements RequirementIssueDecorato
 
     @Override
     public String getRoot() {
-        return this.baseGithubURI;
+        return this.gitHubRepoName;
     }
 
 }

@@ -17,20 +17,22 @@ public class SimpleRequirementGrabberCompositeVisitor implements TreeVisitor {
 
     private final ReqMatcherBuilder parentMatcher;
     private final List<ReqMatcherBuilder> builders;
+    private final int parentLineNumber;
 
-    public SimpleRequirementGrabberCompositeVisitor(ReqMatcherBuilder parentMatcher) {
+    public SimpleRequirementGrabberCompositeVisitor(ReqMatcherBuilder parentMatcher, int parentLineNumber) {
         this.parentMatcher = parentMatcher;
         this.builders = new ArrayList<>();
+        this.parentLineNumber = parentLineNumber;
     }
 
     @Override
     public void startTree(Tree tree) {
 
-        builders.add(this.parentMatcher.line(tree.getLine()).commits(((Collection<String>) tree.getMetadata(GumTreeFacade.BLAME_ID)).stream()
+        builders.add(this.parentMatcher.line(tree.getLine() + this.parentLineNumber).commits(((Collection<String>) tree.getMetadata(GumTreeFacade.BLAME_ID)).stream()
                 .filter(Predicate.not(Strings::isNullOrEmpty)).collect(Collectors.toList())).getCopy());
 
         for (Tree child : tree.getChildren()) {
-            new SimpleRequirementGrabberCompositeVisitor(parentMatcher).startTree(child);
+            new SimpleRequirementGrabberCompositeVisitor(parentMatcher, this.parentLineNumber).startTree(child);
         }
     }
 

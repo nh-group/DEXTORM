@@ -8,8 +8,8 @@ import fr.pantheonsorbonne.cri.reqmapping.GitHubRequirementIssueDecorator;
 public class GitHubRepoProviderModule extends GitRepoProviderModule {
 
 
-    public GitHubRepoProviderModule(String repoAddress) {
-        super(repoAddress);
+    public GitHubRepoProviderModule(String gitHubRepoName, String repoAddress) {
+        super(gitHubRepoName, repoAddress);
     }
 
     @Override
@@ -18,8 +18,8 @@ public class GitHubRepoProviderModule extends GitRepoProviderModule {
     }
 
     @Provides
-    @Named("github-repo")
-    public String getGitHubRepoName() {
-        return this.repoAddress;
+    @Named("gitHubRepoName")
+    public String getIssueCollectorAddress() {
+        return this.issueCollectorAddress;
     }
 }

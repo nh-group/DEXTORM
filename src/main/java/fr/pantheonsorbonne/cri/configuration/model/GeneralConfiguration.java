@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
+import fr.pantheonsorbonne.cri.configuration.model.collectors.GitHubIssueCollectorConfig;
 import fr.pantheonsorbonne.cri.configuration.model.collectors.IssueCollectorsConfig;
 import fr.pantheonsorbonne.cri.configuration.model.differ.DifferAlgorithmConfig;
 import fr.pantheonsorbonne.cri.configuration.model.publisher.DBPublisherConfig;
@@ -85,7 +86,9 @@ public class GeneralConfiguration {
         {
 
             if ((this.issueCollectors.github.containsKey(this.app.getIssueCollectorName()))) {
-                gitRepoProviderModule = new GitHubRepoProviderModule("https://github.com/" + this.issueCollectors.github.get(this.app.getIssueCollectorName()).getRepo());
+                GitHubIssueCollectorConfig gitHubConfig = this.issueCollectors.github.get(this.app.getIssueCollectorName());
+                gitRepoProviderModule = new GitHubRepoProviderModule(gitHubConfig.getGitHubRepoName(), gitHubConfig.getRepoAddress());
+
 
             } else {
                 throw new UnsupportedOperationException("only github is supported at this point");

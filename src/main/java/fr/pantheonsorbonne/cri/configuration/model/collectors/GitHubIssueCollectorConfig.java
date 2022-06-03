@@ -1,27 +1,31 @@
 package fr.pantheonsorbonne.cri.configuration.model.collectors;
 
 public class GitHubIssueCollectorConfig {
-    String repo;
+    String gitHubRepoName;
+    String repoAddress;
 
-    public GitHubIssueCollectorConfig(String repo) {
-        this.repo = repo;
-    }
-
+   
     public GitHubIssueCollectorConfig() {
     }
 
-    public String getRepo() {
-        return repo;
+    public String getRepoAddress() {
+        if (repoAddress == null) {
+            return "https://github.com/" + gitHubRepoName + ".git";
+        }
+        return repoAddress;
     }
 
-    public void setRepo(String repo) {
-        this.repo = repo;
+    public void setRepoAddress(String repoAddress) {
+        this.repoAddress = repoAddress;
     }
 
-    @Override
-    public String toString() {
-        return "GitHubIssueCollectorConfig{" +
-                "repo='" + repo + '\'' +
-                '}';
+    public String getGitHubRepoName() {
+        return gitHubRepoName;
     }
+
+    public void setGitHubRepoName(String gitHubRepoName) {
+        this.gitHubRepoName = gitHubRepoName;
+    }
+
+
 }

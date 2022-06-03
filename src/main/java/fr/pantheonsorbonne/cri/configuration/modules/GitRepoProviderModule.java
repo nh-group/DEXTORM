@@ -20,9 +20,12 @@ import java.util.logging.Logger;
 public abstract class GitRepoProviderModule extends AbstractModule {
 
     private static final Logger logger = Logger.getLogger(GitRepoProviderModule.class.getName());
+    protected String issueCollectorAddress;
     protected String repoAddress;
 
-    public GitRepoProviderModule(String repoAddress) {
+
+    public GitRepoProviderModule(String isseCollectorAddress, String repoAddress) {
+        this.issueCollectorAddress = isseCollectorAddress;
         this.repoAddress = repoAddress;
     }
 

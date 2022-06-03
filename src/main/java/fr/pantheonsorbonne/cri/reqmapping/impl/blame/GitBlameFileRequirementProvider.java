@@ -7,6 +7,7 @@ import com.google.common.io.CharStreams;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
+import fr.pantheonsorbonne.cri.reqmapping.Utils;
 import fr.pantheonsorbonne.cri.reqmapping.impl.FileRequirementMappingProvider;
 import org.eclipse.jgit.api.BlameCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -30,8 +31,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
         implements FileRequirementMappingProvider {
@@ -76,18 +75,13 @@ public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
             BlameResult blamed = blamer.call();
 
             int lines = countLinesOfFileInCommit(this.repo, commitID, relativeFilePath.toString());
-            final Pattern p = Pattern.compile(".*#([0-9]+)");
+
             Map<Integer, Collection<String>> fileBlameData = new HashMap<>();
             for (int i = 0; i < lines; i++) {
                 RevCommit commit = blamed.getSourceCommit(i);
-                Matcher m = p.matcher(commit.getShortMessage());
-                if (m.matches()) {
-                    Collection<String> matchingIssueId = new HashSet<>();
-                    for (int j = 1; j < m.groupCount() + 1; j++) {
-                        matchingIssueId.add(m.group(j));
-                    }
-                    fileBlameData.put(i, matchingIssueId);
-                }
+
+                fileBlameData.put(i, Utils.getIssueIdFromCommits(commit.getFullMessage()));
+
 
             }
 

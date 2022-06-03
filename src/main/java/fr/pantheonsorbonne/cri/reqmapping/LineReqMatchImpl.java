@@ -14,10 +14,10 @@ public class LineReqMatchImpl extends ReqMatchImpl {
     }
 
     @Override
-    public boolean isMatch(StackTraceElement elt) {
+    protected boolean isMatchLogged(StackTraceElement elt) {
         return super.isMatchFQClass(elt)
                 && (elt.getLine() == this.getLine())
-                && this.getReq().stream().anyMatch(Predicate.not(Strings::isNullOrEmpty));
+                && this.getRequirementsIds().stream().anyMatch(Predicate.not(Strings::isNullOrEmpty));
     }
 
     public Integer getLine() {
@@ -27,6 +27,6 @@ public class LineReqMatchImpl extends ReqMatchImpl {
 
     @Override
     public String toString() {
-        return this.packageName + "." + this.className + "." + this.line + "(" + this.getReq().stream().collect(Collectors.joining(",")) + ") :" + this.commits.stream().collect(Collectors.joining(","));
+        return this.packageName + "." + this.className + "." + this.line + "(" + this.getRequirementsIds().stream().collect(Collectors.joining(",")) + ") :" + this.commits.stream().collect(Collectors.joining(","));
     }
 }

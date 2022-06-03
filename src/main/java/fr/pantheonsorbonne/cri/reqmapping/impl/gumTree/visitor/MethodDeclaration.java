@@ -82,7 +82,7 @@ public class MethodDeclaration extends JavaParserTreeVisitorComposite {
             for (Tree child : tree.getChildren()) {
                 if (child.getType().name.equals("BlockStmt")) {
                     //here the issue is that the line in the block statement and its children are relative to the line of the the parent an not relative to the file.
-                    var visitor = new SimpleRequirementGrabberCompositeVisitor(currentMethodMatcher);
+                    var visitor = new SimpleRequirementGrabberCompositeVisitor(currentMethodMatcher, tree.getLine());
                     //visitor.startTree(child);
                     statementBuilder.addAll(visitor.collect());
                 }

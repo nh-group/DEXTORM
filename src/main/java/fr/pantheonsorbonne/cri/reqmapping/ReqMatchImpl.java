@@ -1,12 +1,14 @@
 package fr.pantheonsorbonne.cri.reqmapping;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 public abstract class ReqMatchImpl implements ReqMatch {
 
     protected final Set<String> commits = new HashSet<>();
+    protected final Set<StackTraceElement> matches = new HashSet<>();
     protected final String packageName;
     protected final String className;
 
@@ -21,17 +23,31 @@ public abstract class ReqMatchImpl implements ReqMatch {
         return new ReqMatcherBuilder();
     }
 
-    public String getClassName() {
-        return this.className;
+    public final boolean isMatch(StackTraceElement elt) {
+        boolean isAMatch = isMatchLogged(elt);
+        if (isAMatch) {
+            this.matches.add(elt);
+        }
+        return isAMatch;
     }
 
-    public Set<String> getReq() {
+    protected abstract boolean isMatchLogged(StackTraceElement elt);
+
+    public Set<String> getRequirementsIds() {
         return commits;
+    }
+
+    public Collection<StackTraceElement> getMatchingTraceElement() {
+        return this.matches;
     }
 
     public void setReq(java.util.List<String> req) {
         this.commits.clear();
         this.commits.addAll(req);
+    }
+
+    public String getClassName() {
+        return this.className;
     }
 
     protected boolean isMatchFQClass(StackTraceElement elt) {

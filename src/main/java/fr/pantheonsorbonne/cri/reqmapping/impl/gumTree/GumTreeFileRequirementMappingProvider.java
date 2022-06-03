@@ -2,6 +2,7 @@ package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree;
 
 import com.google.inject.Inject;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
+import fr.pantheonsorbonne.cri.reqmapping.Utils;
 import fr.pantheonsorbonne.cri.reqmapping.impl.FileRequirementMappingProvider;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
@@ -25,8 +26,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class GumTreeFileRequirementMappingProvider implements FileRequirementMappingProvider {
@@ -66,7 +65,7 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
 
                 CommitIssueMapping mapping = new CommitIssueMapping();
                 mapping.id = revCommit;
-                mapping.issueId = getIssueIdFromCommits(revCommit.getFullMessage());
+                mapping.issueId = Utils.getIssueIdFromCommits(revCommit.getFullMessage());
                 commitIssueMappings.add(mapping);
 
             }
@@ -83,16 +82,6 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
 
         throw new NoSuchFileException(file.toString());
 
-    }
-
-    private List<String> getIssueIdFromCommits(String message) {
-        List<String> res = new ArrayList<>();
-        final Pattern p = Pattern.compile("#([0-9]+)");
-        Matcher m = p.matcher(message);
-        while (m.find()) {
-            res.add(m.group(1));
-        }
-        return res;
     }
 
     private Path materializeFileFromCommit(Repository repository, ObjectId commitID, String name) throws IOException {

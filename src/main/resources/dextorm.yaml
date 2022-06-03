@@ -1,9 +1,9 @@
 app:
-  instrumentedPackage: "fr.pantheonsorbonne.ufr27"
+  instrumentedPackage: "fr.pantheonsorbonne"
   sourceRootDir: src/main/java
   publisher: console1
-  issueCollector: github1
-  diffAlgorithm: b
+  issueCollector: dummy
+  diffAlgorithm: g
 differs:
   g:
     diffAlgorithm: GUMTREE
@@ -15,8 +15,12 @@ differs:
     instructions: true
 issueCollectors:
   github:
-    github1:
-      repo: nh-group/basic-cli-uni
+    basic-cli-uni:
+      gitHubRepoName: nh-group/basic-cli-uni
+    dummy:
+      gitHubRepoName: nherbaut/dextorm-dummy-project
+      repoAddress: file:///home/nherbaut/tmp/dextorm-dummy-project.git
+
 publishers:
   grpcPublishers:
     grpc1:

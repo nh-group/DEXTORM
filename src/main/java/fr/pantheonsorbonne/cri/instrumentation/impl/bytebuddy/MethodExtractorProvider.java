@@ -6,9 +6,9 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import fr.pantheonsorbonne.cri.model.requirements.Requirement;
 import fr.pantheonsorbonne.cri.publisher.RequirementPublisher;
+import fr.pantheonsorbonne.cri.reqmapping.ElementMapper;
 import fr.pantheonsorbonne.cri.reqmapping.RequirementMappingProvider;
 import fr.pantheonsorbonne.cri.reqmapping.StackTraceElement;
-import fr.pantheonsorbonne.cri.reqmapping.StackTraceParser;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.AgentBuilder.Identified.Extendable;
 import net.bytebuddy.description.type.TypeDescription;
@@ -72,8 +72,8 @@ public class MethodExtractorProvider implements javax.inject.Provider<Extendable
             List<StackTraceElement> ste = Arrays.stream(Thread.getAllStackTraces().get(Thread.currentThread())).map(e -> new StackTraceElement(e.getFileName(), instrumentedPackage
                     , e.getClassName(), e.getMethodName(), "", e.getLineNumber())).collect(Collectors.toList());
 
-            Collection<String> reqs = new StackTraceParser(ste.toArray(new StackTraceElement[0]), instrumentedPackage,
-                    mapper.getReqMatcher()).getReqs();
+            Collection<String> reqs = new ElementMapper(ste.toArray(new StackTraceElement[0]), instrumentedPackage,
+                    mapper.getReqMatcher()).getMatchingRequirementsIdSet();
 
             reqs.stream().collect(Collectors.toSet()).stream()
                     .map((String req) -> Requirement.newBuilder().setId(req).build())
