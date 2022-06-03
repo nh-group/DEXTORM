@@ -8,11 +8,11 @@ differs:
   g:
     diffAlgorithm: GUMTREE
     methods: true
-    instructions: true
+    instructions: false
   b:
     diffAlgorithm: BLAME
     methods: true
-    instructions: true
+    instructions: false
 issueCollectors:
   github:
     basic-cli-uni:

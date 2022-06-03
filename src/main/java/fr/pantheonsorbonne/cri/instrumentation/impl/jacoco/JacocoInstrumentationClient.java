@@ -1,6 +1,5 @@
 package fr.pantheonsorbonne.cri.instrumentation.impl.jacoco;
 
-import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import fr.pantheonsorbonne.cri.instrumentation.InstrumentationClient;
@@ -25,6 +24,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class JacocoInstrumentationClient implements InstrumentationClient {
 
@@ -59,6 +59,7 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
 
         //get the matcher from the code<->req mapper
         Set<ReqMatch> requirementsMatchers = mapper.getReqMatcher();
+        Set<String> reqIds = requirementsMatchers.stream().map(rm -> rm.getRequirementsIds()).flatMap(Collection::stream).collect(Collectors.toSet());
 
         //Matches elements with the mapper
         ElementMapper parserCovered = new ElementMapper(stackTracesCovered.toArray(new StackTraceElement[0]), instrumentedPackage, requirementsMatchers);
@@ -83,13 +84,13 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
 
         //fill the map with all the id from all element
         var allReqIdList = parserAll.getMatchingRequirementsIdList();
-        for (String reqId : Sets.newHashSet(allReqIdList.iterator())) {
+        for (String reqId : reqIds) {
             coverageInfo.put(reqId, Double.valueOf(allReqIdList.stream().filter(req -> req.equals(reqId)).count()));
         }
 
         //update the map to get the ratio between covered and all
         var coveredReqIdList = parserCovered.getMatchingRequirementsIdList();
-        for (String reqId : Sets.newTreeSet(coveredReqIdList)) {
+        for (String reqId : reqIds) {
             Double countTotal = coverageInfo.get(reqId);
             Double countCovered = Double.valueOf(coveredReqIdList.stream().filter(req -> req.equals(reqId)).count());
             Double ratio = countCovered / countTotal;

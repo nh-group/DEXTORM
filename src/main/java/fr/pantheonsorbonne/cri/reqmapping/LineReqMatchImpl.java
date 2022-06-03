@@ -27,6 +27,6 @@ public class LineReqMatchImpl extends ReqMatchImpl {
 
     @Override
     public String toString() {
-        return this.packageName + "." + this.className + "." + this.line + "(" + this.getRequirementsIds().stream().collect(Collectors.joining(",")) + ") :" + this.commits.stream().collect(Collectors.joining(","));
+        return "LineReqMatchImpl" + " " + this.packageName + "." + this.className + "." + this.line + "(" + this.getRequirementsIds().stream().collect(Collectors.joining(",")) + ") :" + this.commits.stream().collect(Collectors.joining(","));
     }
 }

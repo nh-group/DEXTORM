@@ -24,16 +24,21 @@ public class GitRepoRequirementMappingProvider extends SimpleFileVisitor<Path> i
 
     private final static Logger LOGGER = LoggerFactory.getLogger(GitRepoRequirementMappingProvider.class);
     private final Set<ReqMatch> repoReqMatcherImpls = new HashSet<>();
+    private final String sourceRootDir;
+
     protected Repository repo;
     protected FileRequirementMappingProvider fileReqProvider;
 
     @Inject
     public GitRepoRequirementMappingProvider(@Named("temp-git-repo") Path tempFolderGitRepo, Repository repo,
-                                             FileRequirementMappingProvider fileReqProvider) {
+                                             FileRequirementMappingProvider fileReqProvider, @Named("sourceRootDir")
+                                                     String sourceRootDir) {
 
+
+        this.sourceRootDir = Path.of(tempFolderGitRepo.toString(), sourceRootDir).toString();
+        this.fileReqProvider = fileReqProvider;
+        this.repo = repo;
         try {
-            this.fileReqProvider = fileReqProvider;
-            this.repo = repo;
             Files.walkFileTree(tempFolderGitRepo, this);
 
         } catch (Exception e) {
@@ -57,7 +62,7 @@ public class GitRepoRequirementMappingProvider extends SimpleFileVisitor<Path> i
 
         try {
 
-            if (com.google.common.io.Files.getFileExtension(file.toString()).equals("java")) {
+            if (file.toString().startsWith(sourceRootDir) && com.google.common.io.Files.getFileExtension(file.toString()).equals("java")) {
                 LOGGER.debug("analyzing from {}", file);
                 this.repoReqMatcherImpls.addAll(fileReqProvider.getReqMatcher(file));
             }

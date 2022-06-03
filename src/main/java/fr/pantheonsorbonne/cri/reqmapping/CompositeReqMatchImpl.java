@@ -25,7 +25,7 @@ public class CompositeReqMatchImpl implements ReqMatch {
 
     @Override
     public Collection<String> getRequirementsIds() {
-        Collection<String> res = new LinkedList<>();
+        Set<String> res = new HashSet<>();
         for (ReqMatch m : this.requirementsMatches) {
             res.addAll(m.getRequirementsIds());
         }
@@ -44,5 +44,12 @@ public class CompositeReqMatchImpl implements ReqMatch {
 
     public <T extends ReqMatch> Optional<T> getComponent(Class<T> klass) {
         return (Optional<T>) this.requirementsMatches.stream().filter(m -> m.getClass().equals(klass)).findFirst();
+    }
+
+    @Override
+    public String toString() {
+        return "CompositeReqMatchImpl{" +
+                "requirementsMatches=" + requirementsMatches.stream().map(r -> r.toString() + ";").collect(Collectors.joining()) +
+                '}';
     }
 }

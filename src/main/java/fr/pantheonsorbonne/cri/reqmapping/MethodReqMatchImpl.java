@@ -3,7 +3,6 @@ package fr.pantheonsorbonne.cri.reqmapping;
 import com.google.common.base.Strings;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -23,7 +22,7 @@ public class MethodReqMatchImpl extends ReqMatchImpl {
     protected boolean isMatchLogged(StackTraceElement elt) {
         return super.isMatchFQClass(elt)
                 && this.getMethodName().equals(elt.getMethodName().split("\\$")[0])
-                && Arrays.equals(this.getArgs().toArray(), ReqMatcherBuilder.strArgsToList(elt.getMethodArgs()).toArray())
+                && this.getArgs().equals(elt.getMethodArgs())
                 && this.getRequirementsIds().stream().anyMatch(Predicate.not(Strings::isNullOrEmpty));
     }
 
@@ -37,6 +36,6 @@ public class MethodReqMatchImpl extends ReqMatchImpl {
 
     @Override
     public String toString() {
-        return this.packageName + "." + this.className + "." + this.methodName + "(" + this.args.stream().collect(Collectors.joining(",")) + ") :" + this.commits.stream().collect(Collectors.joining(","));
+        return "MethodReqMatchImpl" + " " + this.packageName + "." + this.className + "." + this.methodName + "(" + this.args.stream().collect(Collectors.joining(",")) + ") :" + this.commits.stream().collect(Collectors.joining(","));
     }
 }

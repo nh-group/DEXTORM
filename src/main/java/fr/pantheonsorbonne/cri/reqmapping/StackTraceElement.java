@@ -1,5 +1,6 @@
 package fr.pantheonsorbonne.cri.reqmapping;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -12,7 +13,7 @@ public class StackTraceElement {
     private final String packageName;
     private final String methodName;
     private final String sourceFileName;
-    private final String methodArgs;
+    private final List<String> methodArgs;
     private final Integer line;
 
     public StackTraceElement(String sourceFileName, String packageName, String className, String methodName, String args, Integer line) {
@@ -28,14 +29,15 @@ public class StackTraceElement {
         this.line = line;
     }
 
-    private static String cleanupStringArgs(String args) {
+    private static List<String> cleanupStringArgs(String args) {
+        List<String> res = new ArrayList<>();
 
-        StringBuilder sb = new StringBuilder("(");
         Pattern pattern = Pattern.compile("\\((.*)\\).*");
         Matcher matcher = pattern.matcher(args);
         if (matcher.matches()) {
             args = matcher.group(1);
             for (String arg : args.split(";")) {
+                StringBuilder sb = new StringBuilder();
                 Pattern patternArg = Pattern.compile("(\\[*)([ZBCSIJFDL])(.*)");
                 Matcher matcher1 = patternArg.matcher(arg);
                 if (matcher1.matches()) {
@@ -48,15 +50,12 @@ public class StackTraceElement {
                     if (matcher1.group(3) != null) {
                         sb.append(Arrays.stream(matcher1.group(3).split("/")).reduce((f, s) -> s).get());
                     }
-                    sb.append(";");
+                    res.add(sb.toString());
                 }
             }
 
         }
-        sb.substring(0, sb.length() - 1);
-        sb.append(")");
-
-        return sb.toString();
+        return res;
     }
 
     public static StackTraceElement build(java.lang.StackTraceElement e) {
@@ -90,7 +89,7 @@ public class StackTraceElement {
 
     @Override
     public String toString() {
-        return packageName + "." + className + "." + methodName + "(" + line + "): ";
+        return packageName + "." + className + "." + methodName + "(" + this.methodArgs + "): " + line;
     }
 
     public String getMethodName() {
@@ -101,7 +100,7 @@ public class StackTraceElement {
         return sourceFileName;
     }
 
-    public String getMethodArgs() {
+    public List<String> getMethodArgs() {
         return methodArgs;
     }
 
