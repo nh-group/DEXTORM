@@ -4,7 +4,6 @@ import com.github.javaparser.Position;
 import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
@@ -20,11 +19,6 @@ public class ReqMatcherJavaVisitor extends VoidVisitorAdapter<BlameDataWrapper> 
     private final Set<ReqMatch> reqMatcherImpls = new HashSet<>();
     private String className = "";
     private String packageName = "";
-
-    @Override
-    public void visit(BlockStmt n, BlameDataWrapper arg) {
-        super.visit(n, arg);
-    }
 
     @Override
     public void visit(ClassOrInterfaceDeclaration cd, BlameDataWrapper arg) {

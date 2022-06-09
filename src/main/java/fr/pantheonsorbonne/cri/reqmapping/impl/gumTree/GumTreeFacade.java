@@ -21,7 +21,7 @@ import java.util.stream.StreamSupport;
 public class GumTreeFacade {
 
     public static final String BLAME_ID = "blameid";
-    private List<Diff> diffs;
+
 
     {
         Arrays.asList(JavaParserGenerator.class).forEach(gen -> {
@@ -30,7 +30,6 @@ public class GumTreeFacade {
                 TreeGenerators.getInstance().install(gen, a);
         });
     }
-
 
     @SuppressWarnings("unchecked")
     public static void appendMetadata(Tree t, String key, Object value, boolean recursive) {
@@ -64,9 +63,9 @@ public class GumTreeFacade {
         GumTreeFacade.appendMetadata(t, BLAME_ID, commitID, false);
     }
 
-    private static List<ReqMatch> getReqMatcher(final Tree tree) {
+    private static List<ReqMatch> getReqMatcher(final Tree tree, boolean doMethods, boolean doInstructions) {
 
-        CompilationUnitVisitor visitor = new CompilationUnitVisitor(tree, ReqMatchImpl.newBuilder());
+        CompilationUnitVisitor visitor = new CompilationUnitVisitor(tree, ReqMatchImpl.newBuilder(), 0, doMethods, doInstructions);
         TreeVisitor.visitTree(tree, visitor);
 
         return visitor.getMatchersBuilders().stream().map(ReqMatcherBuilder::build).collect(Collectors.toList());
@@ -108,7 +107,7 @@ public class GumTreeFacade {
         //GumTreeFacade.showTree(dst, "[final]", System.out);
     }
 
-    public List<ReqMatch> getReqMatcher(List<Diff> diffs) {
+    public List<ReqMatch> getReqMatcher(List<Diff> diffs, boolean doMethods, boolean doInstructions) {
 
         Tree currentTree = null;
         for (Diff diff : diffs) {
@@ -130,7 +129,7 @@ public class GumTreeFacade {
             //GumTreeFacade.showTree(currentTree, "", System.out);
         }
 
-        return GumTreeFacade.getReqMatcher(currentTree);
+        return GumTreeFacade.getReqMatcher(currentTree, doMethods, doInstructions);
 
     }
 

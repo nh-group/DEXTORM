@@ -33,7 +33,7 @@ public class ElementMapper {
             if (elt.getPackageName().startsWith(this.instrumentedPackage)) {
                 for (ReqMatch m : reqMatcherImpls) {
                     if (match(elt, m)) {
-                        System.out.println(elt + " ->" + m);
+                        //System.out.println(elt + " ->" + m);
                         res.add(m);
                     }
                 }

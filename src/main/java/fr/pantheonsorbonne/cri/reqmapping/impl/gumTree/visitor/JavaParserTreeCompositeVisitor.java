@@ -3,28 +3,29 @@ package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor;
 
 import com.github.gumtreediff.tree.Tree;
 import com.github.gumtreediff.tree.TreeVisitor;
+import com.github.gumtreediff.tree.Type;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 
 import java.util.Collection;
 
-public abstract class JavaParserTreeVisitorComposite extends JavaParserTreeVisitor implements TreeVisitor {
+public abstract class JavaParserTreeCompositeVisitor extends JavaParserTreeVisitor implements TreeVisitor {
 
-    public JavaParserTreeVisitorComposite(Tree tree, ReqMatcherBuilder treeBuilder) {
-        super(tree, treeBuilder);
-
+    public JavaParserTreeCompositeVisitor(Tree tree, ReqMatcherBuilder treeBuilder, int startLine, boolean doMethods, boolean doInstructions) {
+        super(tree, treeBuilder, startLine, doMethods, doInstructions);
     }
 
     @Override
     public void startTree(Tree tree) {
         try {
             for (Tree subtree : tree.getChildren()) {
-                String subtreeType = subtree.toTreeString();
+
                 for (Class<? extends JavaParserTreeVisitor> subVisitorClass : this.getChildVisitors()) {
 
-                    if (canSubvisitorHandleTree(subtreeType, subVisitorClass)) {
-                        JavaParserTreeVisitor subVisitor = subVisitorClass
-                                .getDeclaredConstructor(Tree.class, ReqMatcherBuilder.class)
-                                .newInstance(this.tree, parentMatcherBuilder.getCopy());
+                    JavaParserTreeVisitor subVisitor = subVisitorClass
+                            .getDeclaredConstructor(Tree.class, ReqMatcherBuilder.class, Integer.TYPE, Boolean.TYPE, Boolean.TYPE)
+                            .newInstance(this.tree, parentMatcherBuilder.getCopy(), subtree.getLine(), this.doMethods, this.doInstructions);
+
+                    if (canSubvisitorHandleTree(subtree.getType(), subVisitor)) {
 
                         subVisitor.startTree(subtree);
                         subVisitor.endTree(subtree);
@@ -41,9 +42,9 @@ public abstract class JavaParserTreeVisitorComposite extends JavaParserTreeVisit
 
     public abstract Collection<Class<? extends JavaParserTreeVisitor>> getChildVisitors();
 
-    protected boolean canSubvisitorHandleTree(String subtreeType,
-                                              Class<? extends JavaParserTreeVisitor> subVisitorClass) {
-        return subtreeType.startsWith(subVisitorClass.getSimpleName());
+    protected boolean canSubvisitorHandleTree(Type subtreeType,
+                                              JavaParserTreeVisitor subVisitorClass) {
+        return subVisitorClass.doesSupport(subtreeType);
     }
 
     @Override

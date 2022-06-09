@@ -37,7 +37,7 @@ class TestDiffGumtree {
 
         GumTreeFacade facade = new GumTreeFacade();
 
-        Collection<ReqMatch> reqMatcherImpls = facade.getReqMatcher(builder.build());
+        Collection<ReqMatch> reqMatcherImpls = facade.getReqMatcher(builder.build(), true, true);
 
         //DiffTree dt = diffs.get(3).toDiffTree();
         //TreeUtils.visitTree(dt.dst.getRoot(), new PrettyBlameTreePrinter(dt.dst));

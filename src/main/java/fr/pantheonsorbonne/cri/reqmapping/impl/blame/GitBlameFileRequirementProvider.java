@@ -61,6 +61,7 @@ public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
 
     private Collection<ReqMatch> blameUnsafeVisit(Path file) throws GitAPIException, IOException {
 
+        Collection<ReqMatch> res = new ArrayList<>();
         BlameDataWrapper wrapper = new BlameDataWrapper();
 
         File relativeFilePath = this.repo.getDirectory().getParentFile().toPath().relativize(file).toFile();
@@ -77,16 +78,24 @@ public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
             int lines = countLinesOfFileInCommit(this.repo, commitID, relativeFilePath.toString());
 
             Map<Integer, Collection<String>> fileBlameData = new HashMap<>();
-            for (int i = 0; i < lines; i++) {
-                RevCommit commit = blamed.getSourceCommit(i);
-
-                fileBlameData.put(i, Utils.getIssueIdFromCommits(commit.getFullMessage()));
-
-
-            }
-
             String inferedClassName = Paths.get(sourceRootDir).relativize(relativeFilePath.toPath())
                     .toString().replaceAll("/", ".").replaceFirst("[.][^.]+$", "");
+
+            for (int idx = 0; idx < lines; idx++) {
+                RevCommit commit = blamed.getSourceCommit(idx);
+
+                fileBlameData.put(idx, Utils.getIssueIdFromCommits(commit.getFullMessage()));
+
+                var commits = Utils.getIssueIdFromCommits(blamed.getSourceCommit(idx).getFullMessage());
+                if (commits.size() > 0) {
+                    res.add(
+                            ReqMatch.builder()
+                                    .fQClassName(inferedClassName)
+                                    .line(blamed.getSourceLine(idx))
+                                    .commits(commits)
+                                    .build());
+                }
+            }
             wrapper.blameData.put(inferedClassName, fileBlameData);
 
             JavaParser parser = new JavaParser();
@@ -98,9 +107,10 @@ public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
                 ReqMatcherJavaVisitor blameVisitor = new ReqMatcherJavaVisitor();
 
                 cu.get().accept(blameVisitor, wrapper);
-                return blameVisitor.getMatchers();
+                res.addAll(blameVisitor.getMatchers());
 
             }
+            return res;
 
         }
         return Collections.EMPTY_LIST;

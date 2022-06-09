@@ -3,6 +3,7 @@ package fr.pantheonsorbonne.cri.reqmapping;
 import com.google.common.base.Strings;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
@@ -20,6 +21,10 @@ public class ReqMatcherBuilder implements Cloneable {
     private String methodName = null;
     private String className = null;
     private Integer line;
+
+    protected ReqMatcherBuilder() {
+        
+    }
 
     public ReqMatcherBuilder arg(String arg) {
         this.args.add(arg);
@@ -99,6 +104,13 @@ public class ReqMatcherBuilder implements Cloneable {
 
     public ReqMatcherBuilder methodName(String name) {
         this.methodName = name;
+        return this;
+    }
+
+    public ReqMatcherBuilder fQClassName(String name) {
+        String[] bits = name.split("\\.");
+        this.className = bits[bits.length - 1];
+        this.packageName = Arrays.stream(Arrays.copyOf(bits, bits.length - 1)).collect(Collectors.joining("."));
         return this;
     }
 

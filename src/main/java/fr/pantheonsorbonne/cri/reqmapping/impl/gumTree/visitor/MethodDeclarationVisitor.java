@@ -2,22 +2,39 @@ package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor;
 
 
 import com.github.gumtreediff.tree.Tree;
+import com.github.gumtreediff.tree.Type;
+import com.github.javaparser.ast.stmt.Statement;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 import fr.pantheonsorbonne.cri.reqmapping.impl.Utils;
 import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.GumTreeFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class MethodDeclaration extends JavaParserTreeVisitorComposite {
+public class MethodDeclarationVisitor extends JavaParserTreeCompositeVisitor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodDeclaration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodDeclarationVisitor.class);
 
-    public MethodDeclaration(Tree tree, ReqMatcherBuilder treeBuilder) {
-        super(tree, treeBuilder);
+    public MethodDeclarationVisitor(Tree tree, ReqMatcherBuilder treeBuilder, int startLine, boolean doMethods, boolean doInstructions) {
+        super(tree, treeBuilder, startLine, doMethods, doInstructions);
+    }
 
+    protected static boolean isAStatement(Tree tree) {
+        try {
+            return Statement.class.isAssignableFrom(Class.forName(("com.github.javaparser.ast.stmt." + tree.getType().toString())));
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean doesSupport(Type type) {
+        return type.name.equals("MethodDeclaration");
     }
 
     private void showTree(Tree tree, String offset) {
@@ -72,30 +89,34 @@ public class MethodDeclaration extends JavaParserTreeVisitorComposite {
             String trace = this.parentMatcherBuilder.getPackageName() + "." + this.parentMatcherBuilder.getClassName() + "." + methodName.get().getLabel() + "(" + strParameter + ")" + ((Collection<String>) tree.getMetadata(GumTreeFacade.BLAME_ID)).stream().collect(Collectors.joining("-"));
             //System.out.println("#" + trace);
 
-            ReqMatcherBuilder currentMethodMatcher = this.parentMatcherBuilder
-                    .methodName(methodName.get().getLabel())
-                    .commits((Collection<String>) tree.getMetadata(GumTreeFacade.BLAME_ID))
-                    .args(strParameter.toString())
-                    .getCopy();
-
-            List<ReqMatcherBuilder> statementBuilder = new ArrayList<>();
-            for (Tree child : tree.getChildren()) {
-                if (child.getType().name.equals("BlockStmt")) {
-                    //here the issue is that the line in the block statement and its children are relative to the line of the the parent an not relative to the file.
-                    var visitor = new SimpleRequirementGrabberCompositeVisitor(currentMethodMatcher, tree.getLine());
-                    //visitor.startTree(child);
-                    statementBuilder.addAll(visitor.collect());
+            if (this.doInstructions) {
+                for (Tree child : tree.getChildren()) {
+                    //find the code block for this method
+                    if (child.getType().name.equals("BlockStmt")) {
+                        StatementVisitor statementVisitor = new StatementVisitor(child, this.parentMatcherBuilder.getCopy(), this.startLine, this.doMethods, this.doInstructions);
+                        statementVisitor.startTree(child);
+                        this.matchersBuilders.addAll(statementVisitor.collect());
+                        break;
+                    }
                 }
             }
-            this.matchersBuilders.add(currentMethodMatcher);
-            this.matchersBuilders.addAll(statementBuilder);
+
+            if (this.doMethods) {
+                ReqMatcherBuilder currentMethodMatcher = this.parentMatcherBuilder
+                        .methodName(methodName.get().getLabel())
+                        .args(strParameter.toString())
+                        .commits((Collection<String>) tree.getMetadata(GumTreeFacade.BLAME_ID))
+                        .getCopy();
+                this.matchersBuilders.add(currentMethodMatcher);
+            }
+
         }
 
     }
 
     @Override
     public Collection<Class<? extends JavaParserTreeVisitor>> getChildVisitors() {
-        return Arrays.asList(CodeBlockVisitor.class);
+        return Collections.EMPTY_LIST;
     }
 
     @Override

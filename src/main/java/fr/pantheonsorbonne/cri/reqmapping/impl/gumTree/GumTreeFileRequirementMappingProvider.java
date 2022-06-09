@@ -1,6 +1,7 @@
 package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.Utils;
 import fr.pantheonsorbonne.cri.reqmapping.impl.FileRequirementMappingProvider;
@@ -37,12 +38,19 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
     @Inject
     private Git git;
 
+    @Inject
+    @Named("DoMethodsDiff")
+    private Boolean doMethods;
+    @Inject
+    @Named("DoInstructionsDiff")
+    private Boolean doInstructions;
+
     @Override
     public Collection<ReqMatch> getReqMatcher(Path p) {
 
         try {
             List<Diff> diffs = this.materializeCommitDiff(p);
-            return this.facade.getReqMatcher(diffs);
+            return this.facade.getReqMatcher(diffs, this.doMethods, this.doInstructions);
         } catch (IOException | GitAPIException e) {
             e.printStackTrace();
             System.exit(-3);

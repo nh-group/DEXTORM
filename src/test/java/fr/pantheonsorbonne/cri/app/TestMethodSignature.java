@@ -29,7 +29,7 @@ public class TestMethodSignature {
 
         List<Diff> diffs = Diff.getBuilder().add(f1.file, f1.commitId).build();
         GumTreeFacade facade = new GumTreeFacade();
-        Collection<ReqMatch> reqMatcherImpls = facade.getReqMatcher(diffs);
+        Collection<ReqMatch> reqMatcherImpls = facade.getReqMatcher(diffs, true, true);
         List<MethodReqMatchImpl> reqMatchersListImpl = reqMatcherImpls.stream().map(r -> ((MethodReqMatchImpl) r)).collect(Collectors.toList());
         methodSignatureExtraction(reqMatchersListImpl);
 

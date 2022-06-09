@@ -53,7 +53,7 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
         //get Jacoco Data
         Report report = getReportObjectFromXMl();
         //get the covered elements
-        List<StackTraceElement> stackTracesCovered = extractStackTraceElement(report, this.doMethods, true, this.doInstructions, true);
+        List<StackTraceElement> stackTracesCovered = extractStackTraceElement(report, this.doMethods, false, this.doInstructions, true);
         //get all the elements
         List<StackTraceElement> stackTracesAll = extractStackTraceElement(report, this.doMethods, false, this.doInstructions, false);
 
@@ -70,6 +70,30 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
         var covered = parserCovered.getMatchedElements();
         //every element
         var all = parserAll.getMatchedElements();
+
+        List<ReqMatch> rms = new ArrayList<>(requirementsMatchers).stream().collect(Collectors.toList());
+        //Collections.sort(rms);
+        for (ReqMatch rm : rms) {
+
+            StackTraceElement matchee = null;
+            for (StackTraceElement ste : all) {
+                if (rm.isMatch(ste)) {
+
+                    matchee = ste;
+                    break;
+                }
+            }
+            if (matchee != null) {
+                if (covered.contains(matchee)) {
+                    System.out.println("COVERED\t" + rm + " by " + matchee);
+                } else {
+                    System.out.println("NOCOVRD\t" + rm + " by " + matchee);
+                }
+
+            } else {
+                System.out.println("IRRLVNT\t" + rm.toString());
+            }
+        }
         var uncovered = new HashSet<>(all);
         uncovered.removeAll(covered);
 
@@ -157,10 +181,9 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
                     }
                 }
                 if (doInstructions) {
-                    for (Sourcefile sourcefile : pakage.getSourceFile()) {
-
-                        for (Line line : sourcefile.getLine()) {
-                            //https://stackoverflow.com/questions/33868761/how-to-interpret-the-jacoco-xml-file
+                    Sourcefile sourcefile = pakage.getSourceFile().stream().filter(sf -> sf.getName().equals(klass.getSourcefilename())).findAny().orElseThrow();
+                    for (Line line : sourcefile.getLine()) {
+                        //https://stackoverflow.com/questions/33868761/how-to-interpret-the-jacoco-xml-file
                         /*
                         mi = missed instructions (statements)
                         ci = covered instructions (statements)
@@ -175,20 +198,17 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
                         cb>0||ci>0 => hit
 
                          */
-                            if (linePredicate.test(line)) {
+                        if (linePredicate.test(line)) {
 
-                                Optional<Method> method = klass.getMethod().stream().filter(m -> m.getLine() >= line.getNr()).findFirst();
-                                if (method.isPresent()) {
-                                    stackTraces.add(
-                                            new StackTraceElement(
-                                                    klass.getSourcefilename(),
-                                                    pakage.getName(),
-                                                    klass.getName(),
-                                                    method.get().getName(),
-                                                    method.get().getDesc(),
-                                                    line.getNr()));
-                                }
-                            }
+
+                            stackTraces.add(
+                                    new StackTraceElement(
+                                            klass.getSourcefilename(),
+                                            pakage.getName().replaceAll("/", "."),
+                                            Arrays.stream(klass.getName().split("/")).reduce((f, l) -> l).get(),
+                                            "",
+                                            "()V",
+                                            line.getNr()));
                         }
                     }
                 }
