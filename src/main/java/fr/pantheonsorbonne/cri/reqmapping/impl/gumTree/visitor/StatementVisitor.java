@@ -10,7 +10,7 @@ import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.GumTreeFacade;
 import java.util.Collection;
 import java.util.Collections;
 
-public class StatementVisitor extends JavaParserTreeCompositeVisitor {
+public class StatementVisitor extends JavaParserTreeExclusiveCompositeVisitor {
 
 
     public StatementVisitor(Tree tree, ReqMatcherBuilder treeBuilder, int startLine, boolean doMethods, boolean doInstructions) {

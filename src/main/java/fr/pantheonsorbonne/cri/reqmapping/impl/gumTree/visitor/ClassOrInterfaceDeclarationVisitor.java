@@ -7,10 +7,9 @@ import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Optional;
 
 
-public class ClassOrInterfaceDeclarationVisitor extends JavaParserTreeCompositeVisitor {
+public class ClassOrInterfaceDeclarationVisitor extends JavaParserTreeExclusiveCompositeVisitor {
 
     public ClassOrInterfaceDeclarationVisitor(Tree tree, ReqMatcherBuilder treeBuilder, int startLine, boolean doMethods, boolean doInstructions) {
         super(tree, treeBuilder, startLine, doMethods, doInstructions);
@@ -24,19 +23,19 @@ public class ClassOrInterfaceDeclarationVisitor extends JavaParserTreeCompositeV
     @Override
     public void startTree(Tree tree) {
 
-        Optional<Tree> classNameLeaf = tree.getChildren().stream()
-                .filter((Tree t) -> t.toTreeString().startsWith("SimpleName")).findFirst();
+        String className = tree.getChildren().stream()
+                .filter((Tree t) -> t.toTreeString().startsWith("SimpleName")).findFirst().orElseThrow().getLabel();
 
-        if (classNameLeaf.isPresent()) {
-            this.parentMatcherBuilder.className(classNameLeaf.get().getLabel());
-            super.startTree(tree);
-        }
+
+        this.parentMatcherBuilder.className(className);
+        super.startTree(tree);
+
 
     }
 
     @Override
     public Collection<Class<? extends JavaParserTreeVisitor>> getChildVisitors() {
-        return Arrays.asList(MethodDeclarationVisitor.class);
+        return Arrays.asList(MethodDeclarationVisitor.class, ConstructorVisitor.class);
     }
 
 }

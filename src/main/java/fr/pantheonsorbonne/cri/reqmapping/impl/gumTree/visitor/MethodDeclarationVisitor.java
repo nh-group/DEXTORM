@@ -13,10 +13,9 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class MethodDeclarationVisitor extends JavaParserTreeCompositeVisitor {
+public class MethodDeclarationVisitor extends JavaParserTreeExclusiveCompositeVisitor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodDeclarationVisitor.class);
 
@@ -53,65 +52,76 @@ public class MethodDeclarationVisitor extends JavaParserTreeCompositeVisitor {
 
         //GumTreeFacade.showTree(tree, "", System.out);
 
-        Optional<Tree> methodName = tree.getChildren().stream()
-                .filter((Tree child) -> child.getType().name.startsWith("SimpleName")).findFirst();
+        String methodName = tree.getChildren().stream()
+                .filter((Tree child) -> child.getType().name.startsWith("SimpleName")).findFirst().orElseThrow().getLabel();
         List<List<Tree>> parameters = tree.getChildren().stream()
                 .filter((Tree child) -> child.getType().name.equals("Parameter"))
                 .map(p -> p.getDescendants()).collect(Collectors.toList());
 
 
-        if (methodName.isPresent()) {
-            StringBuilder strParameter = new StringBuilder("(");
-            for (List<Tree> parameter : parameters) {
+        String strParameter = extractMethodLikeParameters(parameters);
+        //String trace = this.parentMatcherBuilder.getPackageName() + "." + this.parentMatcherBuilder.getClassName() + "." + methodName.get().getLabel() + "(" + strParameter + ")" + ((Collection<String>) tree.getMetadata(GumTreeFacade.BLAME_ID)).stream().collect(Collectors.joining("-"));
+        //System.out.println("#" + trace);
 
-                int analyserIndex = 0;
-                if (parameter.get(analyserIndex).getType().name.equals("SingleMemberAnnotationExpr")) {
-                    analyserIndex += 3;
-                }
-                if (parameter.get(analyserIndex).getType().name.equals("ArrayType")) {
-                    strParameter.append("[");
-                    analyserIndex++;
-                }
-                if ("ClassOrInterfaceType".equals(parameter.get(analyserIndex).getType().name)) {
-                    strParameter.append("L");
-                    strParameter.append(parameter.get(++analyserIndex).getLabel());
-
-                } else {
-                    strParameter.append(Utils.typeToCodeJVM(parameter.get(analyserIndex).getLabel()));
-                }
-
-                strParameter.append(";");
-                //System.out.println("\t" + strParameter);
-
-
-            }
-            strParameter.append(")V");
-            String trace = this.parentMatcherBuilder.getPackageName() + "." + this.parentMatcherBuilder.getClassName() + "." + methodName.get().getLabel() + "(" + strParameter + ")" + ((Collection<String>) tree.getMetadata(GumTreeFacade.BLAME_ID)).stream().collect(Collectors.joining("-"));
-            //System.out.println("#" + trace);
-
-            if (this.doInstructions) {
-                for (Tree child : tree.getChildren()) {
-                    //find the code block for this method
-                    if (child.getType().name.equals("BlockStmt")) {
-                        StatementVisitor statementVisitor = new StatementVisitor(child, this.parentMatcherBuilder.getCopy(), this.startLine, this.doMethods, this.doInstructions);
-                        statementVisitor.startTree(child);
-                        this.matchersBuilders.addAll(statementVisitor.collect());
-                        break;
-                    }
-                }
-            }
-
-            if (this.doMethods) {
-                ReqMatcherBuilder currentMethodMatcher = this.parentMatcherBuilder
-                        .methodName(methodName.get().getLabel())
-                        .args(strParameter.toString())
-                        .commits((Collection<String>) tree.getMetadata(GumTreeFacade.BLAME_ID))
-                        .getCopy();
-                this.matchersBuilders.add(currentMethodMatcher);
-            }
-
+        if (this.doInstructions) {
+            extractStatement(tree);
         }
 
+        if (this.doMethods) {
+            extractMethodLike(tree, methodName, strParameter);
+        }
+
+
+    }
+
+    private String extractMethodLikeParameters(List<List<Tree>> parameters) {
+        StringBuilder strParameter = new StringBuilder("(");
+        for (List<Tree> parameter : parameters) {
+
+            int analyserIndex = 0;
+            if (parameter.get(analyserIndex).getType().name.equals("SingleMemberAnnotationExpr")) {
+                analyserIndex += 3;
+            }
+            if (parameter.get(analyserIndex).getType().name.equals("ArrayType")) {
+                strParameter.append("[");
+                analyserIndex++;
+            }
+            if ("ClassOrInterfaceType".equals(parameter.get(analyserIndex).getType().name)) {
+                strParameter.append("L");
+                strParameter.append(parameter.get(++analyserIndex).getLabel());
+
+            } else {
+                strParameter.append(Utils.typeToCodeJVM(parameter.get(analyserIndex).getLabel()));
+            }
+
+            strParameter.append(";");
+            //System.out.println("\t" + strParameter);
+
+
+        }
+        strParameter.append(")V");
+        return strParameter.toString();
+    }
+
+    protected void extractStatement(Tree tree) {
+        for (Tree child : tree.getChildren()) {
+            //find the code block for this method
+            if (child.getType().name.equals("BlockStmt")) {
+                StatementVisitor statementVisitor = new StatementVisitor(child, this.parentMatcherBuilder.getCopy(), this.startLine, this.doMethods, this.doInstructions);
+                statementVisitor.startTree(child);
+                this.matchersBuilders.addAll(statementVisitor.collect());
+                break;
+            }
+        }
+    }
+
+    protected void extractMethodLike(Tree tree, String methodName, String strParameter) {
+        ReqMatcherBuilder currentMethodMatcher = this.parentMatcherBuilder
+                .methodName(methodName)
+                .args(strParameter)
+                .commits((Collection<String>) tree.getMetadata(GumTreeFacade.BLAME_ID))
+                .getCopy();
+        this.matchersBuilders.add(currentMethodMatcher);
     }
 
     @Override

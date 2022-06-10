@@ -7,29 +7,39 @@ import com.github.gumtreediff.tree.Type;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 
 import java.util.Collection;
+import java.util.HashSet;
 
-public abstract class JavaParserTreeCompositeVisitor extends JavaParserTreeVisitor implements TreeVisitor {
+public abstract class JavaParserTreeExclusiveCompositeVisitor extends JavaParserTreeVisitor implements TreeVisitor {
 
-    public JavaParserTreeCompositeVisitor(Tree tree, ReqMatcherBuilder treeBuilder, int startLine, boolean doMethods, boolean doInstructions) {
+    public JavaParserTreeExclusiveCompositeVisitor(Tree tree, ReqMatcherBuilder treeBuilder, int startLine, boolean doMethods, boolean doInstructions) {
         super(tree, treeBuilder, startLine, doMethods, doInstructions);
     }
 
     @Override
     public void startTree(Tree tree) {
+        Collection<Tree> remainingChildren = new HashSet<>(tree.getChildren());
         try {
+            //for the level-1 subnotes
             for (Tree subtree : tree.getChildren()) {
-
+                if (!remainingChildren.contains(subtree)) {
+                    //already delt with
+                    continue;
+                }
+                //for each childViritor
                 for (Class<? extends JavaParserTreeVisitor> subVisitorClass : this.getChildVisitors()) {
-
+                    //create the new visitor
                     JavaParserTreeVisitor subVisitor = subVisitorClass
                             .getDeclaredConstructor(Tree.class, ReqMatcherBuilder.class, Integer.TYPE, Boolean.TYPE, Boolean.TYPE)
                             .newInstance(this.tree, parentMatcherBuilder.getCopy(), subtree.getLine(), this.doMethods, this.doInstructions);
 
+                    //if the type can be handled by the subvisitor
                     if (canSubvisitorHandleTree(subtree.getType(), subVisitor)) {
 
                         subVisitor.startTree(subtree);
                         subVisitor.endTree(subtree);
                         matchersBuilders.addAll(subVisitor.getMatchersBuilders());
+                        //so that we don't process it twice with 2 visitors
+                        remainingChildren.remove(subtree);
                     }
                 }
             }

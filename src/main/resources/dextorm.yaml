@@ -3,25 +3,25 @@ app:
   sourceRootDir: src/main/java
   publisher: console1
   issueCollector: dummy
-  diffAlgorithm: g
+  diffAlgorithm: b
 differs:
   g:
     diffAlgorithm: GUMTREE
-    methods: false
+    methods: true
     instructions: true
   b:
     diffAlgorithm: BLAME
-    methods: false
-    instructions: true
+    methods: true
+    instructions: false
 issueCollectors:
   github:
     basic-cli-uni:
       gitHubRepoName: nh-group/basic-cli-uni
-      branch: test1
+      branch: master
     dummy:
       gitHubRepoName: nherbaut/dextorm-dummy-project
       repoAddress: file:///home/nherbaut/tmp/dextorm-dummy-project.git
-      branch: test1
+      branch: master
 
 publishers:
   grpcPublishers:

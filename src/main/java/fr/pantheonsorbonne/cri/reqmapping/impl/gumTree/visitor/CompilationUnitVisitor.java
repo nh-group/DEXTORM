@@ -9,7 +9,7 @@ import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class CompilationUnitVisitor extends JavaParserTreeCompositeVisitor implements TreeVisitor {
+public class CompilationUnitVisitor extends JavaParserTreeExclusiveCompositeVisitor implements TreeVisitor {
 
     public CompilationUnitVisitor(Tree tree, ReqMatcherBuilder treeBuilder, int startLine, boolean doMethods, boolean doInstructions) {
         super(tree, treeBuilder, startLine, doMethods, doInstructions);
