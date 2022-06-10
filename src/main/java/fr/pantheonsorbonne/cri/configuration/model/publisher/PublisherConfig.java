@@ -6,12 +6,11 @@ public class PublisherConfig {
     public Map<String, GrpcPublisherConfig> grpcPublishers;
     public Map<String, FilePublisherConfig> filePublishers;
     public Map<String, RESTPublisherConfig> restPublishers;
-    public Map<String, DBPublisherConfig> dbPublishers;
 
-    public PublisherConfig(Map<String, GrpcPublisherConfig> grpcPublishers, Map<String, FilePublisherConfig> consolePublishers, Map<String, DBPublisherConfig> dbPublishers, Map<String, RESTPublisherConfig> restPublishers) {
+
+    public PublisherConfig(Map<String, GrpcPublisherConfig> grpcPublishers, Map<String, FilePublisherConfig> consolePublishers, Map<String, RESTPublisherConfig> restPublishers) {
         this.grpcPublishers = grpcPublishers;
         this.filePublishers = consolePublishers;
-        this.dbPublishers = dbPublishers;
         this.restPublishers = restPublishers;
     }
 
@@ -26,13 +25,6 @@ public class PublisherConfig {
         this.restPublishers = restPublishers;
     }
 
-    public Map<String, DBPublisherConfig> getDbPublishers() {
-        return dbPublishers;
-    }
-
-    public void setDbPublishers(Map<String, DBPublisherConfig> dbPublishers) {
-        this.dbPublishers = dbPublishers;
-    }
 
     public Map<String, GrpcPublisherConfig> getGrpcPublishers() {
         return grpcPublishers;

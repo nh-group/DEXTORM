@@ -2,7 +2,7 @@ app:
   instrumentedPackage: "fr.pantheonsorbonne"
   sourceRootDir: src/main/java
   publisher: console1
-  issueCollector: dummy
+  issueCollector: basic-cli-uni
   diffAlgorithm: b
 differs:
   g:

@@ -6,7 +6,6 @@ import fr.pantheonsorbonne.cri.instrumentation.InstrumentationClient;
 import fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model.Class;
 import fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model.Package;
 import fr.pantheonsorbonne.cri.instrumentation.impl.jacoco.model.*;
-import fr.pantheonsorbonne.cri.model.requirements.Requirement;
 import fr.pantheonsorbonne.cri.publisher.RequirementPublisher;
 import fr.pantheonsorbonne.cri.reqmapping.ElementMapper;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
@@ -45,6 +44,13 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
     @Inject
     @Named("DoInstructionsDiff")
     Boolean doInstructions;
+    @Inject
+    @Named("gitHubRepoName")
+    String gitHubRepoName;
+
+    @Inject
+    @Named("diffMethod")
+    String diffMethod;
 
     @Override
     public void registerClient() {
@@ -116,18 +122,19 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
         var coveredReqIdList = parserCovered.getMatchingRequirementsIdList();
         for (String reqId : reqIds) {
             Double countTotal = coverageInfo.get(reqId);
-            Double countCovered = Double.valueOf(coveredReqIdList.stream().filter(req -> req.equals(reqId)).count());
+            Long countCovered = coveredReqIdList.stream().filter(req -> req.equals(reqId)).count();
             Double ratio = countCovered / countTotal;
             coverageInfo.put(reqId, ratio);
-            System.out.println("Coverage " + reqId + " : " + 100 * ratio + " (" + countCovered + "/" + countTotal + ")");
+            publisher.publish(gitHubRepoName, reqId, diffMethod, ratio, ratio, countCovered.intValue(), countCovered.intValue());
+            //System.out.println("Coverage " + reqId + " : " + 100 * ratio + " (" + countCovered + "/" + countTotal + ")");
         }
 
-
+    /*
         parserCovered.getMatchingRequirementsIdSet()
                 .stream()
                 .map((String req) -> Requirement.newBuilder().setId(req).build())
                 .forEach((Requirement req) -> publisher.publish(req));
-
+*/
 
     }
 

@@ -65,4 +65,9 @@ public class ConsoleRequirementsPublisher implements RequirementPublisher {
 
     }
 
+    @Override
+    public void publish(String project, String issue, String method, double lineCoverage, double methodCoverage, int countLine, int countMethod) {
+        logger.info("prjetct={}\tissue={}\tmethod={}\tlc={}\tmc={}\tcl={},\tcm={}", project, issue, method, lineCoverage, methodCoverage, countLine, countMethod);
+    }
+
 }

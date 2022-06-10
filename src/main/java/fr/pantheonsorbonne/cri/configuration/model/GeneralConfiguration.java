@@ -7,7 +7,6 @@ import com.google.inject.name.Names;
 import fr.pantheonsorbonne.cri.configuration.model.collectors.GitHubIssueCollectorConfig;
 import fr.pantheonsorbonne.cri.configuration.model.collectors.IssueCollectorsConfig;
 import fr.pantheonsorbonne.cri.configuration.model.differ.DifferAlgorithmConfig;
-import fr.pantheonsorbonne.cri.configuration.model.publisher.DBPublisherConfig;
 import fr.pantheonsorbonne.cri.configuration.model.publisher.GrpcPublisherConfig;
 import fr.pantheonsorbonne.cri.configuration.model.publisher.PublisherConfig;
 import fr.pantheonsorbonne.cri.configuration.model.publisher.RESTPublisherConfig;
@@ -119,10 +118,6 @@ public class GeneralConfiguration {
             } else if (this.publishers.grpcPublishers != null && this.publishers.grpcPublishers.containsKey(this.app.getPublisherName())) {
                 GrpcPublisherConfig grpcPublisherConfig = this.publishers.grpcPublishers.get(this.app.getPublisherName());
                 res.add(new GRPCPublisherConfigurationModule(grpcPublisherConfig.getHost(), grpcPublisherConfig.getPort()));
-            } else if (this.publishers.dbPublishers != null && this.publishers.dbPublishers.containsKey(this.app.getPublisherName())) {
-                DBPublisherConfig dbPublisherConfig = this.publishers.dbPublishers.get(this.app.getPublisherName());
-                res.add(new DBPublisherConfigurationModule(dbPublisherConfig.getJdbc_path()));
-
             } else if (this.publishers.restPublishers != null && this.publishers.restPublishers.containsKey(this.app.getPublisherName())) {
                 RESTPublisherConfig publisherConfig = this.publishers.restPublishers.get(this.app.getPublisherName());
                 res.add(new APIPublisherConfigurationModule(publisherConfig.getBaseUrl()));

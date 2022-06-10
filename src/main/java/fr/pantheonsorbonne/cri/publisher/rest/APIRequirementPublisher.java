@@ -4,8 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import fr.pantheonsorbonne.cri.model.requirements.Requirement;
 import fr.pantheonsorbonne.cri.publisher.AbstractRequirementPublisher;
-import fr.pantheonsorbonne.cri.publisher.rest.model.Gumtree;
-import fr.pantheonsorbonne.cri.publisher.rest.model.IssueReport;
+import fr.pantheonsorbonne.cri.publisher.rest.model.*;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.Entity;
@@ -49,5 +48,15 @@ public class APIRequirementPublisher extends AbstractRequirementPublisher {
             LOG.error(pe.getMessage());
         }
 
+    }
+
+    @Override
+    public void publish(String project, String issue, String method, double lineCoverage, double methodCoverage, int countLine, int countMethod) {
+        var report = new CoverageReport(project, new CoverageProjectReport(System.currentTimeMillis(), Map.of(method, new IssueCoverageProjectReport(Map.of("lineCoverage", lineCoverage, "methodCoverage", methodCoverage)))));
+
+        Response resp = this.target.request().post(Entity.json(report));
+        if (!resp.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+            LOG.error("{} {}", resp.getStatusInfo().getStatusCode(), resp.getStatusInfo().getReasonPhrase());
+        }
     }
 }

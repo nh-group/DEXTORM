@@ -11,4 +11,6 @@ public interface RequirementPublisher {
 
     void publish(Collection<Requirement> reqToPublish);
 
+    void publish(String project, String issue, String method, double lineCoverage, double methodCoverage, int countLine, int countMethod);
+
 }

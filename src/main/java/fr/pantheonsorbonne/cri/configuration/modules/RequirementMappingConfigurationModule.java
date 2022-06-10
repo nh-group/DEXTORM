@@ -2,6 +2,8 @@ package fr.pantheonsorbonne.cri.configuration.modules;
 
 import com.github.gumtreediff.client.Run;
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 import fr.pantheonsorbonne.cri.configuration.RequirementIssueDecorator;
 import fr.pantheonsorbonne.cri.configuration.variables.DiffAlgorithm;
@@ -23,6 +25,12 @@ public class RequirementMappingConfigurationModule extends AbstractModule {
         this.methods = methods;
         this.instructions = instructions;
         this.requirementIssueDecorator = requirementIssueDecorator;
+    }
+
+    @Provides
+    @Named("diffMethod")
+    public String getdiffMethod() {
+        return this.algo.name();
     }
 
 
