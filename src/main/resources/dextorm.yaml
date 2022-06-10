@@ -7,12 +7,12 @@ app:
 differs:
   g:
     diffAlgorithm: GUMTREE
-    methods: true
+    methods: false
     instructions: true
   b:
     diffAlgorithm: BLAME
-    methods: true
-    instructions: false
+    methods: false
+    instructions: true
 issueCollectors:
   github:
     basic-cli-uni:

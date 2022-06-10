@@ -7,7 +7,7 @@ import fr.pantheonsorbonne.cri.reqmapping.CompositeReqMatchImpl;
 import fr.pantheonsorbonne.cri.reqmapping.MethodReqMatchImpl;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.impl.blame.BlameDataWrapper;
-import fr.pantheonsorbonne.cri.reqmapping.impl.blame.ReqMatcherJavaVisitor;
+import fr.pantheonsorbonne.cri.reqmapping.impl.blame.BlameMethodDeclarationVisitor;
 import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.Diff;
 import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.GumTreeFacade;
 import org.junit.jupiter.api.Test;
@@ -103,7 +103,7 @@ public class TestMethodSignature {
         for (int i = 0; i < 999; i++) {
             wrapper.blameData.get("toto.A").put(i, new ArrayList<>());
         }
-        ReqMatcherJavaVisitor blameVisitor = new ReqMatcherJavaVisitor();
+        BlameMethodDeclarationVisitor blameVisitor = new BlameMethodDeclarationVisitor();
 
         JavaParser parser = new JavaParser();
 

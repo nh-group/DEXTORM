@@ -41,7 +41,7 @@ class TestDiffBlame {
         git.add().addFilepattern("toto/A.java").call();
         git.commit().setMessage("commit4 #4").call();
 
-        GitBlameFileRequirementProvider blame = new GitBlameFileRequirementProvider("", git.getRepository());
+        GitBlameFileRequirementProvider blame = new GitBlameFileRequirementProvider("", git.getRepository(), true, false);
         Collection<ReqMatch> reqs = blame.getReqMatcher(Path.of(tmpDir.toString(), "toto/A.java"));
 
         //reqs.stream().forEach(System.out::println);

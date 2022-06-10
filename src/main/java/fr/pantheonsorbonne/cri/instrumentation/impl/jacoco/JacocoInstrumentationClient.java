@@ -53,7 +53,7 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
         //get Jacoco Data
         Report report = getReportObjectFromXMl();
         //get the covered elements
-        List<StackTraceElement> stackTracesCovered = extractStackTraceElement(report, this.doMethods, false, this.doInstructions, true);
+        List<StackTraceElement> stackTracesCovered = extractStackTraceElement(report, this.doMethods, true, this.doInstructions, true);
         //get all the elements
         List<StackTraceElement> stackTracesAll = extractStackTraceElement(report, this.doMethods, false, this.doInstructions, false);
 
@@ -154,7 +154,9 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
     private static List<StackTraceElement> extractStackTraceElement(Report report, boolean doMethods, boolean onlyCoveredMethods, boolean doInstructions, boolean onlyCoveredInstructions) {
         Predicate<Counter> methodPredicate;
         if (onlyCoveredMethods) {
-            methodPredicate = c -> c.getCovered().equals("1");
+            methodPredicate = c -> {
+                return c.getCovered().equals("1");
+            };
         } else {
             methodPredicate = c -> true;
         }

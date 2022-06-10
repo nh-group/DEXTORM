@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.CharBuffer;
 import java.nio.file.Files;
@@ -35,12 +36,17 @@ import java.util.*;
 public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
         implements FileRequirementMappingProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitBlameFileRequirementProvider.class);
-    String sourceRootDir;
-    Repository repo;
-
+    final String sourceRootDir;
+    final Repository repo;
+    final Boolean doMethods;
+    final Boolean doInstructions;
 
     @Inject
-    public GitBlameFileRequirementProvider(@Named("sourceRootDir") String sourceRootDir, Repository repo) {
+    public GitBlameFileRequirementProvider(@Named("sourceRootDir") String sourceRootDir, Repository repo, @Named("DoInstructionsDiff")
+            Boolean doInstructions, @Named("DoMethodsDiff")
+                                                   Boolean doMethods) {
+        this.doMethods = doMethods;
+        this.doInstructions = doInstructions;
 
         this.sourceRootDir = sourceRootDir;
         this.repo = repo;
@@ -62,7 +68,7 @@ public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
     private Collection<ReqMatch> blameUnsafeVisit(Path file) throws GitAPIException, IOException {
 
         Collection<ReqMatch> res = new ArrayList<>();
-        BlameDataWrapper wrapper = new BlameDataWrapper();
+
 
         File relativeFilePath = this.repo.getDirectory().getParentFile().toPath().relativize(file).toFile();
         if (Files.isRegularFile(file)
@@ -81,34 +87,16 @@ public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
             String inferedClassName = Paths.get(sourceRootDir).relativize(relativeFilePath.toPath())
                     .toString().replaceAll("/", ".").replaceFirst("[.][^.]+$", "");
 
-            for (int idx = 0; idx < lines; idx++) {
-                RevCommit commit = blamed.getSourceCommit(idx);
-
-                fileBlameData.put(idx, Utils.getIssueIdFromCommits(commit.getFullMessage()));
-
-                var commits = Utils.getIssueIdFromCommits(blamed.getSourceCommit(idx).getFullMessage());
-                if (commits.size() > 0) {
-                    res.add(
-                            ReqMatch.builder()
-                                    .fQClassName(inferedClassName)
-                                    .line(blamed.getSourceLine(idx))
-                                    .commits(commits)
-                                    .build());
-                }
+            if (doInstructions) {
+                res.addAll(extractLineReqMatchers(blamed, lines, inferedClassName));
             }
-            wrapper.blameData.put(inferedClassName, fileBlameData);
+            if (doMethods) {
+                for (int idx = 0; idx < lines; idx++) {
+                    RevCommit commit = blamed.getSourceCommit(idx);
 
-            JavaParser parser = new JavaParser();
-
-            Optional<CompilationUnit> cu = parser.parse(file.toFile()).getResult();
-
-            if (cu.isPresent()) {
-
-                ReqMatcherJavaVisitor blameVisitor = new ReqMatcherJavaVisitor();
-
-                cu.get().accept(blameVisitor, wrapper);
-                res.addAll(blameVisitor.getMatchers());
-
+                    fileBlameData.put(idx, Utils.getIssueIdFromCommits(commit.getFullMessage()));
+                }
+                res.addAll(extractMethodDeclaration(file, fileBlameData, inferedClassName));
             }
             return res;
 
@@ -143,6 +131,43 @@ public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
                 return CharStreams.readLines(CharBuffer.wrap(stream.toString().toCharArray())).size();
             }
         }
+    }
+
+    private Collection<ReqMatch> extractLineReqMatchers(BlameResult blamed, int lines, String inferedClassName) {
+        Collection<ReqMatch> res = new ArrayList<>();
+        for (int idx = 0; idx < lines; idx++) {
+            RevCommit commit = blamed.getSourceCommit(idx);
+            var commits = Utils.getIssueIdFromCommits(commit.getFullMessage());
+            if (commits.size() > 0) {
+                res.add(
+                        ReqMatch.builder()
+                                .fQClassName(inferedClassName)
+                                .line(blamed.getSourceLine(idx))
+                                .commits(commits)
+                                .build());
+            }
+        }
+        return res;
+    }
+
+    private Collection<ReqMatch> extractMethodDeclaration(Path file, Map<Integer, Collection<String>> fileBlameData, String inferedClassName) throws FileNotFoundException {
+        BlameDataWrapper wrapper = new BlameDataWrapper();
+        Collection<ReqMatch> res = new ArrayList<>();
+        wrapper.blameData.put(inferedClassName, fileBlameData);
+
+        JavaParser parser = new JavaParser();
+
+        Optional<CompilationUnit> cu = parser.parse(file.toFile()).getResult();
+
+        if (cu.isPresent()) {
+
+            BlameMethodDeclarationVisitor blameVisitor = new BlameMethodDeclarationVisitor();
+
+            cu.get().accept(blameVisitor, wrapper);
+            res.addAll(blameVisitor.getMatchers());
+
+        }
+        return res;
     }
 
 }
