@@ -30,7 +30,7 @@ public class RequirementMappingConfigurationModule extends AbstractModule {
     @Provides
     @Named("diffMethod")
     public String getdiffMethod() {
-        return this.algo.name();
+        return this.algo.getConfName();
     }
 
 

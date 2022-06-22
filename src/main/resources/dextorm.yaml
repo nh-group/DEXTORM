@@ -1,17 +1,17 @@
 app:
   instrumentedPackage: "fr.pantheonsorbonne"
   sourceRootDir: src/main/java
-  publisher: console1
-  issueCollector: basic-cli-uni
-  diffAlgorithm: b
+  publisher: json
+  issueCollector: dummy
+  diffAlgorithm: gmethods
 differs:
-  g:
+  gmethods:
     diffAlgorithm: GUMTREE
-    methods: false
+    methods: true
     instructions: true
-  b:
+  bmethods:
     diffAlgorithm: BLAME
-    methods: false
+    methods: true
     instructions: true
 issueCollectors:
   github:
@@ -24,6 +24,9 @@ issueCollectors:
       branch: master
 
 publishers:
+  jsonFilePublisher:
+    json:
+      targetDir: /home/nherbaut/workspace/dextorm/DEXTORM/output
   grpcPublishers:
     grpc1:
       host: localhost

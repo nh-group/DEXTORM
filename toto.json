@@ -1,0 +1,16 @@
+{
+    "7": {
+             "gumtree": {
+               "lineCoverage": 60,
+               "methodCoverage": 70
+             },
+           
+           },
+           "6": {
+               "gumtree": {
+                 "lineCoverage": 60,
+                 "methodCoverage": 70
+               },
+             
+             }
+   }

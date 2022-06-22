@@ -77,7 +77,7 @@ public class MethodExtractorProvider implements javax.inject.Provider<Extendable
 
             reqs.stream().collect(Collectors.toSet()).stream()
                     .map((String req) -> Requirement.newBuilder().setId(req).build())
-                    .forEach((Requirement req) -> publisher.publish(req));
+                    .forEach((Requirement req) -> publisher.publishNow(req));
 
             return zuper.call();
         }

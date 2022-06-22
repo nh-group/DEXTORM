@@ -23,7 +23,17 @@ public class GrPCRequirementPublisher extends AbstractRequirementPublisher {
     }
 
     @Override
-    public void publish(String project, String issue, String method, double lineCoverage, double methodCoverage, int countLine, int countMethod) {
+    public void publishNow(String project, String issue, String method, double lineCoverage, double methodCoverage, int countLine, int countMethod) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void collect(String project, String issue, String method, double lineCoverage, double methodCoverage, int countLine, int countMethod) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void flush() {
         throw new UnsupportedOperationException();
     }
 }

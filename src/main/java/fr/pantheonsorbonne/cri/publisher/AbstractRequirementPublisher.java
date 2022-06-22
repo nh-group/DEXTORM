@@ -15,14 +15,14 @@ public abstract class AbstractRequirementPublisher implements RequirementPublish
     protected abstract void publishLinkedRequirement(Requirement req);
 
     @Override
-    final public void publish(Requirement req) {
+    final public void publishNow(Requirement req) {
         this.publishLinkedRequirement(requirementIssueDecorator.getIssueLink(req));
     }
 
     @Override
-    final public void publish(Collection<Requirement> reqToPublish) {
+    final public void publishNow(Collection<Requirement> reqToPublish) {
         for (Requirement r : reqToPublish) {
-            this.publish(r);
+            this.publishNow(r);
         }
 
     }

@@ -8,6 +8,7 @@ import fr.pantheonsorbonne.cri.configuration.model.collectors.GitHubIssueCollect
 import fr.pantheonsorbonne.cri.configuration.model.collectors.IssueCollectorsConfig;
 import fr.pantheonsorbonne.cri.configuration.model.differ.DifferAlgorithmConfig;
 import fr.pantheonsorbonne.cri.configuration.model.publisher.GrpcPublisherConfig;
+import fr.pantheonsorbonne.cri.configuration.model.publisher.JsonFilePublisherConfig;
 import fr.pantheonsorbonne.cri.configuration.model.publisher.PublisherConfig;
 import fr.pantheonsorbonne.cri.configuration.model.publisher.RESTPublisherConfig;
 import fr.pantheonsorbonne.cri.configuration.modules.*;
@@ -121,6 +122,9 @@ public class GeneralConfiguration {
             } else if (this.publishers.restPublishers != null && this.publishers.restPublishers.containsKey(this.app.getPublisherName())) {
                 RESTPublisherConfig publisherConfig = this.publishers.restPublishers.get(this.app.getPublisherName());
                 res.add(new APIPublisherConfigurationModule(publisherConfig.getBaseUrl()));
+            } else if (this.publishers.jsonFilePublisher != null && this.publishers.jsonFilePublisher.containsKey(this.app.getPublisherName())) {
+                JsonFilePublisherConfig jsonPublisherConfig = this.publishers.getJsonFilePublisher().get(this.app.getPublisherName());
+                res.add(new JsonFilePublisherConfigurationModule(jsonPublisherConfig));
             }
 
         }

@@ -6,15 +6,24 @@ public class PublisherConfig {
     public Map<String, GrpcPublisherConfig> grpcPublishers;
     public Map<String, FilePublisherConfig> filePublishers;
     public Map<String, RESTPublisherConfig> restPublishers;
-
-
-    public PublisherConfig(Map<String, GrpcPublisherConfig> grpcPublishers, Map<String, FilePublisherConfig> consolePublishers, Map<String, RESTPublisherConfig> restPublishers) {
-        this.grpcPublishers = grpcPublishers;
-        this.filePublishers = consolePublishers;
-        this.restPublishers = restPublishers;
-    }
+    public Map<String, JsonFilePublisherConfig> jsonFilePublisher;
 
     public PublisherConfig() {
+    }
+
+    public PublisherConfig(Map<String, GrpcPublisherConfig> grpcPublishers, Map<String, FilePublisherConfig> filePublishers, Map<String, RESTPublisherConfig> restPublishers, Map<String, JsonFilePublisherConfig> jsonFilePublisher) {
+        this.grpcPublishers = grpcPublishers;
+        this.filePublishers = filePublishers;
+        this.restPublishers = restPublishers;
+        this.jsonFilePublisher = jsonFilePublisher;
+    }
+
+    public Map<String, JsonFilePublisherConfig> getJsonFilePublisher() {
+        return jsonFilePublisher;
+    }
+
+    public void setJsonFilePublisher(Map<String, JsonFilePublisherConfig> jsonFilePublisher) {
+        this.jsonFilePublisher = jsonFilePublisher;
     }
 
     public Map<String, RESTPublisherConfig> getRestPublishers() {
@@ -46,7 +55,9 @@ public class PublisherConfig {
     public String toString() {
         return "PublisherConfig{" +
                 "grpcPublishers=" + grpcPublishers +
-                ", consolePublishers=" + filePublishers +
+                ", filePublishers=" + filePublishers +
+                ", restPublishers=" + restPublishers +
+                ", jsonFilePublisher=" + jsonFilePublisher +
                 '}';
     }
 }

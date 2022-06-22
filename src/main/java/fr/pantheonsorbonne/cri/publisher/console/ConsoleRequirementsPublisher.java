@@ -19,6 +19,7 @@ import java.util.Collection;
 public class ConsoleRequirementsPublisher implements RequirementPublisher {
 
     private final Logger logger;
+    StringBuilder sb = new StringBuilder();
 
     @Inject
     public ConsoleRequirementsPublisher(@Named("consolePublishers") String consoleLoggerFileName) {
@@ -51,23 +52,32 @@ public class ConsoleRequirementsPublisher implements RequirementPublisher {
     }
 
     @Override
-    public void publish(Requirement req) {
+    public void publishNow(Requirement req) {
         logger.info(req.getId());
 
 
     }
 
     @Override
-    public void publish(Collection<Requirement> reqToPublish) {
+    public void publishNow(Collection<Requirement> reqToPublish) {
         for (Requirement r : reqToPublish) {
-            this.publish(r);
+            this.publishNow(r);
         }
 
     }
 
     @Override
-    public void publish(String project, String issue, String method, double lineCoverage, double methodCoverage, int countLine, int countMethod) {
-        logger.info("prjetct={}\tissue={}\tmethod={}\tlc={}\tmc={}\tcl={},\tcm={}", project, issue, method, lineCoverage, methodCoverage, countLine, countMethod);
+    public void publishNow(String project, String issue, String method, double lineCoverage, double methodCoverage, int countLine, int countMethod) {
+        logger.info("project={}\tissue={}\tmethod={}\tlc={}\tmc={}\tcl={},\tcm={}", project, issue, method, lineCoverage, methodCoverage, countLine, countMethod);
+    }
+
+    @Override
+    public void collect(String project, String issue, String method, double lineCoverage, double methodCoverage, int countLine, int countMethod) {
+        sb.append(String.format("project=%s\tissue=%s\tmethod=%s\tlc=%s\tmc=%s\tcl=%s,\tcm=%s\n", project, issue, method, lineCoverage, methodCoverage, countLine, countMethod));
+    }
+
+    public void flush() {
+        logger.info(sb.toString());
     }
 
 }

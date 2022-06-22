@@ -7,10 +7,15 @@ import java.util.Collection;
 public interface RequirementPublisher {
 
 
-    void publish(Requirement req);
+    void publishNow(Requirement req);
 
-    void publish(Collection<Requirement> reqToPublish);
+    void publishNow(Collection<Requirement> reqToPublish);
 
-    void publish(String project, String issue, String method, double lineCoverage, double methodCoverage, int countLine, int countMethod);
+    void publishNow(String project, String issue, String method, double lineCoverage, double methodCoverage, int countLine, int countMethod);
+
+    void collect(String project, String issue, String method, double lineCoverage, double methodCoverage, int countLine, int countMethod);
+
+    void flush();
+
 
 }

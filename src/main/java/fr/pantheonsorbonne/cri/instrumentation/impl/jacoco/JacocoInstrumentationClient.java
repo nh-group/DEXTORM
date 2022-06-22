@@ -89,7 +89,7 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
                     break;
                 }
             }
-            if (matchee != null) {
+           /* if (matchee != null) {
                 if (covered.contains(matchee)) {
                     System.out.println("COVERED\t" + rm + " by " + matchee);
                 } else {
@@ -98,7 +98,7 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
 
             } else {
                 System.out.println("IRRLVNT\t" + rm.toString());
-            }
+            }*/
         }
         var uncovered = new HashSet<>(all);
         uncovered.removeAll(covered);
@@ -125,9 +125,11 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
             Long countCovered = coveredReqIdList.stream().filter(req -> req.equals(reqId)).count();
             Double ratio = countCovered / countTotal;
             coverageInfo.put(reqId, ratio);
-            publisher.publish(gitHubRepoName, reqId, diffMethod, ratio, ratio, countCovered.intValue(), countCovered.intValue());
+            publisher.publishNow(gitHubRepoName, reqId, diffMethod, ratio, ratio, countCovered.intValue(), countCovered.intValue());
             //System.out.println("Coverage " + reqId + " : " + 100 * ratio + " (" + countCovered + "/" + countTotal + ")");
         }
+
+
 
     /*
         parserCovered.getMatchingRequirementsIdSet()
