@@ -1,6 +1,6 @@
 package fr.pantheonsorbonne.cri.configuration.modules;
 
-import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import fr.pantheonsorbonne.cri.model.requirements.Requirement;
@@ -31,9 +31,15 @@ public class JsonFilePublisher implements RequirementPublisher {
 
     @Override
     public void publishNow(String project, String issue, String method, double lineCoverage, double methodCoverage, int countLine, int countMethod) {
+        if (Double.isNaN(lineCoverage)) {
+            lineCoverage = 0;
+        }
+        if (Double.isNaN(methodCoverage)) {
+            methodCoverage = 0;
+        }
         var payload = Map.of(issue, Map.of(method, Map.of("lineCoverage", lineCoverage * 100, "methodCoverage", methodCoverage * 100)));
         try (var writer = new FileWriter(Files.createTempFile(Path.of(targetDir), "dextorm", ".json").toAbsolutePath().toString())) {
-            new Gson().toJson(payload, writer);
+            new GsonBuilder().serializeSpecialFloatingPointValues().create().toJson(payload, writer);
         } catch (IOException e) {
             e.printStackTrace();
         }
