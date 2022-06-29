@@ -3,7 +3,6 @@ package fr.pantheonsorbonne.cri.app;
 import com.github.gumtreediff.client.Run;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
-import fr.pantheonsorbonne.cri.reqmapping.CompositeReqMatchImpl;
 import fr.pantheonsorbonne.cri.reqmapping.MethodReqMatchImpl;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.impl.blame.BlameDataWrapper;
@@ -29,7 +28,7 @@ public class TestMethodSignature {
 
         List<Diff> diffs = Diff.getBuilder().add(f1.file, f1.commitId).build();
         GumTreeFacade facade = new GumTreeFacade();
-        Collection<ReqMatch> reqMatcherImpls = facade.getReqMatcher(diffs, true, true);
+        Collection<ReqMatch> reqMatcherImpls = facade.getReqMatcher(diffs, true, false);
         List<MethodReqMatchImpl> reqMatchersListImpl = reqMatcherImpls.stream().map(r -> ((MethodReqMatchImpl) r)).collect(Collectors.toList());
         methodSignatureExtraction(reqMatchersListImpl);
 
@@ -111,7 +110,7 @@ public class TestMethodSignature {
 
         cu.get().accept(blameVisitor, wrapper);
 
-        List<MethodReqMatchImpl> reqMatchersListImpl = new ArrayList<>(blameVisitor.getMatchers()).stream().map(r -> ((CompositeReqMatchImpl) r).getComponent(MethodReqMatchImpl.class).get()).collect(Collectors.toList());
+        List<MethodReqMatchImpl> reqMatchersListImpl = new ArrayList<>(blameVisitor.getMatchers()).stream().map(r -> ((MethodReqMatchImpl) r)).collect(Collectors.toList());
         reqMatchersListImpl.sort(new Comparator<MethodReqMatchImpl>() {
             @Override
             public int compare(MethodReqMatchImpl t0, MethodReqMatchImpl t1) {

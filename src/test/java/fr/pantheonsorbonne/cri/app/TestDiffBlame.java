@@ -1,6 +1,5 @@
 package fr.pantheonsorbonne.cri.app;
 
-import fr.pantheonsorbonne.cri.reqmapping.CompositeReqMatchImpl;
 import fr.pantheonsorbonne.cri.reqmapping.MethodReqMatchImpl;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.impl.blame.GitBlameFileRequirementProvider;
@@ -41,7 +40,7 @@ class TestDiffBlame {
         git.add().addFilepattern("toto/A.java").call();
         git.commit().setMessage("commit4 #4").call();
 
-        GitBlameFileRequirementProvider blame = new GitBlameFileRequirementProvider("", git.getRepository(), true, false);
+        GitBlameFileRequirementProvider blame = new GitBlameFileRequirementProvider("", git.getRepository(), false, true);
         Collection<ReqMatch> reqs = blame.getReqMatcher(Path.of(tmpDir.toString(), "toto/A.java"));
 
         //reqs.stream().forEach(System.out::println);
@@ -50,7 +49,7 @@ class TestDiffBlame {
         boolean[] assertions = new boolean[]{false, false, false};
 
         for (ReqMatch m : reqs) {
-            MethodReqMatchImpl mrm = ((CompositeReqMatchImpl) m).getComponent(MethodReqMatchImpl.class).get();
+            MethodReqMatchImpl mrm = (MethodReqMatchImpl) m;
             if (mrm.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("main")) {
                 assertEquals(1, m.getRequirementsIds().stream().distinct().count());
                 List<String> commits = m.getRequirementsIds().stream().distinct().collect(Collectors.toList());
