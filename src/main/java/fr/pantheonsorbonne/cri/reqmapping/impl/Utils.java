@@ -22,6 +22,8 @@ public class Utils {
                 return "D";
             case "void":
                 return "V";
+            case "final":
+                return "";
         }
         throw new RuntimeException("failed to convert type " + type);
     }

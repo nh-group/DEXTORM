@@ -1,5 +1,8 @@
 package fr.pantheonsorbonne.cri.reqmapping;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -8,7 +11,7 @@ import java.util.stream.Collectors;
 
 
 public class ElementMapper {
-
+    private final static Logger LOGGER = LoggerFactory.getLogger(ElementMapper.class);
 
     private final String instrumentedPackage;
     private final StackTraceElement[] elements;
@@ -30,10 +33,13 @@ public class ElementMapper {
 
         Set<ReqMatch> res = new HashSet<>();
         for (StackTraceElement elt : elements) {
+            LOGGER.trace("analyzing {}", elt.toString());
             if (elt.getPackageName().startsWith(this.instrumentedPackage)) {
                 for (ReqMatch m : reqMatcherImpls) {
+                    LOGGER.trace("applying matcher {}", m.toString());
                     if (match(elt, m)) {
                         //System.out.println(elt + " ->" + m);
+                        LOGGER.trace("applying matcher {} ADDED", m);
                         res.add(m);
                     }
                 }

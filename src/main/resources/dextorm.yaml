@@ -1,39 +1,41 @@
 app:
-  instrumentedPackage: "fr.pantheonsorbonne"
-  sourceRootDir: src/main/java
-  publisher: json
-  issueCollector: dummy
   diffAlgorithm: gmethods
+  instrumentedPackage: org.xbill.DNS
+  issueCollector: dnsjava
+  publisher: json
+  #publisher: console1
+  sourceRootDir: src/main/java
 differs:
-  gmethods:
-    diffAlgorithm: GUMTREE
-    methods: true
-    instructions: true
   bmethods:
     diffAlgorithm: BLAME
+    instructions: false
     methods: true
+  gmethods:
+    diffAlgorithm: GUMTREE
     instructions: true
+    methods: true
 issueCollectors:
   github:
     basic-cli-uni:
-      gitHubRepoName: nh-group/basic-cli-uni
       branch: master
+      gitHubRepoName: nh-group/basic-cli-uni
+    dnsjava:
+      gitHubRepoName: dnsjava/dnsjava
     dummy:
+      branch: master
       gitHubRepoName: nherbaut/dextorm-dummy-project
       repoAddress: file:///home/nherbaut/tmp/dextorm-dummy-project.git
-      branch: master
-
 publishers:
-  jsonFilePublisher:
-    json:
-      targetDir: /home/nherbaut/workspace/dextorm/DEXTORM/output
+  filePublishers:
+    console1:
+      filePath: stdout
   grpcPublishers:
     grpc1:
       host: localhost
       port: 8081
-  filePublishers:
-    console1:
-      filePath: stdout
+  jsonFilePublisher:
+    json:
+      targetDir: /home/nherbaut/workspace/dextorm/DEXTORM/output/res
   restPublishers:
     rest1:
       baseUrl: http://localhost:3000/coverage/issue/all

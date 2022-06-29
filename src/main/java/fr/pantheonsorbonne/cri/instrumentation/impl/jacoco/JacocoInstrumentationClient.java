@@ -56,31 +56,36 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
     public void registerClient() {
         LOGGER.info("analysing {}", jacocoReport);
 
-        //get Jacoco Data
+
+        LOGGER.debug("get jacoco data");
         Report report = getReportObjectFromXMl();
-        //get the covered elements
+
+        LOGGER.debug("getting the covered elements");
         List<StackTraceElement> stackTracesCovered = extractStackTraceElement(report, this.doMethods, true, this.doInstructions, true);
-        //get all the elements
+
+        LOGGER.debug("getting all the elements");
         List<StackTraceElement> stackTracesAll = extractStackTraceElement(report, this.doMethods, false, this.doInstructions, false);
 
-        //get the matcher from the code<->req mapper
+        LOGGER.debug("get the matcher from the code<->req mapper");
         Set<ReqMatch> requirementsMatchers = mapper.getReqMatcher();
         Set<String> reqIds = requirementsMatchers.stream().map(rm -> rm.getRequirementsIds()).flatMap(Collection::stream).collect(Collectors.toSet());
 
-        //Matches elements with the mapper
+
+        LOGGER.debug("Matches elements with the mapper");
         ElementMapper parserCovered = new ElementMapper(stackTracesCovered.toArray(new StackTraceElement[0]), instrumentedPackage, requirementsMatchers);
         ElementMapper parserAll = new ElementMapper(stackTracesAll.toArray(new StackTraceElement[0]), instrumentedPackage, requirementsMatchers);
 
 
-        //only covered
+        LOGGER.debug("//only covered");
         var covered = parserCovered.getMatchedElements();
         //every element
+        LOGGER.debug("//every element");
         var all = parserAll.getMatchedElements();
 
         List<ReqMatch> rms = new ArrayList<>(requirementsMatchers).stream().collect(Collectors.toList());
         //Collections.sort(rms);
         for (ReqMatch rm : rms) {
-
+            LOGGER.debug("//every element");
             StackTraceElement matchee = null;
             for (StackTraceElement ste : all) {
                 if (rm.isMatch(ste)) {
