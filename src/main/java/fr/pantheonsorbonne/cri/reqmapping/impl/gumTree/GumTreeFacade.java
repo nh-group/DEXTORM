@@ -87,24 +87,29 @@ public class GumTreeFacade {
     public void labelDestWithCommit(Tree src, Tree dst, String commitId) {
 
         Matcher m = Matchers.getInstance().getMatcher(); // retrieve the default matcher
-        MappingStore store = m.match(src, dst);
+        try {
+            MappingStore store = m.match(src, dst);
 
 
-        for (Tree t : dst.breadthFirst()) {
+            for (Tree t : dst.breadthFirst()) {
 
-            var srcTree = store.getSrcForDst(t);
-            if (store.getSrcForDst(t) == null) {
-                //that's new stuff in dst that wasn't in sources, apply the new commiId
-                GumTreeFacade.appendMetadata(t, BLAME_ID, commitId, false);
+                var srcTree = store.getSrcForDst(t);
+                if (store.getSrcForDst(t) == null) {
+                    //that's new stuff in dst that wasn't in sources, apply the new commiId
+                    GumTreeFacade.appendMetadata(t, BLAME_ID, commitId, false);
 
-            } else {
-                GumTreeFacade.appendMetadata(t, BLAME_ID, srcTree.getMetadata(BLAME_ID), false);
+                } else {
+                    GumTreeFacade.appendMetadata(t, BLAME_ID, srcTree.getMetadata(BLAME_ID), false);
+                }
+                //GumTreeFacade.showTree(dst, "[final]", System.out);
+
+
             }
             //GumTreeFacade.showTree(dst, "[final]", System.out);
-
-
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
+            return;
         }
-        //GumTreeFacade.showTree(dst, "[final]", System.out);
     }
 
     public List<ReqMatch> getReqMatcher(List<Diff> diffs, boolean doMethods, boolean doInstructions) {
