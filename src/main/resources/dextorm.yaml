@@ -2,8 +2,8 @@ app:
   diffAlgorithm: gmethods
   instrumentedPackage: org.xbill.DNS
   issueCollector: dnsjava
-  publisher: json
-  #publisher: console1
+  #publisher: json
+  publisher: console1
   sourceRootDir: src/main/java
 differs:
   bmethods:
@@ -12,7 +12,7 @@ differs:
     methods: true
   gmethods:
     diffAlgorithm: GUMTREE
-    instructions: true
+    instructions: false
     methods: true
 issueCollectors:
   github:

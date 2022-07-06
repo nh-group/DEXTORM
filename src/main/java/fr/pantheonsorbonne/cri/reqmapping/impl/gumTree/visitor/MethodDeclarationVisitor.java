@@ -82,7 +82,7 @@ public class MethodDeclarationVisitor extends JavaParserTreeExclusiveCompositeVi
             if (parameter.get(analyserIndex).getType().name.equals("SingleMemberAnnotationExpr")) {
                 analyserIndex += 3;
             }
-            if (parameter.get(analyserIndex).getType().name.equals("ArrayType")) {
+            while (parameter.get(analyserIndex).getType().name.equals("ArrayType")) {
                 strParameter.append("[");
                 analyserIndex++;
             }

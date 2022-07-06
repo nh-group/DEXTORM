@@ -17,6 +17,8 @@ import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,6 +34,7 @@ import java.util.stream.Collectors;
 
 public class GumTreeFileRequirementMappingProvider implements FileRequirementMappingProvider {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(GumTreeFileRequirementMappingProvider.class);
     private final GumTreeFacade facade = new GumTreeFacade();
     @Inject
     private Repository repo;
@@ -83,8 +86,12 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
             Collections.reverse(commitIssueMappings);
             Diff.DiffBuilder builder = Diff.getBuilder();
             for (CommitIssueMapping mapping : commitIssueMappings) {
+                LOGGER.debug("mapping {} for file {}", mapping.id.getName(), relativeFilePath);
                 Path path = materializeFileFromCommit(this.repo, mapping.id, relativeFilePath.toString());
-                builder.add(path, mapping.issueId.stream().collect(Collectors.joining(" ")));
+                if (path != null) {
+                    builder.add(path, mapping.issueId.stream().collect(Collectors.joining(" ")));
+                }
+
 
             }
 
@@ -111,7 +118,8 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
                 treeWalk.setRecursive(true);
                 treeWalk.setFilter(PathFilter.create(name));
                 if (!treeWalk.next()) {
-                    throw new IllegalStateException("Did not find expected file ");
+                    LOGGER.warn("failed to find file {} in commit {}", name, commit.getName());
+                    return null;
                 }
 
                 ObjectId objectId = treeWalk.getObjectId(0);

@@ -31,6 +31,8 @@ public class Agent {
     Set<InstrumentationClient> instrumentatinClients;
 
     public static void main(String... args) throws IOException {
+
+        System.out.println("###" + Agent.class.getClassLoader().getResource("benchmark/dextorm-dummy-project/gumtree/methods.yaml"));
         // gather all modules to be used in the IC
         if (args.length != 2) {
             LOG.error("usage: configuration_file_path jacoco_report_file_path");
@@ -71,7 +73,7 @@ public class Agent {
         agent.run();
     }
 
-    private void run() {
+    public void run() {
 
         for (InstrumentationClient ic : instrumentatinClients) {
             ic.registerClient();

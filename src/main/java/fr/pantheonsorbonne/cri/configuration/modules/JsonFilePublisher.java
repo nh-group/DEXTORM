@@ -38,6 +38,14 @@ public class JsonFilePublisher implements RequirementPublisher {
             methodCoverage = 0;
         }
         var payload = Map.of(issue, Map.of(method, Map.of("lineCoverage", lineCoverage * 100, "methodCoverage", methodCoverage * 100)));
+        if (!Files.exists(Path.of(targetDir))) {
+            try {
+                Files.createDirectory(Path.of(targetDir));
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.exit(-1);
+            }
+        }
         try (var writer = new FileWriter(Files.createTempFile(Path.of(targetDir), "dextorm", ".json").toAbsolutePath().toString())) {
             new GsonBuilder().serializeSpecialFloatingPointValues().create().toJson(payload, writer);
         } catch (IOException e) {

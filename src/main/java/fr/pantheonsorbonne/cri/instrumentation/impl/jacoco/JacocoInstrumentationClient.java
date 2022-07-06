@@ -22,6 +22,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -182,57 +185,88 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
             linePredicate = l -> true;
         }
 
-
-        List<StackTraceElement> stackTraces = new ArrayList<>();
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        List<StackTraceElement> stackTraces = Collections.synchronizedList(new ArrayList<>());
+        AtomicInteger atomicInteger = new AtomicInteger();
         for (Package pakage : report.getPackages()) {
             for (Class klass : pakage.getClazz()) {
                 if (doMethods) {
-                    for (Method method : klass.getMethod()) {
-                        String[] klassBits = klass.getName().replaceAll("/", ".").split("\\.");
-                        String klassName = klassBits[klassBits.length - 1];
-                        if (method.getCounter().stream().anyMatch(methodPredicate)) {
-                            stackTraces.add(new StackTraceElement(klass.getSourcefilename(),
-                                    pakage.getName().replaceAll("/", "."), klassName, method.getName(), method.getDesc(), method.getLine()));
-                        }
-                    }
+                    executorService.submit(() -> {
+                        atomicInteger.incrementAndGet();
+                        extractMethodInfo(methodPredicate, stackTraces, pakage, klass);
+                        atomicInteger.decrementAndGet();
+                    });
                 }
                 if (doInstructions) {
-                    Sourcefile sourcefile = pakage.getSourceFile().stream().filter(sf -> sf.getName().equals(klass.getSourcefilename())).findAny().orElseThrow();
-                    for (Line line : sourcefile.getLine()) {
-                        //https://stackoverflow.com/questions/33868761/how-to-interpret-the-jacoco-xml-file
-                        /*
-                        mi = missed instructions (statements)
-                        ci = covered instructions (statements)
-                        mb = missed branches
-                        cb = covered branches
-
-                        When mb or cb is greater then 0 the line is a branch.
-                        When mb and cb are 0 the line is a statement.
-                        cb / (mb+cb) (line 11) is 2/4 partial hit
-                        When not a branch and mi == 0 the line is hit
-
-                        cb>0||ci>0 => hit
-
-                         */
-                        if (linePredicate.test(line)) {
-
-
-                            stackTraces.add(
-                                    new StackTraceElement(
-                                            klass.getSourcefilename(),
-                                            pakage.getName().replaceAll("/", "."),
-                                            Arrays.stream(klass.getName().split("/")).reduce((f, l) -> l).get(),
-                                            "",
-                                            "()V",
-                                            line.getNr()));
-                        }
-                    }
+                    executorService.submit(() -> {
+                        atomicInteger.incrementAndGet();
+                        extractInstructionInfo(linePredicate, stackTraces, pakage, klass);
+                        atomicInteger.decrementAndGet();
+                    });
                 }
             }
 
 
         }
+
+
+        int value;
+        while ((value = atomicInteger.get()) > 0) {
+            try {
+                Thread.sleep(2l);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            //System.out.println("NHE remaining tasks " + atomicInteger.get());
+        }
+
+
+        executorService.shutdownNow();
         return stackTraces;
+    }
+
+    private static void extractMethodInfo(Predicate<Counter> methodPredicate, List<StackTraceElement> stackTraces, Package pakage, Class klass) {
+        for (Method method : klass.getMethod()) {
+            String[] klassBits = klass.getName().replaceAll("/", ".").split("\\.");
+            String klassName = klassBits[klassBits.length - 1];
+            if (method.getCounter().stream().anyMatch(methodPredicate)) {
+                stackTraces.add(new StackTraceElement(klass.getSourcefilename(),
+                        pakage.getName().replaceAll("/", "."), klassName, method.getName(), method.getDesc(), method.getLine()));
+            }
+        }
+    }
+
+    private static void extractInstructionInfo(Predicate<Line> linePredicate, List<StackTraceElement> stackTraces, Package pakage, Class klass) {
+        Sourcefile sourcefile = pakage.getSourceFile().stream().filter(sf -> sf.getName().equals(klass.getSourcefilename())).findAny().orElseThrow();
+        for (Line line : sourcefile.getLine()) {
+            //https://stackoverflow.com/questions/33868761/how-to-interpret-the-jacoco-xml-file
+            /*
+            mi = missed instructions (statements)
+            ci = covered instructions (statements)
+            mb = missed branches
+            cb = covered branches
+
+            When mb or cb is greater then 0 the line is a branch.
+            When mb and cb are 0 the line is a statement.
+            cb / (mb+cb) (line 11) is 2/4 partial hit
+            When not a branch and mi == 0 the line is hit
+
+            cb>0||ci>0 => hit
+
+             */
+            if (linePredicate.test(line)) {
+
+
+                stackTraces.add(
+                        new StackTraceElement(
+                                klass.getSourcefilename(),
+                                pakage.getName().replaceAll("/", "."),
+                                Arrays.stream(klass.getName().split("/")).reduce((f, l) -> l).get(),
+                                "",
+                                "()V",
+                                line.getNr()));
+            }
+        }
     }
 }
 
