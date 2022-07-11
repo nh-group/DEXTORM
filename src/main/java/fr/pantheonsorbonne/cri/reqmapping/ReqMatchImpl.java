@@ -11,11 +11,13 @@ public abstract class ReqMatchImpl implements ReqMatch {
     protected final Set<StackTraceElement> matches = new HashSet<>();
     protected final String packageName;
     protected final String className;
+    protected final String fqClassName;
 
     public ReqMatchImpl(String className, String packageName, String[] reqs) {
         this.className = className;
         this.packageName = packageName;
         commits.addAll(Arrays.asList(reqs));
+        this.fqClassName = this.packageName.isEmpty() ? className : this.packageName + "." + className;
 
     }
 
@@ -41,6 +43,11 @@ public abstract class ReqMatchImpl implements ReqMatch {
         return this.matches;
     }
 
+    @Override
+    public String getFQClassName() {
+        return this.fqClassName;
+    }
+
     public void setReq(java.util.List<String> req) {
         this.commits.clear();
         this.commits.addAll(req);
@@ -51,11 +58,7 @@ public abstract class ReqMatchImpl implements ReqMatch {
     }
 
     protected boolean isMatchFQClass(StackTraceElement elt) {
-        return this.getFQClassName().equals(elt.getFQClassName());
-    }
-
-    public String getFQClassName() {
-        return this.packageName.isEmpty() ? className : this.packageName + "." + className;
+        return this.getFQClassName().equals(elt.getFqClassName());
     }
 
     @Override

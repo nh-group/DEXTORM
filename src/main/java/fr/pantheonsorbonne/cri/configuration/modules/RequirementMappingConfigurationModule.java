@@ -9,8 +9,8 @@ import fr.pantheonsorbonne.cri.configuration.RequirementIssueDecorator;
 import fr.pantheonsorbonne.cri.configuration.variables.DiffAlgorithm;
 import fr.pantheonsorbonne.cri.reqmapping.RequirementMappingProvider;
 import fr.pantheonsorbonne.cri.reqmapping.impl.FileRequirementMappingProvider;
+import fr.pantheonsorbonne.cri.reqmapping.impl.GitRepoRequirementMappingProvider;
 import fr.pantheonsorbonne.cri.reqmapping.impl.blame.GitBlameFileRequirementProvider;
-import fr.pantheonsorbonne.cri.reqmapping.impl.blame.GitRepoRequirementMappingProvider;
 import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.GumTreeFileRequirementMappingProvider;
 
 public class RequirementMappingConfigurationModule extends AbstractModule {

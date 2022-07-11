@@ -14,10 +14,10 @@ import fr.pantheonsorbonne.cri.configuration.modules.InstrumentationConfiguratio
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -33,8 +33,26 @@ public class DextormBench {
         // gather all modules to be used in the IC
 
 
-        String argProvidedConfigurationFile = new File(getClass().getClassLoader().getResource("benchmark/" + executionPlan.project + "/" + executionPlan.diffAlgo + "/" + executionPlan.scope + ".yaml").toURI()).getAbsolutePath();
-        String coverageReport = new File(getClass().getClassLoader().getResource("benchmark/" + executionPlan.project + ".xml").toURI()).getAbsolutePath();
+        Path configurationFile = Files.createTempFile("", executionPlan.project + "-" + executionPlan.diffAlgo + "-" + executionPlan.scope);
+        Path jacocoReport = Files.createTempFile("", "jacoco-" + executionPlan.project + "-" + executionPlan.diffAlgo + "-" + executionPlan.scope);
+
+        {
+            InputStream is = new BufferedInputStream(getClass().getClassLoader().getResourceAsStream("benchmark/" + executionPlan.project + "/" + executionPlan.diffAlgo + "/" + executionPlan.scope + ".yaml"));
+            
+
+            com.google.common.io.Files.write(is.readAllBytes(), configurationFile.toFile());
+        }
+
+        {
+            BufferedInputStream is = new BufferedInputStream(getClass().getClassLoader().getResourceAsStream("benchmark/" + executionPlan.project + ".xml"));
+
+
+            com.google.common.io.Files.write(is.readAllBytes(), jacocoReport.toFile());
+        }
+
+
+        String argProvidedConfigurationFile = new File(configurationFile.toFile().toURI()).getAbsolutePath();
+        String coverageReport = new File(jacocoReport.toFile().toURI()).getAbsolutePath();
 
 
         Collection<Module> loadedModules = new HashSet<>();

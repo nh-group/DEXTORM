@@ -2,7 +2,7 @@ clean:
 	mvn clean
 
 build:
-	mvn package
+	mvn package assembly:single@make-bench
 
 test:
 	mvn test

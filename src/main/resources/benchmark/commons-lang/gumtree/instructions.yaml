@@ -1,0 +1,21 @@
+app:
+  diffAlgorithm: gmethods
+  instrumentedPackage: org.apache.commons
+  issueCollector: dummy
+  publisher: console1
+  #publisher: console1
+  sourceRootDir: src/main/java
+differs:
+  gmethods:
+    diffAlgorithm: GUMTREE
+    instructions: true
+    methods: false
+issueCollectors:
+  github:
+    dummy:
+      gitHubRepoName: apache/commons-lang
+publishers:
+  filePublishers:
+    console1:
+      filePath: stdout
+

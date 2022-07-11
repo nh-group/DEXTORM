@@ -13,6 +13,7 @@ public class StackTraceElement {
     private final String packageName;
     private final String methodName;
     private final String sourceFileName;
+    private final String fqClassName;
     private final List<String> methodArgs;
     private final Integer line;
 
@@ -20,6 +21,7 @@ public class StackTraceElement {
         this.className = className;
         this.packageName = packageName;
         this.methodName = methodName;
+        this.fqClassName = packageName + "." + className;
         //method args in jacoco report includes the FQName of the class, we don't have that in GumTree, so let's remove it
         //it could be a problem for homonymous classes
         List<String> argsAsList = ReqMatcherBuilder.strArgsToList(args);
@@ -62,16 +64,8 @@ public class StackTraceElement {
         return new StackTraceElement(e.getFileName(), e.getModuleName(), e.getClassName(), e.getMethodName(), "", e.getLineNumber());
     }
 
-    public String getFQClassName() {
-        return this.getPackageName() + "." + this.getClassName();
-    }
-
-    public String getPackageName() {
-        return packageName;
-    }
-
-    public String getClassName() {
-        return className;
+    public String getFqClassName() {
+        return this.fqClassName;
     }
 
     @Override
@@ -79,17 +73,12 @@ public class StackTraceElement {
         return Objects.hash(getClassName(), getPackageName(), getMethodName(), getSourceFileName(), getMethodArgs(), getLine());
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof StackTraceElement)) return false;
-        StackTraceElement that = (StackTraceElement) o;
-        return getClassName().equals(that.getClassName()) && getPackageName().equals(that.getPackageName()) && getMethodName().equals(that.getMethodName()) && getSourceFileName().equals(that.getSourceFileName()) && getMethodArgs().equals(that.getMethodArgs()) && getLine().equals(that.getLine());
+    public String getClassName() {
+        return className;
     }
 
-    @Override
-    public String toString() {
-        return packageName + "." + className + "." + methodName + "(" + this.methodArgs + "): " + line;
+    public String getPackageName() {
+        return packageName;
     }
 
     public String getMethodName() {
@@ -106,5 +95,18 @@ public class StackTraceElement {
 
     public Integer getLine() {
         return line;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof StackTraceElement)) return false;
+        StackTraceElement that = (StackTraceElement) o;
+        return getClassName().equals(that.getClassName()) && getPackageName().equals(that.getPackageName()) && getMethodName().equals(that.getMethodName()) && getSourceFileName().equals(that.getSourceFileName()) && getMethodArgs().equals(that.getMethodArgs()) && getLine().equals(that.getLine());
+    }
+
+    @Override
+    public String toString() {
+        return packageName + "." + className + "." + methodName + "(" + this.methodArgs + "): " + line;
     }
 }

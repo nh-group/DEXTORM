@@ -42,6 +42,11 @@ public class CompositeReqMatchImpl implements ReqMatch {
 
     }
 
+    @Override
+    public String getFQClassName() {
+        return requirementsMatches.stream().findAny().map(reqMatch -> reqMatch.getFQClassName()).orElseThrow();
+    }
+
     public <T extends ReqMatch> Optional<T> getComponent(Class<T> klass) {
         return (Optional<T>) this.requirementsMatches.stream().filter(m -> m.getClass().equals(klass)).findFirst();
     }

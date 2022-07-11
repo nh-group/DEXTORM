@@ -15,12 +15,15 @@ import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor.CompilationUnitVi
 
 import java.io.PrintStream;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class GumTreeFacade {
 
     public static final String BLAME_ID = "blameid";
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(12);
 
 
     {
@@ -84,7 +87,7 @@ public class GumTreeFacade {
         }
     }
 
-    public void labelDestWithCommit(Tree src, Tree dst, String commitId) {
+    public static void labelDestWithCommit(Tree src, Tree dst, String commitId) {
 
         Matcher m = Matchers.getInstance().getMatcher(); // retrieve the default matcher
         try {
@@ -121,7 +124,7 @@ public class GumTreeFacade {
                     GumTreeFacade.appendMetadata(diff.dst, GumTreeFacade.BLAME_ID,
                             diff.commitId, true);
                 } else {
-                    this.labelDestWithCommit(diff.src, diff.dst, diff.commitId);
+                    GumTreeFacade.labelDestWithCommit(diff.src, diff.dst, diff.commitId);
                 }
                 //showTree(diff.dst, "", System.out);
                 currentTree = diff.dst;

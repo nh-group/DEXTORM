@@ -13,4 +13,5 @@ public interface ReqMatch {
 
     Collection<StackTraceElement> getMatchingTraceElement();
 
+    String getFQClassName();
 }

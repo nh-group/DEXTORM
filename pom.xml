@@ -167,32 +167,9 @@
 
 
             <plugin>
-                <!-- NOTE: We don't need a groupId specification because the group is
-                    org.apache.maven.plugins ...which is assumed by default. -->
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.3.0</version>
-                <configuration>
 
-                    <archive>
-                        <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                            <mainClass>fr.pantheonsorbonne.cri.app.Agent</mainClass>
-                        </manifest>
-
-                        <manifestEntries>
-                            <Premain-Class>fr.pantheonsorbonne.cri.app.Agent</Premain-Class>
-                        </manifestEntries>
-
-                    </archive>
-                    <finalName>dextorm</finalName>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <appendAssemblyId>false</appendAssemblyId>
-
-
-                </configuration>
 
                 <executions>
                     <execution>
@@ -201,6 +178,54 @@
                         <goals>
                             <goal>single</goal>
                         </goals>
+                        <configuration>
+
+                            <archive>
+                                <manifest>
+                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                                    <mainClass>fr.pantheonsorbonne.cri.app.Agent</mainClass>
+                                </manifest>
+
+                                <manifestEntries>
+                                    <Premain-Class>fr.pantheonsorbonne.cri.app.Agent</Premain-Class>
+                                </manifestEntries>
+
+                            </archive>
+                            <finalName>dextorm</finalName>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <appendAssemblyId>false</appendAssemblyId>
+
+
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>make-bench</id> <!-- this is used for inheritance merges -->
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+
+                            <archive>
+                                <manifest>
+                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                                    <mainClass>fr.pantheonsorbonne.cri.app.Benchmark</mainClass>
+                                </manifest>
+
+
+                            </archive>
+                            <finalName>benchmark</finalName>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <appendAssemblyId>false</appendAssemblyId>
+
+
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

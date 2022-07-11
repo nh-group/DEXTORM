@@ -1,5 +1,6 @@
 package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree;
 
+import com.google.common.io.MoreFiles;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
@@ -36,23 +37,40 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GumTreeFileRequirementMappingProvider.class);
     private final GumTreeFacade facade = new GumTreeFacade();
-    @Inject
-    private Repository repo;
-    @Inject
-    private Git git;
-
+    private final String repoAddress;
+    @Named("temp-git-repo")
+    Path lookupFolderPath;
+    private File localBareRepoAddress;
     @Inject
     @Named("DoMethodsDiff")
     private Boolean doMethods;
     @Inject
     @Named("DoInstructionsDiff")
     private Boolean doInstructions;
+    private String branchName;
+
+    @Inject
+    public GumTreeFileRequirementMappingProvider(@Named("repoAddress") String repoAddress, @Named("git-branch") String branchName, @Named("DoMethodsDiff") Boolean doMethods, @Named("DoInstructionsDiff") Boolean doInstructions, @Named("temp-git-repo") Path lookupFolderPath) {
+        this.repoAddress = repoAddress;
+        this.lookupFolderPath = lookupFolderPath;
+        try {
+            this.localBareRepoAddress = Files.createTempDirectory("dextorm").toFile();
+            this.branchName = branchName;
+            Git.cloneRepository().setURI(repoAddress).setBranch(branchName).setDirectory(localBareRepoAddress).setBare(true).call();
+            this.doMethods = doMethods;
+            this.doInstructions = doInstructions;
+        } catch (IOException | GitAPIException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+    }
 
     @Override
     public Collection<ReqMatch> getReqMatcher(Path p) {
 
+        Git git = this.getFreshRepo();
         try {
-            List<Diff> diffs = this.materializeCommitDiff(p);
+            List<Diff> diffs = materializeCommitDiff(p, git, lookupFolderPath);
             return this.facade.getReqMatcher(diffs, this.doMethods, this.doInstructions);
         } catch (IOException | GitAPIException e) {
             e.printStackTrace();
@@ -62,14 +80,26 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
 
     }
 
-    private List<Diff> materializeCommitDiff(Path file) throws GitAPIException, IOException {
+    private Git getFreshRepo() {
+        try {
+            Path tmpRepo = Files.createTempDirectory("dextorm");
+            Git git = Git.cloneRepository().setURI("file://" + this.localBareRepoAddress).setBranch(this.branchName).setDirectory(tmpRepo.toFile()).setBare(false).call();
+            return git;
+        } catch (IOException | GitAPIException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        return null;//unreachable
 
-        List<Diff> diffs = new ArrayList<>();
-        File relativeFilePath = this.repo.getDirectory().getParentFile().toPath().relativize(file).toFile();
+    }
+
+    private static List<Diff> materializeCommitDiff(Path file, Git git, Path lookupFolderPath) throws GitAPIException, IOException {
+
+        File relativeFilePath = lookupFolderPath.relativize(file).toFile();
         if (Files.isRegularFile(file)
                 && com.google.common.io.Files.getFileExtension(relativeFilePath.toString()).equals("java")) {
 
-            LogCommand logCommand = git.log().add(this.repo.resolve(Constants.HEAD))
+            LogCommand logCommand = git.log().add(git.getRepository().resolve(Constants.HEAD))
                     .addPath(relativeFilePath.toString());
 
             List<CommitIssueMapping> commitIssueMappings = new ArrayList<>();
@@ -87,13 +117,14 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
             Diff.DiffBuilder builder = Diff.getBuilder();
             for (CommitIssueMapping mapping : commitIssueMappings) {
                 LOGGER.debug("mapping {} for file {}", mapping.id.getName(), relativeFilePath);
-                Path path = materializeFileFromCommit(this.repo, mapping.id, relativeFilePath.toString());
+                Path path = materializeFileFromCommit(git.getRepository(), mapping.id, relativeFilePath.toString());
                 if (path != null) {
                     builder.add(path, mapping.issueId.stream().collect(Collectors.joining(" ")));
                 }
 
 
             }
+            MoreFiles.deleteDirectoryContents(git.getRepository().getDirectory().toPath());
 
             return builder.build();
 
@@ -103,7 +134,7 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
 
     }
 
-    private Path materializeFileFromCommit(Repository repository, ObjectId commitID, String name) throws IOException {
+    private static Path materializeFileFromCommit(Repository repository, ObjectId commitID, String name) throws IOException {
 
         Path temp1 = Files.createTempFile(
                 com.google.common.io.Files.getNameWithoutExtension(name), ".java");

@@ -38,6 +38,12 @@ public abstract class GitRepoProviderModule extends AbstractModule {
         this.branch = branch;
     }
 
+    @Provides
+    @Singleton
+    @Named("repoAddress")
+    private String getRepoAddress() {
+        return this.repoAddress;
+    }
 
     @Provides
     @Singleton
