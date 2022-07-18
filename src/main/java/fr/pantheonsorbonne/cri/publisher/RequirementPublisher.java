@@ -6,16 +6,20 @@ import java.util.Collection;
 
 public interface RequirementPublisher {
 
-
     void publishNow(Requirement req);
 
     void publishNow(Collection<Requirement> reqToPublish);
 
-    void publishNow(String project, String issue, String method, double lineCoverage, double methodCoverage, int countLine, int countMethod);
+    void publishNow(String project, String issue, String method, COVERAGE_TYPE coverageType, double coverage, int count);
 
-    void collect(String project, String issue, String method, double lineCoverage, double methodCoverage, int countLine, int countMethod);
+    void collect(String project, String issue, String method, COVERAGE_TYPE coverageType, double coverage, int count);
 
     void flush();
+
+    enum COVERAGE_TYPE {
+        METHODS,
+        LINES
+    }
 
 
 }

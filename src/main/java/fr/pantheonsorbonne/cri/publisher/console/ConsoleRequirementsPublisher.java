@@ -67,14 +67,15 @@ public class ConsoleRequirementsPublisher implements RequirementPublisher {
     }
 
     @Override
-    public void publishNow(String project, String issue, String method, double lineCoverage, double methodCoverage, int countLine, int countMethod) {
-        logger.info("project={}\tissue={}\tmethod={}\tlc={}\tmc={}\tcl={},\tcm={}", project, issue, method, lineCoverage, methodCoverage, countLine, countMethod);
+    public void publishNow(String project, String issue, String method, COVERAGE_TYPE coverageType, double coverage, int count) {
+        logger.info("project={}\tissue={}\tmethod={}\tct={}\tcov={}\tcount={}", project, issue, method, coverageType, coverage, count);
     }
 
     @Override
-    public void collect(String project, String issue, String method, double lineCoverage, double methodCoverage, int countLine, int countMethod) {
-        sb.append(String.format("project=%s\tissue=%s\tmethod=%s\tlc=%s\tmc=%s\tcl=%s,\tcm=%s\n", project, issue, method, lineCoverage, methodCoverage, countLine, countMethod));
+    public void collect(String project, String issue, String method, COVERAGE_TYPE coverageType, double coverage, int count) {
+        logger.info("project={}\tissue={}\tmethod={}\tct={}\tcov={}\tcount={}", project, issue, method, coverageType, coverage, count);
     }
+
 
     public void flush() {
         logger.info(sb.toString());

@@ -30,14 +30,22 @@ public class JsonFilePublisher implements RequirementPublisher {
     }
 
     @Override
-    public void publishNow(String project, String issue, String method, double lineCoverage, double methodCoverage, int countLine, int countMethod) {
-        if (Double.isNaN(lineCoverage)) {
-            lineCoverage = 0;
+    public void publishNow(String project, String issue, String method, COVERAGE_TYPE coverageType, double coverage, int count) {
+        if (Double.isNaN(coverage)) {
+            coverage = 0;
         }
-        if (Double.isNaN(methodCoverage)) {
-            methodCoverage = 0;
+        Map<String, Object> payload;
+        switch (coverageType) {
+            case LINES:
+                payload = Map.of(issue, Map.of(method, Map.of("lineCoverage", coverage * 100)));
+                break;
+            case METHODS:
+                payload = Map.of(issue, Map.of(method, Map.of("methodCoverage", coverage * 100)));
+                break;
+            default:
+                payload = null;
         }
-        var payload = Map.of(issue, Map.of(method, Map.of("lineCoverage", lineCoverage * 100, "methodCoverage", methodCoverage * 100)));
+
         if (!Files.exists(Path.of(targetDir))) {
             try {
                 Files.createDirectory(Path.of(targetDir));
@@ -55,7 +63,7 @@ public class JsonFilePublisher implements RequirementPublisher {
     }
 
     @Override
-    public void collect(String project, String issue, String method, double lineCoverage, double methodCoverage, int countLine, int countMethod) {
+    public void collect(String project, String issue, String method, COVERAGE_TYPE coverageType, double coverage, int count) {
         throw new UnsupportedOperationException();
     }
 
@@ -63,4 +71,6 @@ public class JsonFilePublisher implements RequirementPublisher {
     public void flush() {
         throw new UnsupportedOperationException();
     }
+
+
 }
