@@ -2,28 +2,28 @@ package fr.pantheonsorbonne.cri.configuration.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
+
 public class AppConfiguration {
     @JsonProperty
     String instrumentedPackage;
     @JsonProperty
-    String sourceRootDir;
+    List<String> sourceRootDirs;
     @JsonProperty("publisher")
     String publisherName;
     @JsonProperty("issueCollector")
     String issueCollectorName;
     @JsonProperty("diffAlgorithm")
     String diffAlgorithmName;
+    @JsonProperty("coverageFolder")
+    String coverageFolder;
 
+    public String getCoverageFolder() {
+        return coverageFolder;
+    }
 
-    @Override
-    public String toString() {
-        return "AppConfiguration{" +
-                "instrumentedPackage='" + instrumentedPackage + '\'' +
-                ", sourceRootDir='" + sourceRootDir + '\'' +
-                ", publisherName='" + publisherName + '\'' +
-                ", issueCollectorName='" + issueCollectorName + '\'' +
-                ", diffAlgorithmName='" + diffAlgorithmName + '\'' +
-                '}';
+    public void setCoverageFolder(String coverageFolder) {
+        this.coverageFolder = coverageFolder;
     }
 
     public String getInstrumentedPackage() {
@@ -34,12 +34,12 @@ public class AppConfiguration {
         this.instrumentedPackage = instrumentedPackage;
     }
 
-    public String getSourceRootDir() {
-        return sourceRootDir;
+    public List<String> getSourceRootDirs() {
+        return sourceRootDirs;
     }
 
-    public void setSourceRootDir(String sourceRootDir) {
-        this.sourceRootDir = sourceRootDir;
+    public void setSourceRootDirs(List<String> sourceRootDirs) {
+        this.sourceRootDirs = sourceRootDirs;
     }
 
     public String getPublisherName() {
@@ -64,5 +64,17 @@ public class AppConfiguration {
 
     public void setDiffAlgorithmName(String diffAlgorithmName) {
         this.diffAlgorithmName = diffAlgorithmName;
+    }
+
+    @Override
+    public String toString() {
+        return "AppConfiguration{" +
+                "instrumentedPackage='" + instrumentedPackage + '\'' +
+                ", sourceRootDir=" + sourceRootDirs +
+                ", publisherName='" + publisherName + '\'' +
+                ", issueCollectorName='" + issueCollectorName + '\'' +
+                ", diffAlgorithmName='" + diffAlgorithmName + '\'' +
+                ", coverageFolder='" + coverageFolder + '\'' +
+                '}';
     }
 }

@@ -14,42 +14,49 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static java.nio.file.FileVisitResult.CONTINUE;
 
 public class GitRepoRequirementMappingProvider extends SimpleFileVisitor<Path> implements RequirementMappingProvider {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(GitRepoRequirementMappingProvider.class);
-    private final static ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(50);
+    private final static ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(12);
     private final Set<ReqMatch> repoReqMatcherImpls = ConcurrentHashMap.newKeySet();
-    private final String sourceRootDir;
+    private final List<String> sourceRootDirs;
+    private final Path tempFolderGitRepo;
     protected Repository repo;
     protected FileRequirementMappingProvider fileReqProvider;
 
     @Inject
     public GitRepoRequirementMappingProvider(@Named("temp-git-repo") Path tempFolderGitRepo, Repository repo,
                                              FileRequirementMappingProvider fileReqProvider, @Named("sourceRootDir")
-                                                     String sourceRootDir) {
+                                                     List<String> sourceRootDirs) {
 
+        this.tempFolderGitRepo = tempFolderGitRepo;
+        this.sourceRootDirs = sourceRootDirs.stream().map(s -> Path.of(tempFolderGitRepo.toString(), s)).map(s -> s.normalize().toString()).collect(Collectors.toList());
 
-        this.sourceRootDir = Path.of(tempFolderGitRepo.toString(), sourceRootDir).toString();
         this.fileReqProvider = fileReqProvider;
         this.repo = repo;
         try {
             Files.walkFileTree(tempFolderGitRepo, this);
             EXECUTOR_SERVICE.shutdown();
+            System.out.println("ex sht");
             EXECUTOR_SERVICE.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-
+            System.out.println("past await");
 
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);
         }
+
+
     }
 
     @Override
@@ -66,8 +73,9 @@ public class GitRepoRequirementMappingProvider extends SimpleFileVisitor<Path> i
     public FileVisitResult visitFile(Path file, BasicFileAttributes attr) {
 
         try {
+            String strFile = file.toString();
 
-            if (file.toString().startsWith(sourceRootDir) && com.google.common.io.Files.getFileExtension(file.toString()).equals("java")) {
+            if (com.google.common.io.Files.getFileExtension(file.toString()).equals("java") && this.sourceRootDirs.stream().anyMatch(s -> strFile.startsWith(s))) {
                 LOGGER.debug("analyzing from {}", file);
                 //thread
                 EXECUTOR_SERVICE.submit(() -> {

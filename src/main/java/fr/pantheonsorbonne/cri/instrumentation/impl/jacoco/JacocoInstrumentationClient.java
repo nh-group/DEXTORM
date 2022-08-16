@@ -21,6 +21,9 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,8 +37,8 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
     @Inject
     public RequirementPublisher publisher;
     @Inject
-    @Named("jacocoReport")
-    String jacocoReport;
+    @Named("coverageFolder")
+    String coverageFolder;
     @Inject
     RequirementMappingProvider mapper;
     @Inject
@@ -57,18 +60,20 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
 
     @Override
     public void registerClient() {
-        LOGGER.info("analysing {}", jacocoReport);
+        LOGGER.info("analysing {}", coverageFolder);
 
 
         LOGGER.debug("get jacoco data");
-        Report report = getReportObjectFromXMl();
+        List<Report> reports = getReportObjectFromXMl();
+        List<StackTraceElement> stackTracesCovered = new ArrayList<>();
+        List<StackTraceElement> stackTracesAll = new ArrayList<>();
+        for (Report report : reports) {
+            LOGGER.debug("getting the covered elements");
+            stackTracesCovered.addAll(extractStackTraceElement(report, this.doMethods, true, this.doInstructions, true));
 
-        LOGGER.debug("getting the covered elements");
-        List<StackTraceElement> stackTracesCovered = extractStackTraceElement(report, this.doMethods, true, this.doInstructions, true);
-
-        LOGGER.debug("getting all the elements");
-        List<StackTraceElement> stackTracesAll = extractStackTraceElement(report, this.doMethods, false, this.doInstructions, false);
-
+            LOGGER.debug("getting all the elements");
+            stackTracesAll.addAll(extractStackTraceElement(report, this.doMethods, false, this.doInstructions, false));
+        }
         LOGGER.debug("get the matcher from the code<->req mapper");
         Set<ReqMatch> requirementsMatchers = mapper.getReqMatcher();
         Set<String> reqIds = requirementsMatchers.stream().map(rm -> rm.getRequirementsIds()).flatMap(Collection::stream).collect(Collectors.toSet());
@@ -132,6 +137,9 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
             Double countTotal = coverageInfo.get(reqId);
             Long countCovered = coveredReqIdList.stream().filter(req -> req.equals(reqId)).count();
             Double ratio = countCovered / countTotal;
+            if (Double.isNaN(ratio)) {
+                continue;
+            }
             coverageInfo.put(reqId, ratio);
             if (this.doMethods) {
                 publisher.publishNow(gitHubRepoName, reqId, diffMethod, RequirementPublisher.COVERAGE_TYPE.METHODS, ratio, countCovered.intValue());
@@ -153,24 +161,33 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
 
     }
 
-    private Report getReportObjectFromXMl() {
+    private List<Report> getReportObjectFromXMl() {
+        List<Report> res = new ArrayList<>();
         try {
-            JAXBContext jc = JAXBContext.newInstance(Report.class);
-            XMLInputFactory xif = XMLInputFactory.newFactory();
-            xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
-            XMLStreamReader xsr = xif.createXMLStreamReader(new StreamSource(jacocoReport));
-            Unmarshaller unmarshaller = jc.createUnmarshaller();
-            return (Report) unmarshaller.unmarshal(xsr);
+            List<String> reports = Files.walk(Path.of(this.coverageFolder)).filter(Files::isRegularFile).map(p -> p.toString()).collect(Collectors.toList());
+
+            for (String report : reports) {
+                try {
+                    LOGGER.info("adding {} coverage report", report);
+                    JAXBContext jc = JAXBContext.newInstance(Report.class);
+                    XMLInputFactory xif = XMLInputFactory.newFactory();
+                    xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+                    XMLStreamReader xsr = xif.createXMLStreamReader(new StreamSource(report));
+                    Unmarshaller unmarshaller = jc.createUnmarshaller();
+                    res.add((Report) unmarshaller.unmarshal(xsr));
 
 
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        } catch (XMLStreamException e) {
+                } catch (JAXBException e) {
+                    e.printStackTrace();
+                } catch (XMLStreamException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
-        System.exit(-1);
-        return null;
+        return res;
     }
 
     private static List<StackTraceElement> extractStackTraceElement(Report report, boolean doMethods, boolean onlyCoveredMethods, boolean doInstructions, boolean onlyCoveredInstructions) {

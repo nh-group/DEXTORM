@@ -3,6 +3,7 @@ package fr.pantheonsorbonne.cri.configuration.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
+import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import fr.pantheonsorbonne.cri.configuration.model.collectors.GitHubIssueCollectorConfig;
 import fr.pantheonsorbonne.cri.configuration.model.collectors.IssueCollectorsConfig;
@@ -14,10 +15,7 @@ import fr.pantheonsorbonne.cri.configuration.model.publisher.RESTPublisherConfig
 import fr.pantheonsorbonne.cri.configuration.modules.*;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class GeneralConfiguration {
     public AppConfiguration app;
@@ -139,6 +137,10 @@ public class GeneralConfiguration {
                     try {
                         Class klass = field.getType();
                         this.bind(klass).annotatedWith(Names.named(field.getName())).toInstance(klass.cast(field.get(app)));
+                        this.bind(String.class).annotatedWith(Names.named("coverageFolder")).toInstance(app.getCoverageFolder());
+
+                        bind(new TypeLiteral<List<String>>() {
+                        }).annotatedWith(Names.named("sourceRootDir")).toInstance(app.getSourceRootDirs());
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }

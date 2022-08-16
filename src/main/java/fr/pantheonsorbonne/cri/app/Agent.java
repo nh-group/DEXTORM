@@ -3,9 +3,10 @@ package fr.pantheonsorbonne.cri.app;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.google.inject.*;
-import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
 import fr.pantheonsorbonne.cri.configuration.model.GeneralConfiguration;
 import fr.pantheonsorbonne.cri.configuration.modules.InstrumentationConfigurationModule;
@@ -32,25 +33,15 @@ public class Agent {
 
     public static void main(String... args) throws IOException {
 
-        System.out.println("###" + Agent.class.getClassLoader().getResource("benchmark/dextorm-dummy-project/gumtree/methods.yaml"));
         // gather all modules to be used in the IC
-        if (args.length != 2) {
-            LOG.error("usage: configuration_file_path jacoco_report_file_path");
+        if (args.length != 1) {
+            LOG.error("usage: configuration_file_path ");
             System.exit(-1);
         }
         String argProvidedConfigurationFile = args[0];
-        String coverageReport = args[1];
-
 
         Collection<Module> loadedModules = new HashSet<>();
         loadedModules.add(new InstrumentationConfigurationModule());
-        loadedModules.add(new AbstractModule() {
-            @Override
-            protected void configure() {
-                super.bind(String.class).annotatedWith(Names.named("jacocoReport")).toInstance(coverageReport);
-            }
-        });
-
         GeneralConfiguration appConfiguration = null;
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         mapper.enable(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT);

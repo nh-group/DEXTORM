@@ -8,7 +8,8 @@ public class ExecutionPlan {
     @Param({"gumtree", "blame"})
     public String diffAlgo;
 
-    @Param({"basic-cli-uni", "dextorm-dummy-project", "dnsjava", "commons-lang"})
+    @Param({"shenyu", "dextorm-dummy-project", "dnsjava"})
+    //@Param({"dextorm-dummy-project"})
     public String project;
 
     @Param({"instructions", "methods"})

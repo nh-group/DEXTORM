@@ -24,6 +24,8 @@ public class Utils {
                 return "V";
             case "final":
                 return "";
+            case "":
+                return "";
         }
         throw new RuntimeException("failed to convert type " + type);
     }

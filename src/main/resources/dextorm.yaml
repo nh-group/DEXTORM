@@ -4,7 +4,8 @@ app:
   issueCollector: dnsjava
   #publisher: json
   publisher: console1
-  sourceRootDir: src/main/java
+  sourceRootDir:
+    - src/main/java
 differs:
   bmethods:
     diffAlgorithm: BLAME

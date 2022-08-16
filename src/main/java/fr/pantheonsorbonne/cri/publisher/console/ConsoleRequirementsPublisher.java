@@ -27,7 +27,7 @@ public class ConsoleRequirementsPublisher implements RequirementPublisher {
 
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
         PatternLayoutEncoder ple = new PatternLayoutEncoder();
-        ple.setPattern("%date %level [%thread] %logger{10} %msg%n");
+        ple.setPattern("%date %level [%thread] %logger{10} \t%msg%n");
         ple.setContext(lc);
         ple.start();
         OutputStreamAppender<ILoggingEvent> appender;
@@ -68,12 +68,12 @@ public class ConsoleRequirementsPublisher implements RequirementPublisher {
 
     @Override
     public void publishNow(String project, String issue, String method, COVERAGE_TYPE coverageType, double coverage, int count) {
-        logger.info("project={}\tissue={}\tmethod={}\tct={}\tcov={}\tcount={}", project, issue, method, coverageType, coverage, count);
+        logger.info("{},{},{},{},{},{}", project, issue, method, coverageType, coverage, count);
     }
 
     @Override
     public void collect(String project, String issue, String method, COVERAGE_TYPE coverageType, double coverage, int count) {
-        logger.info("project={}\tissue={}\tmethod={}\tct={}\tcov={}\tcount={}", project, issue, method, coverageType, coverage, count);
+        logger.info("{},{},{},{},{},{}", project, issue, method, coverageType, coverage, count);
     }
 
 

@@ -1,5 +1,6 @@
 package fr.pantheonsorbonne.cri.app;
 
+import com.google.common.collect.Lists;
 import fr.pantheonsorbonne.cri.reqmapping.MethodReqMatchImpl;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.impl.blame.GitBlameFileRequirementProvider;
@@ -40,7 +41,7 @@ class TestDiffBlame {
         git.add().addFilepattern("toto/A.java").call();
         git.commit().setMessage("commit4 #4").call();
 
-        GitBlameFileRequirementProvider blame = new GitBlameFileRequirementProvider("", git.getRepository(), false, true);
+        GitBlameFileRequirementProvider blame = new GitBlameFileRequirementProvider(Lists.newArrayList(""), git.getRepository(), false, true);
         Collection<ReqMatch> reqs = blame.getReqMatcher(Path.of(tmpDir.toString(), "toto/A.java"));
 
         //reqs.stream().forEach(System.out::println);

@@ -3,6 +3,8 @@ clean:
 
 build:
 	mvn package assembly:single@make-bench
+bench:
+	cd target && java -jar ./benchmark.jar
 
 test:
 	mvn test

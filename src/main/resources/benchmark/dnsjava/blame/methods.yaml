@@ -4,7 +4,9 @@ app:
   issueCollector: dummy
   publisher: console1
   #publisher: console1
-  sourceRootDir: src/main/java
+  sourceRootDirs:
+    - src/main/java
+  coverageFolder: benchmark/dnsjava/coverage
 differs:
   gmethods:
     diffAlgorithm: BLAME

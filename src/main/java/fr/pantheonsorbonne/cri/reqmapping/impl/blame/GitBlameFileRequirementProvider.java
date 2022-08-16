@@ -36,20 +36,19 @@ import java.util.*;
 public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
         implements FileRequirementMappingProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitBlameFileRequirementProvider.class);
-    final String sourceRootDir;
     final Repository repo;
     final Boolean doMethods;
     final Boolean doInstructions;
+    final List<String> sourceRootDirs;
 
     @Inject
-    public GitBlameFileRequirementProvider(@Named("sourceRootDir") String sourceRootDir, Repository repo, @Named("DoInstructionsDiff")
+    public GitBlameFileRequirementProvider(@Named("sourceRootDir") List<String> sourceRootDirs, Repository repo, @Named("DoInstructionsDiff")
             Boolean doInstructions, @Named("DoMethodsDiff")
                                                    Boolean doMethods) {
         this.doMethods = doMethods;
         this.doInstructions = doInstructions;
-
-        this.sourceRootDir = sourceRootDir;
         this.repo = repo;
+        this.sourceRootDirs = sourceRootDirs;
     }
 
     @Override
@@ -84,8 +83,8 @@ public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
             int lines = countLinesOfFileInCommit(this.repo, commitID, relativeFilePath.toString());
 
             Map<Integer, Collection<String>> fileBlameData = new HashMap<>();
-            String inferedClassName = Paths.get(sourceRootDir).relativize(relativeFilePath.toPath())
-                    .toString().replaceAll("/", ".").replaceFirst("[.][^.]+$", "");
+            String inferedClassName = Paths.get(sourceRootDirs.get(0)).relativize(relativeFilePath.toPath()).toString().replaceAll("/", ".").replaceFirst("[.][^.]+$", "");
+
 
             if (doInstructions) {
                 res.addAll(extractLineReqMatchers(blamed, lines, inferedClassName));
