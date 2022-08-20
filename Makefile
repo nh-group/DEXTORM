@@ -3,6 +3,9 @@ clean:
 
 build:
 	mvn package assembly:single@make-bench
+
+build-docker:
+	docker build -f ./docker/Dockerfile . -t nherbaut/dextorm-benchmark
 bench:
 	cd target && java -jar ./benchmark.jar
 	rm -rf /tmp/dextorm*

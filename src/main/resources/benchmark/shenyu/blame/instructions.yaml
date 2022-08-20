@@ -152,7 +152,7 @@ issueCollectors:
   github:
     dummy:
       gitHubRepoName: apache/shenyu
-      repoAddress: file:///home/nherbaut/tmp/shenyu.git
+      #repoAddress: file:///home/nherbaut/tmp/shenyu.git
 publishers:
   filePublishers:
     console1:

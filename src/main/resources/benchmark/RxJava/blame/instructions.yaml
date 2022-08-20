@@ -17,7 +17,7 @@ issueCollectors:
     dummy:
       branch: 3.x
       gitHubRepoName: ReactiveX/RxJava
-      repoAddress: file:///home/nherbaut/tmp/RxJava.git
+      #repoAddress: file:///home/nherbaut/tmp/RxJava.git
 publishers:
   filePublishers:
     console1:

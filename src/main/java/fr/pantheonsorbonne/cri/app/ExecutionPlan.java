@@ -9,8 +9,8 @@ public class ExecutionPlan {
     //@Param({"blame"})
     public String diffAlgo;
 
-    @Param({"shenyu", "dextorm-dummy-project", "dnsjava", "RxJava"})
-    //@Param({"dnsjava"})
+    //@Param({"shenyu", "dextorm-dummy-project", "dnsjava", "RxJava"})
+    @Param({"dnsjava"})
     public String project;
 
     @Param({"methods", "instructions"})
