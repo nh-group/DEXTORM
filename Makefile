@@ -5,6 +5,7 @@ build:
 	mvn package assembly:single@make-bench
 bench:
 	cd target && java -jar ./benchmark.jar
+	rm -rf /tmp/dextorm*
 
 test:
 	mvn test

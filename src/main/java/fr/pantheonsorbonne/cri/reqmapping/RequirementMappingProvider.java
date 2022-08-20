@@ -8,4 +8,6 @@ public interface RequirementMappingProvider {
 
     int countReqMatchers();
 
+    void dispose();
+
 }

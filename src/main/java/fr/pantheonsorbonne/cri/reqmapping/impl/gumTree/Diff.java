@@ -4,6 +4,7 @@ import com.github.gumtreediff.gen.TreeGenerators;
 import com.github.gumtreediff.tree.Tree;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -22,14 +23,27 @@ public class Diff {
 
     }
 
+
     public static DiffBuilder getBuilder() {
         return new DiffBuilder();
     }
 
     public static class DiffBuilder {
+
         private final List<DiffAtom> atoms = new ArrayList<>();
 
         protected DiffBuilder() {
+        }
+
+        public void dispose() {
+            for (DiffAtom atom : this.atoms) {
+                try {
+                    Files.deleteIfExists(atom.src);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
         }
 
         public DiffBuilder add(Path file, String commitId) {

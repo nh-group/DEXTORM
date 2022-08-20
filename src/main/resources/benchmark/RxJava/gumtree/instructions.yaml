@@ -1,0 +1,25 @@
+app:
+  diffAlgorithm: gmethods
+  instrumentedPackage: io.reactivex.rxjava3
+  issueCollector: dummy
+  publisher: console1
+  #publisher: console1
+  coverageFolder: benchmark/RxJava/coverage
+  sourceRootDirs:
+    - ./src/main/java
+differs:
+  gmethods:
+    diffAlgorithm: GUMTREE
+    instructions: true
+    methods: false
+issueCollectors:
+  github:
+    dummy:
+      branch: 3.x
+      gitHubRepoName: ReactiveX/RxJava
+      repoAddress: file:///home/nherbaut/tmp/RxJava.git
+publishers:
+  filePublishers:
+    console1:
+      filePath: stdout
+

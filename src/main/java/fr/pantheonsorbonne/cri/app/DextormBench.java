@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.concurrent.TimeUnit;
 
 public class DextormBench {
 
@@ -26,6 +27,7 @@ public class DextormBench {
     @Fork(value = 1, warmups = 0)
     @Warmup(iterations = 0)
     @Measurement(iterations = 1)
+    @Timeout(time = Integer.MAX_VALUE, timeUnit = TimeUnit.DAYS)
     @BenchmarkMode(Mode.SingleShotTime)
     public void benchDextorm(ExecutionPlan executionPlan) throws IOException, URISyntaxException {
         // gather all modules to be used in the IC

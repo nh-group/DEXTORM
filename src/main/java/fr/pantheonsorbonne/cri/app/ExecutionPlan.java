@@ -6,13 +6,15 @@ import org.openjdk.jmh.annotations.*;
 public class ExecutionPlan {
 
     @Param({"gumtree", "blame"})
+    //@Param({"blame"})
     public String diffAlgo;
 
-    @Param({"shenyu", "dextorm-dummy-project", "dnsjava"})
-    //@Param({"dextorm-dummy-project"})
+    @Param({"shenyu", "dextorm-dummy-project", "dnsjava", "RxJava"})
+    //@Param({"dnsjava"})
     public String project;
 
-    @Param({"instructions", "methods"})
+    @Param({"methods", "instructions"})
+    //@Param({"instructions"})
     public String scope;
 
     public DextormBench bench;

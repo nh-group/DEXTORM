@@ -52,7 +52,7 @@ public class ElementMapper {
         }
         executorService.shutdown();
         try {
-            executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+            executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

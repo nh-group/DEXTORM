@@ -65,18 +65,36 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
         }
     }
 
+    public void dispose() {
+        try {
+            MoreFiles.deleteRecursively(this.localBareRepoAddress.toPath());
+        } catch (IOException e) {
+            // cleanup
+        }
+    }
+
     @Override
     public Collection<ReqMatch> getReqMatcher(Path p) {
 
         Git git = this.getFreshRepo();
+        List<Diff> diffs = null;
         try {
-            List<Diff> diffs = materializeCommitDiff(p, git, lookupFolderPath);
+            diffs = materializeCommitDiff(p, git, lookupFolderPath);
             return this.facade.getReqMatcher(diffs, this.doMethods, this.doInstructions);
         } catch (IOException | GitAPIException e) {
             e.printStackTrace();
             System.exit(-3);
             throw new RuntimeException("unreachable");
+
+
+        } finally {
+            try {
+                MoreFiles.deleteRecursively(git.getRepository().getDirectory().toPath().getParent());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
 
     }
 
@@ -126,7 +144,11 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
             }
             MoreFiles.deleteDirectoryContents(git.getRepository().getDirectory().toPath());
 
-            return builder.build();
+            try {
+                return builder.build();
+            } finally {
+                builder.dispose();
+            }
 
         }
 

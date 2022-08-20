@@ -16,6 +16,7 @@ issueCollectors:
   github:
     dummy:
       gitHubRepoName: nherbaut/dextorm-dummy-project
+      repoAddress: file:///home/nherbaut/tmp/dextorm-dummy-project.git
 publishers:
   filePublishers:
     console1:

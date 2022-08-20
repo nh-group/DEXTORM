@@ -30,7 +30,6 @@ public class GitRepoRequirementMappingProvider extends SimpleFileVisitor<Path> i
     private final static ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(12);
     private final Set<ReqMatch> repoReqMatcherImpls = ConcurrentHashMap.newKeySet();
     private final List<String> sourceRootDirs;
-    private final Path tempFolderGitRepo;
     protected Repository repo;
     protected FileRequirementMappingProvider fileReqProvider;
 
@@ -39,7 +38,7 @@ public class GitRepoRequirementMappingProvider extends SimpleFileVisitor<Path> i
                                              FileRequirementMappingProvider fileReqProvider, @Named("sourceRootDir")
                                                      List<String> sourceRootDirs) {
 
-        this.tempFolderGitRepo = tempFolderGitRepo;
+    
         this.sourceRootDirs = sourceRootDirs.stream().map(s -> Path.of(tempFolderGitRepo.toString(), s)).map(s -> s.normalize().toString()).collect(Collectors.toList());
 
         this.fileReqProvider = fileReqProvider;
@@ -47,9 +46,9 @@ public class GitRepoRequirementMappingProvider extends SimpleFileVisitor<Path> i
         try {
             Files.walkFileTree(tempFolderGitRepo, this);
             EXECUTOR_SERVICE.shutdown();
-            System.out.println("ex sht");
-            EXECUTOR_SERVICE.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-            System.out.println("past await");
+
+            EXECUTOR_SERVICE.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -67,6 +66,11 @@ public class GitRepoRequirementMappingProvider extends SimpleFileVisitor<Path> i
     @Override
     public int countReqMatchers() {
         return this.repoReqMatcherImpls.size();
+    }
+
+    @Override
+    public void dispose() {
+
     }
 
     @Override
