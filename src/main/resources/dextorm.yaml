@@ -6,6 +6,7 @@ app:
   publisher: console1
   sourceRootDir:
     - src/main/java
+  ideToolExportPath: /home/nherbaut/Desktop/toto.json
 differs:
   bmethods:
     diffAlgorithm: BLAME

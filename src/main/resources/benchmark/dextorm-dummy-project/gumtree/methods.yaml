@@ -3,10 +3,10 @@ app:
   instrumentedPackage: fr
   issueCollector: dummy
   publisher: console1
-  #publisher: console1
   sourceRootDirs:
     - src/main/java
   coverageFolder: benchmark/dextorm-dummy-project/coverage
+  ideToolExportPath: dextorm-vscode-export.json
 differs:
   gmethods:
     diffAlgorithm: GUMTREE

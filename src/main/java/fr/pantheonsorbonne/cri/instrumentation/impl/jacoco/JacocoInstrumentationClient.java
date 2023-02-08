@@ -22,8 +22,8 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -61,6 +61,10 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
     @Named("diffMethod")
     String diffMethod;
 
+    @Inject
+    @Named("ideToolExportPath")
+    String ideToolExportPath;
+
     @Override
     public void registerClient() {
         try {
@@ -80,9 +84,22 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
             }
             LOGGER.debug("get the matcher from the code<->req mapper");
             Set<ReqMatch> requirementsMatchers = mapper.getReqMatcher();
-            Writer writer = new StringWriter();
-            new Gson().toJson(requirementsMatchers,writer);
-            System.out.println(writer.toString());
+            Writer writer = null;
+            try {
+                if (!ideToolExportPath.isEmpty()) {
+                    writer = new FileWriter(ideToolExportPath);
+                    new Gson().toJson(requirementsMatchers, writer);
+                    writer.close();
+
+                } else {
+                    LOGGER.warn("I am NOT going to export data for any IDE because the app.ideToolExportPath is empty of undefined");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.exit(-1);
+            }
+
+
             Set<String> reqIds = requirementsMatchers.stream().map(rm -> rm.getRequirementsIds()).flatMap(Collection::stream).collect(Collectors.toSet());
 
 

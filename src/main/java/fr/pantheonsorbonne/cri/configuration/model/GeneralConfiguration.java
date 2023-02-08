@@ -150,6 +150,14 @@ public class GeneralConfiguration {
             }
         });
 
+        res.add(new AbstractModule() {
+            @Override
+            protected void configure() {
+                super.configure();
+                this.bind(String.class).annotatedWith(Names.named("ideToolExportPath")).toInstance(app.getIdeToolExportPath());
+            }
+        });
+
         return res;
 
 

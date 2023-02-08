@@ -18,6 +18,17 @@ public class AppConfiguration {
     @JsonProperty("coverageFolder")
     String coverageFolder;
 
+    public String getIdeToolExportPath() {
+        return ideToolExportPath;
+    }
+
+    public void setIdeToolExportPath(String ideToolExportPath) {
+        this.ideToolExportPath = ideToolExportPath;
+    }
+
+    @JsonProperty(value = "ideToolExportPath",defaultValue = "")
+    String ideToolExportPath="";
+
     public String getCoverageFolder() {
         return coverageFolder;
     }
@@ -66,15 +77,17 @@ public class AppConfiguration {
         this.diffAlgorithmName = diffAlgorithmName;
     }
 
+
     @Override
     public String toString() {
         return "AppConfiguration{" +
                 "instrumentedPackage='" + instrumentedPackage + '\'' +
-                ", sourceRootDir=" + sourceRootDirs +
+                ", sourceRootDirs=" + sourceRootDirs +
                 ", publisherName='" + publisherName + '\'' +
                 ", issueCollectorName='" + issueCollectorName + '\'' +
                 ", diffAlgorithmName='" + diffAlgorithmName + '\'' +
                 ", coverageFolder='" + coverageFolder + '\'' +
+                ", ideToolExportPath='" + ideToolExportPath + '\'' +
                 '}';
     }
 }
