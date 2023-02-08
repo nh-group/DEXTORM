@@ -1,6 +1,7 @@
 package fr.pantheonsorbonne.cri.reqmapping.impl.gumTree;
 
 import com.google.common.io.MoreFiles;
+import com.google.common.io.RecursiveDeleteOption;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
@@ -67,7 +68,7 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
 
     public void dispose() {
         try {
-            MoreFiles.deleteRecursively(this.localBareRepoAddress.toPath());
+            MoreFiles.deleteRecursively(this.localBareRepoAddress.toPath(),RecursiveDeleteOption.ALLOW_INSECURE);
         } catch (IOException e) {
             // cleanup
         }
@@ -89,7 +90,7 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
 
         } finally {
             try {
-                MoreFiles.deleteRecursively(git.getRepository().getDirectory().toPath().getParent());
+                MoreFiles.deleteRecursively(git.getRepository().getDirectory().toPath().getParent(), RecursiveDeleteOption.ALLOW_INSECURE);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -142,7 +143,7 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
 
 
             }
-            MoreFiles.deleteDirectoryContents(git.getRepository().getDirectory().toPath());
+            MoreFiles.deleteDirectoryContents(git.getRepository().getDirectory().toPath(),RecursiveDeleteOption.ALLOW_INSECURE);
 
             try {
                 return builder.build();
