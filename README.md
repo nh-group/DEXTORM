@@ -23,6 +23,11 @@ or
 docker build -f ./docker/Dockerfile . -t nherbaut/dextorm-benchmark
 docker run nherbaut/dextorm-benchmark
 ```
+## Running the project on dextorm-dummy-project
+
+```make clean run```
+
+should generate the file `target/dextorm-vscode-export.json` containing the json export usable for IDE integration
 
 ## Usage
 
@@ -46,6 +51,7 @@ app:
   sourceRootDirs:
     - src/main/java
   coverageFolder: benchmark/dnsjava/coverage
+  ideToolExportPath: /home/nherbaut/Desktop/toto.json
 differs:
   gmethods:
     diffAlgorithm: GUMTREE
