@@ -1,5 +1,6 @@
 package fr.pantheonsorbonne.cri.instrumentation.impl.jacoco;
 
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import fr.pantheonsorbonne.cri.instrumentation.InstrumentationClient;
@@ -22,6 +23,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -77,6 +80,9 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
             }
             LOGGER.debug("get the matcher from the code<->req mapper");
             Set<ReqMatch> requirementsMatchers = mapper.getReqMatcher();
+            Writer writer = new StringWriter();
+            new Gson().toJson(requirementsMatchers,writer);
+            System.out.println(writer.toString());
             Set<String> reqIds = requirementsMatchers.stream().map(rm -> rm.getRequirementsIds()).flatMap(Collection::stream).collect(Collectors.toSet());
 
 

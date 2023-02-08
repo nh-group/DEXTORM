@@ -22,6 +22,17 @@ public class ReqMatcherBuilder implements Cloneable {
     private String className = null;
     private Integer line;
 
+    public Integer getLen() {
+        return len;
+    }
+
+    public Integer getPos() {
+        return pos;
+    }
+
+    private Integer len;
+    private Integer pos;
+
     protected ReqMatcherBuilder() {
         
     }
@@ -80,9 +91,9 @@ public class ReqMatcherBuilder implements Cloneable {
         if (line == null) {
             return new MethodReqMatchImpl(this.className, this.packageName, this.methodName, this.args, this.reqs.toArray(new String[0]));
         } else if (this.methodName == null) {
-            return new LineReqMatchImpl(this.className, this.packageName, this.line, this.reqs.toArray(new String[0]));
+            return new LineReqMatchImpl(this.className, this.packageName, this.line, this.pos,this.len,this.reqs.toArray(new String[0]));
         } else {
-            return new CompositeReqMatchImpl(new MethodReqMatchImpl(this.className, this.packageName, this.methodName, this.args, this.reqs.toArray(new String[0])), new LineReqMatchImpl(this.className, this.packageName, this.line, this.reqs.toArray(new String[0])));
+            return new CompositeReqMatchImpl(new MethodReqMatchImpl(this.className, this.packageName, this.methodName, this.args, this.reqs.toArray(new String[0])), new LineReqMatchImpl(this.className, this.packageName, this.line, this.pos,this.len,this.reqs.toArray(new String[0])));
         }
 
     }
@@ -124,6 +135,16 @@ public class ReqMatcherBuilder implements Cloneable {
         return this;
     }
 
+    public ReqMatcherBuilder pos(int position) {
+        this.pos = position;
+        return this;
+    }
+
+    public ReqMatcherBuilder len(int length) {
+        this.len = length;
+        return this;
+    }
+
     public ReqMatcherBuilder getCopy() {
         ReqMatcherBuilder res = new ReqMatcherBuilder();
         res.args.addAll(this.args);
@@ -132,6 +153,8 @@ public class ReqMatcherBuilder implements Cloneable {
         res.line = this.line;
         res.methodName = this.methodName;
         res.packageName = this.packageName;
+        res.pos=this.pos;
+        res.len=this.len;
         return res;
     }
 

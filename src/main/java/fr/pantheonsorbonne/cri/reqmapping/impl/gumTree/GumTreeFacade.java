@@ -134,7 +134,7 @@ public class GumTreeFacade {
                 System.exit(-2);
             }
 
-            //GumTreeFacade.showTree(currentTree, "", System.out);
+            GumTreeFacade.showTree(currentTree, "", System.out);
         }
 
         return GumTreeFacade.getReqMatcher(currentTree, doMethods, doInstructions);

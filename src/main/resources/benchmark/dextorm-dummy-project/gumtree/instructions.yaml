@@ -6,7 +6,7 @@ app:
   #publisher: console1
   sourceRootDirs:
     - src/main/java
-  coverageFolder: benchmark/dextorm-dummy-project/coverage
+  coverageFolder: /home/nherbaut/workspace/dextorm/dextorm-dummy-project/../DEXTORM/src/main/resources/benchmark/dextorm-dummy-project/coverage/
 differs:
   gmethods:
     diffAlgorithm: GUMTREE

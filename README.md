@@ -1,5 +1,10 @@
 # DEXTORM
 
+Software artefacts of our under press short paper
+
+Mickael Gudin, Nicolas Herbaut Automated and Robust User Story Coverage *"International Conference on Product-Focused Software Process Improvement" PROFES2022*, Jyvaskyla (FI)
+
+
 ## Requirements
 
 maven 3.6.3+, java 11+
