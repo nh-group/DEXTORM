@@ -2,6 +2,6 @@
 
 java \
     -jar dextorm.jar\
-    ./benchmark/dextorm-dummy-project/gumtree/methods.yaml
+    ./benchmark/dextorm-dummy-project/gumtree/instructions.yaml
 
 
