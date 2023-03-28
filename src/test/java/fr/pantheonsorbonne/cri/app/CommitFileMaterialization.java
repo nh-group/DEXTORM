@@ -8,11 +8,13 @@ import java.nio.file.Path;
 class CommitFileMaterialization {
 
     public Path file;
+    public String issueId;
     public String commitId;
 
-    public CommitFileMaterialization(Path file, String commitId) {
+    public CommitFileMaterialization(Path file, String issueId,String commitId) {
         this.file = file;
-        this.commitId = commitId;
+        this.issueId = issueId;
+        this.commitId=commitId;
     }
 
     public static Path meterialize(String fileContent) throws IOException {

@@ -7,6 +7,7 @@ app:
   coverageFolder: benchmark/RxJava/coverage
   sourceRootDirs:
     - ./src/main/java
+  ideToolExportPath: rxjava-dextorm-vscode-export.json
 differs:
   gmethods:
     diffAlgorithm: GUMTREE

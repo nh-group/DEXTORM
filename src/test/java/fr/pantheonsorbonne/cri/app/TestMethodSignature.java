@@ -24,11 +24,11 @@ public class TestMethodSignature {
     public void testGT() {
         Run.initGenerators();
         CommitFileMaterialization f1 = new CommitFileMaterialization(Paths.get("src/test/resources/A5.java"),
-                "commit1");
+                "commit1","0000001");
 
-        List<Diff> diffs = Diff.getBuilder().add(f1.file, f1.commitId).build();
+        List<Diff> diffs = Diff.getBuilder().add(f1.file, f1.issueId,f1.commitId).build();
         GumTreeFacade facade = new GumTreeFacade();
-        Collection<ReqMatch> reqMatcherImpls = facade.getReqMatcher(diffs, true, false);
+        Collection<ReqMatch> reqMatcherImpls = facade.getReqMatcher("A.java",diffs, true, false);
         List<MethodReqMatchImpl> reqMatchersListImpl = reqMatcherImpls.stream().map(r -> ((MethodReqMatchImpl) r)).collect(Collectors.toList());
         methodSignatureExtraction(reqMatchersListImpl);
 

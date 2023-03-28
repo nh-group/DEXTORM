@@ -12,14 +12,16 @@ import java.util.List;
 
 public class Diff {
 
-    public Tree src;
-    public Tree dst;
-    public String commitId;
+    public final Tree src;
+    public final Tree dst;
+    public final String issueId;
+    public final String commitId;
 
-    private Diff(Tree src, Tree dst, String commitId) {
+    private Diff(Tree src, Tree dst, String issueId,String commitId) {
         this.src = src;
         this.dst = dst;
-        this.commitId = commitId;
+        this.issueId = issueId;
+        this.commitId=commitId;
 
     }
 
@@ -46,8 +48,8 @@ public class Diff {
             }
         }
 
-        public DiffBuilder add(Path file, String commitId) {
-            atoms.add(new DiffAtom(file, commitId));
+        public DiffBuilder add(Path file, String issueId,String commitId) {
+            atoms.add(new DiffAtom(file, issueId,commitId));
             return this;
         }
 
@@ -55,11 +57,10 @@ public class Diff {
             List<Diff> res = new LinkedList<>();
             try {
 
-                DiffAtom lastAtom = new DiffAtom(null, null);
                 for (DiffAtom atom : this.atoms) {
                     var treeDst = TreeGenerators.getInstance().getTree(atom.src.toString()).getRoot();
                     Tree treeSrc = res.size() > 0 ? res.get(res.size() - 1).dst : null;
-                    res.add(new Diff(treeSrc, treeDst, atom.commit));
+                    res.add(new Diff(treeSrc, treeDst, atom.issueId,atom.commitId));
                 }
             } catch (IOException exp) {
                 throw new RuntimeException(exp);
@@ -70,12 +71,14 @@ public class Diff {
     }
 
     static class DiffAtom {
-        public Path src;
-        public String commit;
+        public final Path src;
+        public final String issueId;
+        public final String commitId;
 
-        public DiffAtom(Path src, String commit) {
+        public DiffAtom(Path src, String issueId,String commitId) {
             this.src = src;
-            this.commit = commit;
+            this.issueId = issueId;
+            this.commitId=commitId;
         }
     }
 

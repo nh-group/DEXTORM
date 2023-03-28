@@ -22,6 +22,7 @@ import java.util.stream.StreamSupport;
 
 public class GumTreeFacade {
 
+
     public static final String BLAME_ID = "blameid";
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(12);
 
@@ -87,7 +88,7 @@ public class GumTreeFacade {
         }
     }
 
-    public static void labelDestWithCommit(Tree src, Tree dst, String commitId) {
+    public static void labelDestWithCommit(Tree src, Tree dst, String issueId) {
 
         Matcher m = Matchers.getInstance().getMatcher(); // retrieve the default matcher
         try {
@@ -99,7 +100,7 @@ public class GumTreeFacade {
                 var srcTree = store.getSrcForDst(t);
                 if (store.getSrcForDst(t) == null) {
                     //that's new stuff in dst that wasn't in sources, apply the new commiId
-                    GumTreeFacade.appendMetadata(t, BLAME_ID, commitId, false);
+                    GumTreeFacade.appendMetadata(t, BLAME_ID, issueId, false);
 
                 } else {
                     GumTreeFacade.appendMetadata(t, BLAME_ID, srcTree.getMetadata(BLAME_ID), false);
@@ -115,16 +116,16 @@ public class GumTreeFacade {
         }
     }
 
-    public List<ReqMatch> getReqMatcher(List<Diff> diffs, boolean doMethods, boolean doInstructions) {
+    public List<ReqMatch> getReqMatcher(String filePath,List<Diff> diffs, boolean doMethods, boolean doInstructions) {
 
         Tree currentTree = null;
         for (Diff diff : diffs) {
             try {
                 if (diff.src == null) {
                     GumTreeFacade.appendMetadata(diff.dst, GumTreeFacade.BLAME_ID,
-                            diff.commitId, true);
+                            diff.issueId, true);
                 } else {
-                    GumTreeFacade.labelDestWithCommit(diff.src, diff.dst, diff.commitId);
+                    GumTreeFacade.labelDestWithCommit(diff.src, diff.dst, diff.issueId);
                 }
                 //showTree(diff.dst, "", System.out);
                 currentTree = diff.dst;
@@ -134,7 +135,7 @@ public class GumTreeFacade {
                 System.exit(-2);
             }
 
-            GumTreeFacade.showTree(currentTree, "", System.out);
+            //GumTreeFacade.showTree(currentTree, "", System.out);
         }
 
         return GumTreeFacade.getReqMatcher(currentTree, doMethods, doInstructions);

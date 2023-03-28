@@ -1,11 +1,13 @@
 package fr.pantheonsorbonne.cri.reqmapping;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Strings;
 
 import java.util.Objects;
 import java.util.function.Predicate;
 
 public class LineReqMatchImpl extends ReqMatchImpl implements Comparable<LineReqMatchImpl> {
+    @JsonIgnore
     private final Integer line;
     private final Integer pos;
     private final Integer len;
