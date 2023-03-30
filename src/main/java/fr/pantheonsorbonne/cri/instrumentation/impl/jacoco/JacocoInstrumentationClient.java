@@ -84,6 +84,7 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
             }
             LOGGER.debug("get the matcher from the code<->req mapper");
             Set<ReqMatch> requirementsMatchers = mapper.getReqMatcher();
+            System.out.println(requirementsMatchers.stream().map(rm -> rm.getRequirementsIds().stream().collect(Collectors.joining(","))).collect(Collectors.joining(";")));
             Writer writer = null;
             try {
                 if (!ideToolExportPath.isEmpty()) {

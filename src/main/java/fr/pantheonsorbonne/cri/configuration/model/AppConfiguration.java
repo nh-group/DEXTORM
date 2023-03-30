@@ -1,6 +1,7 @@
 package fr.pantheonsorbonne.cri.configuration.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 import java.util.List;
 
@@ -26,8 +27,19 @@ public class AppConfiguration {
         this.ideToolExportPath = ideToolExportPath;
     }
 
-    @JsonProperty(value = "ideToolExportPath",defaultValue = "")
-    String ideToolExportPath="";
+    public Boolean getUseCache() {
+        return useCache;
+    }
+
+    public void setUseCache(Boolean useCache) {
+        this.useCache = useCache;
+    }
+
+    @JsonProperty(value = "ideToolExportPath", defaultValue = "")
+    String ideToolExportPath = "";
+
+    @JsonProperty(value = "useCache", defaultValue = "true")
+    Boolean useCache = true;
 
     public String getCoverageFolder() {
         return coverageFolder;

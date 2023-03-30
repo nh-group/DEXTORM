@@ -155,6 +155,7 @@ public class GeneralConfiguration {
             protected void configure() {
                 super.configure();
                 this.bind(String.class).annotatedWith(Names.named("ideToolExportPath")).toInstance(app.getIdeToolExportPath());
+                this.bind(Boolean.class).annotatedWith(Names.named("useCache")).toInstance(app.getUseCache());
             }
         });
 
