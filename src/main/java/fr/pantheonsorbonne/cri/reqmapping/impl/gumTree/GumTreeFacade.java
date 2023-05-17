@@ -24,6 +24,8 @@ public class GumTreeFacade {
 
 
     public static final String BLAME_ID = "blameid";
+    public static final String COMMIT_ID = "commitid";
+
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(12);
 
 
@@ -59,12 +61,14 @@ public class GumTreeFacade {
 
     }
 
-    public static void addCommitMetadataToTreeRecursive(Tree t, String commitID) {
+    public static void addCommitMetadataToTreeRecursive(Tree t, String commitID,String issueId) {
         GumTreeFacade.appendMetadata(t, BLAME_ID, commitID, true);
+        GumTreeFacade.appendMetadata(t, COMMIT_ID, issueId, true);
     }
 
-    public static void addCommitMetadataToTree(Tree t, String commitID) {
-        GumTreeFacade.appendMetadata(t, BLAME_ID, commitID, false);
+    public static void addCommitMetadataToTree(Tree t, String commitID, String issueId) {
+        GumTreeFacade.appendMetadata(t, BLAME_ID, issueId, false);
+        GumTreeFacade.appendMetadata(t, COMMIT_ID, commitID, false);
     }
 
     private static List<ReqMatch> getReqMatcher(final Tree tree, boolean doMethods, boolean doInstructions) {
@@ -88,7 +92,7 @@ public class GumTreeFacade {
         }
     }
 
-    public static void labelDestWithCommit(Tree src, Tree dst, String issueId) {
+    public static void labelDestWithCommit(Tree src, Tree dst, String issueId, String commitId) {
 
         Matcher m = Matchers.getInstance().getMatcher(); // retrieve the default matcher
         try {
@@ -101,9 +105,11 @@ public class GumTreeFacade {
                 if (store.getSrcForDst(t) == null) {
                     //that's new stuff in dst that wasn't in sources, apply the new commiId
                     GumTreeFacade.appendMetadata(t, BLAME_ID, issueId, false);
+                    GumTreeFacade.appendMetadata(t, COMMIT_ID, commitId, false);
 
                 } else {
                     GumTreeFacade.appendMetadata(t, BLAME_ID, srcTree.getMetadata(BLAME_ID), false);
+                    GumTreeFacade.appendMetadata(t, COMMIT_ID, srcTree.getMetadata(COMMIT_ID), false);
                 }
                 //GumTreeFacade.showTree(dst, "[final]", System.out);
 
@@ -124,8 +130,10 @@ public class GumTreeFacade {
                 if (diff.src == null) {
                     GumTreeFacade.appendMetadata(diff.dst, GumTreeFacade.BLAME_ID,
                             diff.issueId, true);
+                    GumTreeFacade.appendMetadata(diff.dst, GumTreeFacade.COMMIT_ID,
+                            diff.commitId, true);
                 } else {
-                    GumTreeFacade.labelDestWithCommit(diff.src, diff.dst, diff.issueId);
+                    GumTreeFacade.labelDestWithCommit(diff.src, diff.dst, diff.issueId, diff.commitId);
                 }
                 //showTree(diff.dst, "", System.out);
                 currentTree = diff.dst;

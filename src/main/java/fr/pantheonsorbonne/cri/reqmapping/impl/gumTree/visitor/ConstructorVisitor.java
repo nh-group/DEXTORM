@@ -26,7 +26,8 @@ public class ConstructorVisitor extends MethodDeclarationVisitor {
         ReqMatcherBuilder currentMethodMatcher = this.parentMatcherBuilder
                 .methodName(INIT_METHOD_NAME)
                 .args(strParameter)
-                .commits((Collection<String>) tree.getMetadata(GumTreeFacade.BLAME_ID))
+                .commits((Collection<String>) tree.getMetadata(GumTreeFacade.COMMIT_ID))
+                .issues((Collection<String>) tree.getMetadata(GumTreeFacade.BLAME_ID))
                 .getCopy();
         this.matchersBuilders.add(currentMethodMatcher);
         

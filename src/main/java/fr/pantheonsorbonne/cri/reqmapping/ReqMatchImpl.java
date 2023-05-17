@@ -1,21 +1,20 @@
 package fr.pantheonsorbonne.cri.reqmapping;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public abstract class ReqMatchImpl implements ReqMatch {
 
     protected final Set<String> commits = new HashSet<>();
+    protected final Set<String> issueId = new HashSet<>();
     protected final Set<StackTraceElement> matches = new HashSet<>();
     protected final String packageName;
     protected final String className;
     protected final String fqClassName;
 
-    public ReqMatchImpl(String className, String packageName, String[] reqs) {
+    public ReqMatchImpl(String className, String packageName,String[] issueId, String[] reqs) {
         this.className = className;
         this.packageName = packageName;
+        this.issueId.addAll(List.of(issueId));
         commits.addAll(Arrays.asList(reqs));
         this.fqClassName = this.packageName.isEmpty() ? className : this.packageName + "." + className;
 
