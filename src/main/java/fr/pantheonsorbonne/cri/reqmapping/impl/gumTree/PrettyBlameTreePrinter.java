@@ -21,6 +21,7 @@ public final class PrettyBlameTreePrinter implements TreeVisitor {
     public void startTree(Tree tree) {
         tabs += "\t";
         LOGGER.info(tabs + tree.toTreeString() + tree.getMetadata(GumTreeFacade.BLAME_ID));
+        LOGGER.info(tabs + tree.toTreeString() + tree.getMetadata(GumTreeFacade.COMMIT_ID));
 
     }
 
