@@ -7,7 +7,7 @@ app:
   sourceRootDirs:
     - src/main/java
   coverageFolder: /home/nherbaut/workspace/dextorm/dextorm-dummy-project/../DEXTORM/src/main/resources/benchmark/dextorm-dummy-project/coverage/
-  ideToolExportPath: dextorm-vscode-export.json
+  ideToolExportPath: nathan.json
   useCache: false
 differs:
   gmethods:

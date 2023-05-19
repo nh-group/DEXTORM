@@ -27,7 +27,7 @@ import static java.nio.file.FileVisitResult.CONTINUE;
 public class GitRepoRequirementMappingProvider extends SimpleFileVisitor<Path> implements RequirementMappingProvider {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(GitRepoRequirementMappingProvider.class);
-    private final static ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(12);
+    private final static ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(1);
     private final Set<ReqMatch> repoReqMatcherImpls = ConcurrentHashMap.newKeySet();
     private final List<String> sourceRootDirs;
     protected Repository repo;

@@ -127,7 +127,7 @@ public class GumTreeFacade {
                 } else {
                     GumTreeFacade.labelDestWithCommit(diff.src, diff.dst, diff.issueId);
                 }
-                //showTree(diff.dst, "", System.out);
+                showTree(diff.dst, "", System.out);
                 currentTree = diff.dst;
             } catch (UnsupportedOperationException e) {
 

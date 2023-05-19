@@ -142,7 +142,7 @@ public class GitBlameFileRequirementProvider extends VoidVisitorAdapter<Void>
                         ReqMatch.builder()
                                 .fQClassName(inferedClassName)
                                 .line(blamed.getSourceLine(idx))
-                                .commits(commits)
+                                .issues(commits)
                                 .build());
             }
         }

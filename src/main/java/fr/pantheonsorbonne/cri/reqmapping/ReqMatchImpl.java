@@ -7,17 +7,22 @@ import java.util.Set;
 
 public abstract class ReqMatchImpl implements ReqMatch {
 
-    protected final Set<String> commits = new HashSet<>();
+    protected final Set<String> issueIds = new HashSet<>();
     protected final Set<StackTraceElement> matches = new HashSet<>();
     protected final String packageName;
     protected final String className;
     protected final String fqClassName;
 
-    public ReqMatchImpl(String className, String packageName, String[] reqs) {
+    public ReqMatchImpl(String className, String packageName, String[] issueIds) {
         this.className = className;
         this.packageName = packageName;
-        commits.addAll(Arrays.asList(reqs));
-        this.fqClassName = this.packageName.isEmpty() ? className : this.packageName + "." + className;
+        this.issueIds.addAll(Arrays.asList(issueIds));
+        if(this.className!=null && !this.className.isEmpty()) {
+            this.fqClassName = this.packageName.isEmpty() ? className : this.packageName + "." + className;
+        }
+        else{
+            this.fqClassName="";
+        }
 
     }
 
@@ -36,7 +41,7 @@ public abstract class ReqMatchImpl implements ReqMatch {
     protected abstract boolean isMatchLogged(StackTraceElement elt);
 
     public Set<String> getRequirementsIds() {
-        return commits;
+        return issueIds;
     }
 
     public Collection<StackTraceElement> getMatchingTraceElement() {
@@ -49,8 +54,8 @@ public abstract class ReqMatchImpl implements ReqMatch {
     }
 
     public void setReq(java.util.List<String> req) {
-        this.commits.clear();
-        this.commits.addAll(req);
+        this.issueIds.clear();
+        this.issueIds.addAll(req);
     }
 
     public String getClassName() {
@@ -64,7 +69,7 @@ public abstract class ReqMatchImpl implements ReqMatch {
     @Override
     public String toString() {
         return "ReqMatch{" +
-                "commits=" + commits +
+                "commits=" + issueIds +
                 ", packageName='" + packageName + '\'' +
                 ", className='" + className + '\'' +
                 '}';

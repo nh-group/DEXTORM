@@ -5,6 +5,7 @@ import com.github.gumtreediff.tree.Tree;
 import com.github.gumtreediff.tree.TreeVisitor;
 import com.github.gumtreediff.tree.Type;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
+import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.GumTreeFacade;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,7 +37,7 @@ public class CompilationUnitVisitor extends JavaParserTreeExclusiveCompositeVisi
 
     @Override
     public Collection<Class<? extends JavaParserTreeVisitor>> getChildVisitors() {
-        return Arrays.asList(ClassOrInterfaceDeclarationVisitor.class);
+        return Arrays.asList(ClassOrInterfaceDeclarationVisitor.class,PackageDeclarationVisitor.class);
     }
 
 }

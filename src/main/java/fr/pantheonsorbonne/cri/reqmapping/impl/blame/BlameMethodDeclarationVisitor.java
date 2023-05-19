@@ -46,7 +46,7 @@ public class BlameMethodDeclarationVisitor extends VoidVisitorAdapter<BlameDataW
                             .packageName(this.packageName)
                             .methodName(INIT)
                             .args(args)
-                            .commits(commitId).build());
+                            .issues(commitId).build());
                 }
 
             }
@@ -71,7 +71,7 @@ public class BlameMethodDeclarationVisitor extends VoidVisitorAdapter<BlameDataW
                             .methodName(md.getNameAsString())
                             //.line(pos.get().line) //no line info required for method declaration
                             .args(args)
-                            .commits(commitId).build());
+                            .issues(commitId).build());
                 }
 
             }

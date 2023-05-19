@@ -30,7 +30,7 @@ public abstract class JavaParserTreeExclusiveCompositeVisitor extends JavaParser
                     //create the new visitor
                     JavaParserTreeVisitor subVisitor = subVisitorClass
                             .getDeclaredConstructor(Tree.class, ReqMatcherBuilder.class, Integer.TYPE, Boolean.TYPE, Boolean.TYPE)
-                            .newInstance(this.tree, parentMatcherBuilder.getCopy(), subtree.getLine(), this.doMethods, this.doInstructions);
+                            .newInstance(this.tree, parentMatcherBuilder, subtree.getLine(), this.doMethods, this.doInstructions);
 
                     //if the type can be handled by the subvisitor
                     if (canSubvisitorHandleTree(subtree.getType(), subVisitor)) {

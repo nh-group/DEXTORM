@@ -1,25 +1,26 @@
 app:
   diffAlgorithm: gmethods
-  instrumentedPackage: io.reactivex.rxjava3
+  instrumentedPackage: fr
   issueCollector: dummy
   publisher: console1
-  #publisher: console1
-  coverageFolder: benchmark/RxJava/coverage
   sourceRootDirs:
-    - ./src/main/java
+    - src/main/java
+  coverageFolder: benchmark/RxJava/coverage
+  ideToolExportPath: nathan_rx.json
 differs:
   gmethods:
-    diffAlgorithm: BLAME
+    diffAlgorithm: GUMTREE
     instructions: true
     methods: false
 issueCollectors:
   github:
     dummy:
-      branch: 3.x
       gitHubRepoName: ReactiveX/RxJava
-      #repoAddress: file:///home/nherbaut/tmp/RxJava.git
+      repoAddress: https://github.com/ReactiveX/RxJava.git
+      branch: 3.x
+      excludeIssueNumbers:
+        - 6621
 publishers:
   filePublishers:
     console1:
       filePath: stdout
-

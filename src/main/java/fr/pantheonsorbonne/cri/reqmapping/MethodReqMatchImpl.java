@@ -11,8 +11,8 @@ public class MethodReqMatchImpl extends ReqMatchImpl {
     private final List<String> args = new ArrayList<>();
     private final String methodName;
 
-    public MethodReqMatchImpl(String className, String packageName, String methodName, List<String> args, String... reqs) {
-        super(className, packageName, reqs);
+    public MethodReqMatchImpl(String className, String packageName, String methodName, List<String> args, String... issueIds) {
+        super(className, packageName, issueIds);
         this.methodName = methodName;
         this.args.addAll(args);
         //System.out.println(this);
@@ -36,6 +36,6 @@ public class MethodReqMatchImpl extends ReqMatchImpl {
 
     @Override
     public String toString() {
-        return "MethodReqMatchImpl" + " " + this.packageName + "." + this.className + "." + this.methodName + "(" + this.args.stream().collect(Collectors.joining(",")) + ") :" + this.commits.stream().collect(Collectors.joining(","));
+        return "MethodReqMatchImpl" + " " + this.packageName + "." + this.className + "." + this.methodName + "(" + this.args.stream().collect(Collectors.joining(",")) + ") :" + this.issueIds.stream().collect(Collectors.joining(","));
     }
 }

@@ -8,10 +8,10 @@ import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.Utils;
 import fr.pantheonsorbonne.cri.reqmapping.exception.SkippedFileException;
 import fr.pantheonsorbonne.cri.reqmapping.impl.FileRequirementMappingProvider;
+import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor.DiffCollector;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.lib.Repository;
@@ -28,16 +28,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GumTreeFileRequirementMappingProvider implements FileRequirementMappingProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GumTreeFileRequirementMappingProvider.class);
-    private final GumTreeFacade facade = new CachedGumTreeFacade();
+    private final GumTreeFacade facade;
     private final String repoAddress;
     @Named("temp-git-repo")
     Path lookupFolderPath;
@@ -51,7 +48,12 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
     private String branchName;
 
     @Inject
-    public GumTreeFileRequirementMappingProvider(@Named("repoAddress") String repoAddress, @Named("git-branch") String branchName, @Named("DoMethodsDiff") Boolean doMethods, @Named("DoInstructionsDiff") Boolean doInstructions, @Named("temp-git-repo") Path lookupFolderPath) {
+    public GumTreeFileRequirementMappingProvider(@Named("repoAddress") String repoAddress, @Named("git-branch") String branchName, @Named("DoMethodsDiff") Boolean doMethods, @Named("DoInstructionsDiff") Boolean doInstructions, @Named("temp-git-repo") Path lookupFolderPath, @Named("useCache") Boolean useCache) {
+        if (useCache) {
+            this.facade = new CachedGumTreeFacade();
+        } else {
+            this.facade = new GumTreeFacade();
+        }
         this.repoAddress = repoAddress;
         this.lookupFolderPath = lookupFolderPath;
         try {
@@ -68,7 +70,7 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
 
     public void dispose() {
         try {
-            MoreFiles.deleteRecursively(this.localBareRepoAddress.toPath(),RecursiveDeleteOption.ALLOW_INSECURE);
+            MoreFiles.deleteRecursively(this.localBareRepoAddress.toPath(), RecursiveDeleteOption.ALLOW_INSECURE);
         } catch (IOException e) {
             // cleanup
         }
@@ -81,12 +83,11 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
         List<Diff> diffs = null;
         try {
             diffs = materializeCommitDiff(p, git, lookupFolderPath);
-            return this.facade.getReqMatcher(this.lookupFolderPath.relativize(p).toString(),diffs, this.doMethods, this.doInstructions);
-        }
-        catch(SkippedFileException e){
-            LOGGER.info("we skipped "+p.toString()+" as per configuration");
+            return this.facade.getReqMatcher(this.lookupFolderPath.relativize(p).toString(), diffs, this.doMethods, this.doInstructions);
+        } catch (SkippedFileException e) {
+            LOGGER.info("we skipped " + p.toString() + " as per configuration");
             return Collections.EMPTY_LIST;
-        } catch(IOException | GitAPIException e) {
+        } catch (IOException | GitAPIException e) {
             e.printStackTrace();
             System.exit(-3);
             throw new RuntimeException("unreachable");
@@ -118,17 +119,21 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
 
     private static List<Diff> materializeCommitDiff(Path file, Git git, Path lookupFolderPath) throws GitAPIException, IOException, SkippedFileException {
 
+
         File relativeFilePath = lookupFolderPath.relativize(file).toFile();
+        DiffCollector collector = new DiffCollector(git.getRepository());
+
         if (Files.isRegularFile(file)
                 && com.google.common.io.Files.getFileExtension(relativeFilePath.toString()).equals("java")
                 && !relativeFilePath.getName().equals("package-info.java")) {
 
-            LogCommand logCommand = git.log().add(git.getRepository().resolve(Constants.HEAD))
-                    .addPath(relativeFilePath.toString());
 
             List<CommitIssueMapping> commitIssueMappings = new ArrayList<>();
             //start from head to the begining of time
-            for (RevCommit revCommit : logCommand.call()) {
+            Deque<String> names = new LinkedList<>();
+            List<RevCommit> revCommits = new ArrayList<>();
+            collector.loadFileHistory(relativeFilePath.toString(), revCommits, names);
+            for (RevCommit revCommit : revCommits) {
 
                 CommitIssueMapping mapping = new CommitIssueMapping();
                 mapping.commitId = revCommit;
@@ -140,15 +145,19 @@ public class GumTreeFileRequirementMappingProvider implements FileRequirementMap
             Collections.reverse(commitIssueMappings);
             Diff.DiffBuilder builder = Diff.getBuilder();
             for (CommitIssueMapping mapping : commitIssueMappings) {
-                LOGGER.debug("mapping {} for file {}", mapping.commitId.getName(), relativeFilePath);
-                Path path = materializeFileFromCommit(git.getRepository(), mapping.commitId, relativeFilePath.toString());
+                Path path = null;
+                do {
+                    LOGGER.debug("mapping {} for file {}", mapping.commitId.getName(), names.peekLast());
+                    path = materializeFileFromCommit(git.getRepository(), mapping.commitId, names.peekLast());
+                }
+                while (path == null && !names.isEmpty() && names.pollLast() != null);
                 if (path != null) {
-                    builder.add(path, mapping.issueId.stream().collect(Collectors.joining(" ")),mapping.commitId.name());
+                    builder.add(path, mapping.issueId.stream().collect(Collectors.joining(" ")), mapping.commitId.name());
                 }
 
 
             }
-            MoreFiles.deleteDirectoryContents(git.getRepository().getDirectory().toPath(),RecursiveDeleteOption.ALLOW_INSECURE);
+            MoreFiles.deleteDirectoryContents(git.getRepository().getDirectory().toPath(), RecursiveDeleteOption.ALLOW_INSECURE);
 
             try {
                 return builder.build();

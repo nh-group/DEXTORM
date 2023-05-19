@@ -119,7 +119,7 @@ public class MethodDeclarationVisitor extends JavaParserTreeExclusiveCompositeVi
         ReqMatcherBuilder currentMethodMatcher = this.parentMatcherBuilder
                 .methodName(methodName)
                 .args(strParameter)
-                .commits((Collection<String>) tree.getMetadata(GumTreeFacade.BLAME_ID))
+                .issues((Collection<String>) tree.getMetadata(GumTreeFacade.BLAME_ID))
                 .getCopy();
         this.matchersBuilders.add(currentMethodMatcher);
     }
