@@ -17,6 +17,8 @@ public class ReqMatcherBuilder implements Cloneable {
     private static final Pattern methodParamsPattern = Pattern.compile("(\\[)?([ZBCSIJFDL])?([^;]*)?;");
     private final List<String> args = new ArrayList<>();
     private final List<String> reqs = new ArrayList<>();
+
+    private final List<String> issues = new ArrayList<>();
     private String packageName = null;
     private String methodName = null;
     private String className = null;
@@ -89,11 +91,11 @@ public class ReqMatcherBuilder implements Cloneable {
     public ReqMatch build() {
 
         if (line == null) {
-            return new MethodReqMatchImpl(this.className, this.packageName, this.methodName, this.args, this.reqs.toArray(new String[0]));
+            return new MethodReqMatchImpl(this.className, this.packageName, this.methodName, this.args, this.issues.toArray(new String[0]), this.reqs.toArray(new String[0]));
         } else if (this.methodName == null) {
-            return new LineReqMatchImpl(this.className, this.packageName, this.line, this.pos,this.len,this.reqs.toArray(new String[0]));
+            return new LineReqMatchImpl(this.className, this.packageName, this.line, this.pos,this.len,this.issues.toArray(new String[0]),this.reqs.toArray(new String[0]));
         } else {
-            return new CompositeReqMatchImpl(new MethodReqMatchImpl(this.className, this.packageName, this.methodName, this.args, this.reqs.toArray(new String[0])), new LineReqMatchImpl(this.className, this.packageName, this.line, this.pos,this.len,this.reqs.toArray(new String[0])));
+            return new CompositeReqMatchImpl(new MethodReqMatchImpl(this.className, this.packageName, this.methodName, this.args,this.issues.toArray(new String[0]),this.reqs.toArray(new String[0])), new LineReqMatchImpl(this.className, this.packageName, this.line, this.pos,this.len,this.issues.toArray(new String[0]),this.reqs.toArray(new String[0])));
         }
 
     }
@@ -145,6 +147,22 @@ public class ReqMatcherBuilder implements Cloneable {
         return this;
     }
 
+    public ReqMatcherBuilder issues(String issueId) {
+        if (!Strings.isNullOrEmpty(issueId)) {
+            this.issues.add(issueId);
+        }
+
+        return this;
+    }
+
+    public ReqMatcherBuilder issues(Collection<String> issueId) {
+        if(issueId != null) {
+            this.issues.addAll(
+                    issueId.stream().filter(Predicate.not(Strings::isNullOrEmpty)).collect(Collectors.toList()));
+        }
+        return this;
+    }
+
     public ReqMatcherBuilder getCopy() {
         ReqMatcherBuilder res = new ReqMatcherBuilder();
         res.args.addAll(this.args);
@@ -155,6 +173,7 @@ public class ReqMatcherBuilder implements Cloneable {
         res.packageName = this.packageName;
         res.pos=this.pos;
         res.len=this.len;
+        res.issues.addAll(this.issues);
         return res;
     }
 
