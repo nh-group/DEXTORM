@@ -13,6 +13,8 @@ import fr.pantheonsorbonne.cri.configuration.model.publisher.JsonFilePublisherCo
 import fr.pantheonsorbonne.cri.configuration.model.publisher.PublisherConfig;
 import fr.pantheonsorbonne.cri.configuration.model.publisher.RESTPublisherConfig;
 import fr.pantheonsorbonne.cri.configuration.modules.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -22,6 +24,9 @@ public class GeneralConfiguration {
     public IssueCollectorsConfig issueCollectors;
     public PublisherConfig publishers;
     public Map<String, DifferAlgorithmConfig> differs;
+
+
+    private static final Logger LOGGER = LoggerFactory.getLogger("GeneralConfiguration");
     @JsonIgnore
     public Collection<Module> inheritedModules;
 
@@ -136,16 +141,18 @@ public class GeneralConfiguration {
 
                     try {
                         Class klass = field.getType();
-                        this.bind(klass).annotatedWith(Names.named(field.getName())).toInstance(klass.cast(field.get(app)));
-                        this.bind(String.class).annotatedWith(Names.named("coverageFolder")).toInstance(app.getCoverageFolder());
+                        LOGGER.info(" binding {} annotated with {} to {}", klass, field.getName(), field.get(app));
+                        var value = klass.cast(field.get(app));
+                        this.bind(klass).annotatedWith(Names.named(field.getName())).toInstance(value == null ? "" : value);
+                        //this.bind(String.class).annotatedWith(Names.named("coverageFolder")).toInstance(app.getCoverageFolder());
 
-                        bind(new TypeLiteral<List<String>>() {
-                        }).annotatedWith(Names.named("sourceRootDir")).toInstance(app.getSourceRootDirs());
+
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }
                 }
-
+                bind(new TypeLiteral<List<String>>() {
+                }).annotatedWith(Names.named("sourceRootDir")).toInstance(app.getSourceRootDirs());
 
             }
         });
