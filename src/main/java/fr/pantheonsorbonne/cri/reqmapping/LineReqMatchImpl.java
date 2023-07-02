@@ -12,8 +12,8 @@ public class LineReqMatchImpl extends ReqMatchImpl implements Comparable<LineReq
     private final Integer pos;
     private final Integer len;
 
-    public LineReqMatchImpl(String className, String packageName, Integer line, Integer pos, Integer len, String[] reqs) {
-        super(className, packageName, reqs);
+    public LineReqMatchImpl(String className, String packageName, Integer line, Integer pos, Integer len,String[] issueId, String[] reqs) {
+        super(className, packageName,issueId, reqs);
         this.line = line;
         this.pos = pos;
         this.len = len;
@@ -23,7 +23,7 @@ public class LineReqMatchImpl extends ReqMatchImpl implements Comparable<LineReq
     protected boolean isMatchLogged(StackTraceElement elt) {
         return super.isMatchFQClass(elt)
                 && (elt.getLine() == this.getLine())
-                && this.getRequirementsIds().stream().anyMatch(Predicate.not(Strings::isNullOrEmpty));
+                && this.getIssueIds().stream().anyMatch(Predicate.not(Strings::isNullOrEmpty));
     }
 
     public Integer getLine() {

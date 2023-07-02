@@ -1,27 +1,31 @@
 package fr.pantheonsorbonne.cri.reqmapping;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public abstract class ReqMatchImpl implements ReqMatch {
 
     protected final Set<String> issueIds = new HashSet<>();
+
+    @Override
+    public Set<String> getCommitIds() {
+        return commitIds;
+    }
+
+    protected final Set<String> commitIds = new HashSet<>();
     protected final Set<StackTraceElement> matches = new HashSet<>();
     protected final String packageName;
     protected final String className;
     protected final String fqClassName;
 
-    public ReqMatchImpl(String className, String packageName, String[] issueIds) {
+    public ReqMatchImpl(String className, String packageName, String[] issueIds, String[] commitIds) {
         this.className = className;
         this.packageName = packageName;
-        this.issueIds.addAll(Arrays.asList(issueIds));
-        if(this.className!=null && !this.className.isEmpty()) {
+        this.issueIds.addAll(List.of(issueIds));
+        this.commitIds.addAll(Arrays.asList(commitIds));
+        if (this.className != null && !this.className.isEmpty()) {
             this.fqClassName = this.packageName.isEmpty() ? className : this.packageName + "." + className;
-        }
-        else{
-            this.fqClassName="";
+        } else {
+            this.fqClassName = "";
         }
 
     }
@@ -40,7 +44,7 @@ public abstract class ReqMatchImpl implements ReqMatch {
 
     protected abstract boolean isMatchLogged(StackTraceElement elt);
 
-    public Set<String> getRequirementsIds() {
+    public Set<String> getIssueIds() {
         return issueIds;
     }
 
@@ -53,9 +57,9 @@ public abstract class ReqMatchImpl implements ReqMatch {
         return this.fqClassName;
     }
 
-    public void setReq(java.util.List<String> req) {
+    public void setIssueIds(java.util.List<String> issueIds) {
         this.issueIds.clear();
-        this.issueIds.addAll(req);
+        this.issueIds.addAll(issueIds);
     }
 
     public String getClassName() {
@@ -68,10 +72,13 @@ public abstract class ReqMatchImpl implements ReqMatch {
 
     @Override
     public String toString() {
-        return "ReqMatch{" +
-                "commits=" + issueIds +
+        return "ReqMatchImpl{" +
+                "issueIds=" + issueIds +
+                ", commitIds=" + commitIds +
+                ", matches=" + matches +
                 ", packageName='" + packageName + '\'' +
                 ", className='" + className + '\'' +
+                ", fqClassName='" + fqClassName + '\'' +
                 '}';
     }
 }

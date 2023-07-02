@@ -5,13 +5,13 @@
 
     <groupId>fr.pantheonsorbonne.cri</groupId>
     <artifactId>dextorm</artifactId>
-    <version>1.5.1</version>
+    <version>1.5.2</version>
     <packaging>jar</packaging>
 
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <gumtree.version>3.1.0-SNAPSHOT</gumtree.version>
+        <gumtree.version>3.2.0-SNAPSHOT</gumtree.version>
         <jacoco.version>0.8.7</jacoco.version>
         <hibernate.version>5.6.7.Final</hibernate.version>
     </properties>
@@ -598,13 +598,28 @@
     <distributionManagement>
         <repository>
             <id>miage</id>
+            <name>Miage Releases</name>
             <url>https://maven.miage.dev/releases</url>
         </repository>
 
         <snapshotRepository>
             <id>miage</id>
+            <name>Miage Snapshots</name>
             <url>https://maven.miage.dev/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
+    <repositories>
+    <repository>
+            <id>miage.release</id>
+            <name>Miage Releases</name>
+            <url>https://maven.miage.dev/releases</url>
+        </repository>
+                <repository>
+            <id>miage.snapshots</id>
+            <name>Miage Snapshots</name>
+            <url>https://maven.miage.dev/snapshots</url>
+        </repository>
+    </repositories>
+          
 
 </project>

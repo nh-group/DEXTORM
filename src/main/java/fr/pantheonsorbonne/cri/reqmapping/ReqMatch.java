@@ -9,9 +9,11 @@ public interface ReqMatch {
 
     boolean isMatch(StackTraceElement elt);
 
-    Collection<String> getRequirementsIds();
+    Collection<String> getIssueIds();
 
     Collection<StackTraceElement> getMatchingTraceElement();
 
     String getFQClassName();
+
+    Collection<String> getCommitIds();
 }

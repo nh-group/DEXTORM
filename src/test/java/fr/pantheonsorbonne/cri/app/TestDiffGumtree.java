@@ -48,19 +48,25 @@ class TestDiffGumtree {
         for (ReqMatch m : reqMatcherImpls) {
             MethodReqMatchImpl mrm = (MethodReqMatchImpl) m;
             if (mrm.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("main")) {
-                assertEquals(1, m.getRequirementsIds().stream().distinct().count());
-                List<String> commits = m.getRequirementsIds().stream().distinct().collect(Collectors.toList());
-                assertTrue(commits.contains("commit1"));
+                assertEquals(1, m.getCommitIds().stream().distinct().count());
+                List<String> commits = m.getCommitIds().stream().distinct().collect(Collectors.toList());
+                assertTrue(commits.contains("000001"));
+                List<String> issues = m.getIssueIds().stream().distinct().collect(Collectors.toList());
+                assertTrue(issues.contains("commit1"));
                 assertions[0] = true;
             } else if (mrm.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("sum2")) {
-                assertEquals(1, m.getRequirementsIds().stream().distinct().count());
-                List<String> commits = m.getRequirementsIds().stream().distinct().collect(Collectors.toList());
-                assertTrue(commits.contains("commit2"));
+                assertEquals(1, m.getCommitIds().stream().distinct().count());
+                List<String> commits = m.getCommitIds().stream().distinct().collect(Collectors.toList());
+                assertTrue(commits.contains("000002"));
+                List<String> issues = m.getIssueIds().stream().distinct().collect(Collectors.toList());
+                assertTrue(issues.contains("commit2"));
                 assertions[1] = true;
             } else if (mrm.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("toto")) {
-                assertEquals(1, m.getRequirementsIds().stream().distinct().count());
-                List<String> commits = m.getRequirementsIds().stream().distinct().collect(Collectors.toList());
-                assertTrue(commits.contains("commit2"));
+                assertEquals(1, m.getCommitIds().stream().distinct().count());
+                List<String> commits = m.getCommitIds().stream().distinct().collect(Collectors.toList());
+                assertTrue(commits.contains("000002"));
+                List<String> issues = m.getIssueIds().stream().distinct().collect(Collectors.toList());
+                assertTrue(issues.contains("commit2"));
                 assertions[2] = true;
             } else {
                 fail();
@@ -85,7 +91,7 @@ class TestDiffGumtree {
 
         GumTreeFacade facade = new GumTreeFacade();
 
-        Collection<ReqMatch> reqMatcherImpls = facade.getReqMatcher("App.java", builder.build(), false, true);
+        Collection<ReqMatch> reqMatcherImpls = facade.getReqMatcher("App.java", builder.build(), false, false, true);
         assertEquals(reqMatcherImpls.size(), 1);
 
 

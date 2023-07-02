@@ -39,7 +39,7 @@ public class StatementVisitor extends JavaParserTreeExclusiveCompositeVisitor {
         */
 
         tree.getChildren().stream().filter(MethodDeclarationVisitor::isAStatement).forEach(t -> {
-            this.getMatchersBuilders().add(this.parentMatcherBuilder.getCopy().issues((Collection<String>) (t.getMetadata(GumTreeFacade.BLAME_ID))).line(t.getLine()).pos(t.getPos()).len(t.getLength()));
+            this.getMatchersBuilders().add(this.parentMatcherBuilder.getCopy().commits((Collection<String>) (t.getMetadata(GumTreeFacade.COMMIT_ID))).issues((Collection<String>) (t.getMetadata(GumTreeFacade.BLAME_ID))).line(t.getLine()).pos(t.getPos()).len(t.getLength()));
             StatementVisitor statementVisitor = new StatementVisitor(t, this.parentMatcherBuilder, t.getLine(), this.doMethods, this.doInstructions);
             statementVisitor.startTree(t);
             this.getMatchersBuilders().addAll(statementVisitor.collect());

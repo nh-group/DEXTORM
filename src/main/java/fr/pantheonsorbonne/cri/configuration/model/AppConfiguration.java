@@ -42,7 +42,7 @@ public class AppConfiguration {
     Boolean useCache = true;
 
     public String getCoverageFolder() {
-        return coverageFolder;
+        return coverageFolder==null?"":coverageFolder;
     }
 
     public void setCoverageFolder(String coverageFolder) {

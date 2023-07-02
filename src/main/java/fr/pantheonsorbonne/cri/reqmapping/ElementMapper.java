@@ -27,7 +27,7 @@ public class ElementMapper {
 
     public Set<String> getMatchingRequirementsIdSet() {
 
-        return this.getMatchingRequirementsMatchers().stream().map(rm -> rm.getRequirementsIds()).flatMap(Collection::stream).collect(Collectors.toSet());
+        return this.getMatchingRequirementsMatchers().stream().map(rm -> rm.getIssueIds()).flatMap(Collection::stream).collect(Collectors.toSet());
     }
 
     public Set<ReqMatch> getMatchingRequirementsMatchers() {
@@ -65,7 +65,7 @@ public class ElementMapper {
 
     public List<String> getMatchingRequirementsIdList() {
 
-        return this.getMatchingRequirementsMatchers().stream().map(rm -> rm.getRequirementsIds()).flatMap(Collection::stream).collect(Collectors.toList());
+        return this.getMatchingRequirementsMatchers().stream().map(rm -> rm.getIssueIds()).flatMap(Collection::stream).collect(Collectors.toList());
     }
 
     public Set<StackTraceElement> getMatchedElements() {

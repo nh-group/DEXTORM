@@ -71,108 +71,98 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
             LOGGER.info("analysing {}", coverageFolder);
 
 
-            LOGGER.debug("get jacoco data");
-            List<Report> reports = getReportObjectFromXMl();
-            List<StackTraceElement> stackTracesCovered = new ArrayList<>();
-            List<StackTraceElement> stackTracesAll = new ArrayList<>();
-            for (Report report : reports) {
-                LOGGER.debug("getting the covered elements");
-                stackTracesCovered.addAll(extractStackTraceElement(report, this.doMethods, true, this.doInstructions, true));
-
-                LOGGER.debug("getting all the elements");
-                stackTracesAll.addAll(extractStackTraceElement(report, this.doMethods, false, this.doInstructions, false));
-            }
-            LOGGER.debug("get the matcher from the code<->req mapper");
             Set<ReqMatch> requirementsMatchers = mapper.getReqMatcher();
-            System.out.println(requirementsMatchers.stream().map(rm -> rm.getRequirementsIds().stream().collect(Collectors.joining(","))).collect(Collectors.joining(";")));
-            Writer writer = null;
-            try {
-                if (!ideToolExportPath.isEmpty()) {
-                    writer = new FileWriter(ideToolExportPath);
-                    new Gson().toJson(requirementsMatchers, writer);
-                    writer.close();
+            writeDiffData(requirementsMatchers);
 
-                } else {
-                    LOGGER.warn("I am NOT going to export data for any IDE because the app.ideToolExportPath is empty of undefined");
+
+            if (this.coverageFolder == null || this.coverageFolder.isEmpty()) {
+                LOGGER.warn("I'm NOT going to export coverage analysis, since coverage data cannot be found");
+            } else {
+                LOGGER.debug("get jacoco data");
+                List<Report> reports = getReportObjectFromXMl(this.coverageFolder);
+                List<StackTraceElement> stackTracesCovered = new ArrayList<>();
+                List<StackTraceElement> stackTracesAll = new ArrayList<>();
+                for (Report report : reports) {
+                    LOGGER.debug("getting the covered elements");
+                    stackTracesCovered.addAll(extractStackTraceElement(report, this.doMethods, true, this.doInstructions, true));
+
+                    LOGGER.debug("getting all the elements");
+                    stackTracesAll.addAll(extractStackTraceElement(report, this.doMethods, false, this.doInstructions, false));
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
+                LOGGER.debug("get the matcher from the code<->req mapper");
+
+                Set<String> reqIds = requirementsMatchers.stream().map(rm -> rm.getIssueIds()).flatMap(Collection::stream).collect(Collectors.toSet());
 
 
-            Set<String> reqIds = requirementsMatchers.stream().map(rm -> rm.getRequirementsIds()).flatMap(Collection::stream).collect(Collectors.toSet());
+                LOGGER.debug("Matches elements with the mapper");
+                ElementMapper parserCovered = new ElementMapper(stackTracesCovered.toArray(new StackTraceElement[0]), instrumentedPackage, requirementsMatchers);
+                ElementMapper parserAll = new ElementMapper(stackTracesAll.toArray(new StackTraceElement[0]), instrumentedPackage, requirementsMatchers);
 
 
-            LOGGER.debug("Matches elements with the mapper");
-            ElementMapper parserCovered = new ElementMapper(stackTracesCovered.toArray(new StackTraceElement[0]), instrumentedPackage, requirementsMatchers);
-            ElementMapper parserAll = new ElementMapper(stackTracesAll.toArray(new StackTraceElement[0]), instrumentedPackage, requirementsMatchers);
-
-
-            LOGGER.debug("//only covered");
-            var covered = parserCovered.getMatchedElements();
-            //every element
-            LOGGER.debug("//every element");
-            var all = parserAll.getMatchedElements();
-
-            List<ReqMatch> rms = new ArrayList<>(requirementsMatchers).stream().collect(Collectors.toList());
-            //Collections.sort(rms);
-            for (ReqMatch rm : rms) {
+                LOGGER.debug("//only covered");
+                var covered = parserCovered.getMatchedElements();
+                //every element
                 LOGGER.debug("//every element");
-                StackTraceElement matchee = null;
-                for (StackTraceElement ste : all) {
-                    if (rm.isMatch(ste)) {
+                var all = parserAll.getMatchedElements();
 
-                        matchee = ste;
-                        break;
+                List<ReqMatch> rms = new ArrayList<>(requirementsMatchers).stream().collect(Collectors.toList());
+                //Collections.sort(rms);
+                for (ReqMatch rm : rms) {
+                    LOGGER.debug("//every element");
+                    StackTraceElement matchee = null;
+                    for (StackTraceElement ste : all) {
+                        if (rm.isMatch(ste)) {
+
+                            matchee = ste;
+                            break;
+                        }
                     }
-                }
-                if (matchee != null) {
-                    if (covered.contains(matchee)) {
-                        //System.out.println("COVERED\t" + rm + " by " + matchee);
+                    if (matchee != null) {
+                        if (covered.contains(matchee)) {
+                            //System.out.println("COVERED\t" + rm + " by " + matchee);
+                        } else {
+                            //System.out.println("NOCOVRD\t" + rm + " by " + matchee);
+                        }
+
                     } else {
-                        //System.out.println("NOCOVRD\t" + rm + " by " + matchee);
+                        //System.out.println("IRRLVNT\t" + rm.toString());
+                    }
+                }
+                var uncovered = new HashSet<>(all);
+                uncovered.removeAll(covered);
+
+                //mapp uncovered element
+                var parseUncovered = new ElementMapper(uncovered.toArray(new StackTraceElement[0]), instrumentedPackage, requirementsMatchers);
+
+                //for each element, the correspondings reqId
+                var uncoveredReqIdList = parseUncovered.getMatchingRequirementsIdList();
+
+                //map collecting coverage info
+                Map<String, Double> coverageInfo = new HashMap<>();
+
+                //fill the map with all the id from all element
+                var allReqIdList = parserAll.getMatchingRequirementsIdList();
+                for (String reqId : reqIds) {
+                    coverageInfo.put(reqId, Double.valueOf(allReqIdList.stream().filter(req -> req.equals(reqId)).count()));
+                }
+
+                //update the map to get the ratio between covered and all
+                var coveredReqIdList = parserCovered.getMatchingRequirementsIdList();
+                for (String reqId : reqIds) {
+                    Double countTotal = coverageInfo.get(reqId);
+                    Long countCovered = coveredReqIdList.stream().filter(req -> req.equals(reqId)).count();
+                    Double ratio = countCovered / countTotal;
+                    if (Double.isNaN(ratio)) {
+                        continue;
+                    }
+                    coverageInfo.put(reqId, ratio);
+                    if (this.doMethods) {
+                        publisher.publishNow(gitHubRepoName, reqId, diffMethod, RequirementPublisher.COVERAGE_TYPE.METHODS, ratio, countCovered.intValue());
+                    } else {
+                        publisher.publishNow(gitHubRepoName, reqId, diffMethod, RequirementPublisher.COVERAGE_TYPE.LINES, ratio, countCovered.intValue());
                     }
 
-                } else {
-                    //System.out.println("IRRLVNT\t" + rm.toString());
                 }
-            }
-            var uncovered = new HashSet<>(all);
-            uncovered.removeAll(covered);
-
-            //mapp uncovered element
-            var parseUncovered = new ElementMapper(uncovered.toArray(new StackTraceElement[0]), instrumentedPackage, requirementsMatchers);
-
-            //for each element, the correspondings reqId
-            var uncoveredReqIdList = parseUncovered.getMatchingRequirementsIdList();
-
-            //map collecting coverage info
-            Map<String, Double> coverageInfo = new HashMap<>();
-
-            //fill the map with all the id from all element
-            var allReqIdList = parserAll.getMatchingRequirementsIdList();
-            for (String reqId : reqIds) {
-                coverageInfo.put(reqId, Double.valueOf(allReqIdList.stream().filter(req -> req.equals(reqId)).count()));
-            }
-
-            //update the map to get the ratio between covered and all
-            var coveredReqIdList = parserCovered.getMatchingRequirementsIdList();
-            for (String reqId : reqIds) {
-                Double countTotal = coverageInfo.get(reqId);
-                Long countCovered = coveredReqIdList.stream().filter(req -> req.equals(reqId)).count();
-                Double ratio = countCovered / countTotal;
-                if (Double.isNaN(ratio)) {
-                    continue;
-                }
-                coverageInfo.put(reqId, ratio);
-                if (this.doMethods) {
-                    publisher.publishNow(gitHubRepoName, reqId, diffMethod, RequirementPublisher.COVERAGE_TYPE.METHODS, ratio, countCovered.intValue());
-                } else {
-                    publisher.publishNow(gitHubRepoName, reqId, diffMethod, RequirementPublisher.COVERAGE_TYPE.LINES, ratio, countCovered.intValue());
-                }
-
-
             }
 
         } finally {
@@ -182,10 +172,28 @@ public class JacocoInstrumentationClient implements InstrumentationClient {
 
     }
 
-    private List<Report> getReportObjectFromXMl() {
+    private void writeDiffData(Set<ReqMatch> requirementsMatchers) {
+        System.out.println(requirementsMatchers.stream().map(rm -> rm.getIssueIds().stream().collect(Collectors.joining(","))).collect(Collectors.joining(";")));
+        Writer writer = null;
+        try {
+            if (!ideToolExportPath.isEmpty()) {
+                writer = new FileWriter(ideToolExportPath);
+                new Gson().toJson(requirementsMatchers, writer);
+                writer.close();
+
+            } else {
+                LOGGER.warn("I am NOT going to export data for any IDE because the app.ideToolExportPath is empty of undefined");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+    }
+
+    private static List<Report> getReportObjectFromXMl(String coverageFolder) {
         List<Report> res = new ArrayList<>();
         try {
-            List<String> reports = Files.walk(Path.of(this.coverageFolder)).filter(Files::isRegularFile).map(p -> p.toString()).collect(Collectors.toList());
+            List<String> reports = Files.walk(Path.of(coverageFolder)).filter(Files::isRegularFile).map(p -> p.toString()).collect(Collectors.toList());
 
             for (String report : reports) {
                 try {

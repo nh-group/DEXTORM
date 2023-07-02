@@ -52,18 +52,18 @@ class TestDiffBlame {
         for (ReqMatch m : reqs) {
             MethodReqMatchImpl mrm = (MethodReqMatchImpl) m;
             if (mrm.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("main")) {
-                assertEquals(1, m.getRequirementsIds().stream().distinct().count());
-                List<String> commits = m.getRequirementsIds().stream().distinct().collect(Collectors.toList());
+                assertEquals(1, m.getIssueIds().stream().distinct().count());
+                List<String> commits = m.getIssueIds().stream().distinct().collect(Collectors.toList());
                 assertTrue(commits.contains("1"));
                 assertions[0] = true;
             } else if (mrm.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("sum2")) {
-                assertEquals(1, m.getRequirementsIds().stream().distinct().count());
-                List<String> commits = m.getRequirementsIds().stream().distinct().collect(Collectors.toList());
+                assertEquals(1, m.getIssueIds().stream().distinct().count());
+                List<String> commits = m.getIssueIds().stream().distinct().collect(Collectors.toList());
                 assertTrue(commits.contains("4"));
                 assertions[1] = true;
             } else if (mrm.getFQClassName().equals("toto.A") && mrm.getMethodName().equals("toto")) {
-                assertEquals(1, m.getRequirementsIds().stream().distinct().count());
-                List<String> commits = m.getRequirementsIds().stream().distinct().collect(Collectors.toList());
+                assertEquals(1, m.getIssueIds().stream().distinct().count());
+                List<String> commits = m.getIssueIds().stream().distinct().collect(Collectors.toList());
                 assertTrue(commits.contains("3"));
                 assertions[2] = true;
             } else {

@@ -8,15 +8,16 @@ import com.github.gumtreediff.matchers.Matchers;
 import com.github.gumtreediff.tree.Tree;
 import com.github.gumtreediff.tree.TreeVisitor;
 import com.google.common.base.Strings;
-import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
-import fr.pantheonsorbonne.cri.reqmapping.ReqMatchImpl;
-import fr.pantheonsorbonne.cri.reqmapping.ReqMatcherBuilder;
+import fr.pantheonsorbonne.cri.reqmapping.*;
 import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor.CompilationUnitVisitor;
+import org.eclipse.jgit.internal.storage.file.Pack;
+import org.hibernate.hql.internal.ast.tree.IdentNode;
 
 import java.io.PrintStream;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -24,6 +25,14 @@ public class GumTreeFacade {
 
 
     public static final String BLAME_ID = "blameid";
+    public static final String COMMIT_ID = "commitid";
+    public static final Predicate<ReqMatch> METHOD_FILTER = m -> m instanceof MethodReqMatchImpl;
+    public static final Predicate<ReqMatch> LINE_FILTER = m -> m instanceof LineReqMatchImpl;
+    public static final Predicate<ReqMatch> PACKAGE_FILTER = m -> m instanceof PackageReqMatcher;
+
+
+    public static final Predicate<ReqMatch> NOP_FILTER = m -> false;
+
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(12);
 
 
@@ -59,20 +68,27 @@ public class GumTreeFacade {
 
     }
 
-    public static void addCommitMetadataToTreeRecursive(Tree t, String commitID) {
+    public static void addCommitMetadataToTreeRecursive(Tree t, String commitID, String issueId) {
         GumTreeFacade.appendMetadata(t, BLAME_ID, commitID, true);
+        GumTreeFacade.appendMetadata(t, COMMIT_ID, issueId, true);
     }
 
-    public static void addCommitMetadataToTree(Tree t, String commitID) {
-        GumTreeFacade.appendMetadata(t, BLAME_ID, commitID, false);
+    public static void addCommitMetadataToTree(Tree t, String commitID, String issueId) {
+        GumTreeFacade.appendMetadata(t, BLAME_ID, issueId, false);
+        GumTreeFacade.appendMetadata(t, COMMIT_ID, commitID, false);
     }
 
-    private static List<ReqMatch> getReqMatcher(final Tree tree, boolean doMethods, boolean doInstructions) {
+    private static List<ReqMatch> getReqMatcher(final Tree tree, boolean doMethods, boolean doInstructions, boolean doPackage) {
 
         CompilationUnitVisitor visitor = new CompilationUnitVisitor(tree, ReqMatchImpl.newBuilder(), 0, doMethods, doInstructions);
         TreeVisitor.visitTree(tree, visitor);
 
-        return visitor.getMatchersBuilders().stream().map(ReqMatcherBuilder::build).collect(Collectors.toList());
+
+        Predicate<ReqMatch> filterMethod = doMethods ? METHOD_FILTER : NOP_FILTER;
+        Predicate<ReqMatch> filterInstruction = doInstructions ? LINE_FILTER : NOP_FILTER;
+        Predicate<ReqMatch> packageInstruction = doPackage ? PACKAGE_FILTER : NOP_FILTER;
+
+        return visitor.getMatchersBuilders().stream().map(ReqMatcherBuilder::build).filter(filterMethod.or(filterInstruction).or(packageInstruction)).collect(Collectors.toList());
 
     }
 
@@ -88,7 +104,7 @@ public class GumTreeFacade {
         }
     }
 
-    public static void labelDestWithCommit(Tree src, Tree dst, String issueId) {
+    public static void labelDestWithCommit(Tree src, Tree dst, String issueId, String commitId) {
 
         Matcher m = Matchers.getInstance().getMatcher(); // retrieve the default matcher
         try {
@@ -101,9 +117,11 @@ public class GumTreeFacade {
                 if (store.getSrcForDst(t) == null) {
                     //that's new stuff in dst that wasn't in sources, apply the new commiId
                     GumTreeFacade.appendMetadata(t, BLAME_ID, issueId, false);
+                    GumTreeFacade.appendMetadata(t, COMMIT_ID, commitId, false);
 
                 } else {
                     GumTreeFacade.appendMetadata(t, BLAME_ID, srcTree.getMetadata(BLAME_ID), false);
+                    GumTreeFacade.appendMetadata(t, COMMIT_ID, srcTree.getMetadata(COMMIT_ID), false);
                 }
                 //GumTreeFacade.showTree(dst, "[final]", System.out);
 
@@ -116,7 +134,11 @@ public class GumTreeFacade {
         }
     }
 
-    public List<ReqMatch> getReqMatcher(String filePath,List<Diff> diffs, boolean doMethods, boolean doInstructions) {
+    public List<ReqMatch> getReqMatcher(String filePath, List<Diff> diffs, boolean doMethods, boolean doInstructions) {
+        return this.getReqMatcher(filePath, diffs, doMethods, doInstructions, false);
+    }
+
+    public List<ReqMatch> getReqMatcher(String filePath, List<Diff> diffs, boolean doMethods, boolean doInstructions, boolean doPackage) {
 
         Tree currentTree = null;
         for (Diff diff : diffs) {
@@ -124,8 +146,10 @@ public class GumTreeFacade {
                 if (diff.src == null) {
                     GumTreeFacade.appendMetadata(diff.dst, GumTreeFacade.BLAME_ID,
                             diff.issueId, true);
+                    GumTreeFacade.appendMetadata(diff.dst, GumTreeFacade.COMMIT_ID,
+                            diff.commitId, true);
                 } else {
-                    GumTreeFacade.labelDestWithCommit(diff.src, diff.dst, diff.issueId);
+                    GumTreeFacade.labelDestWithCommit(diff.src, diff.dst, diff.issueId, diff.commitId);
                 }
                 showTree(diff.dst, "", System.out);
                 currentTree = diff.dst;
@@ -138,7 +162,7 @@ public class GumTreeFacade {
             //GumTreeFacade.showTree(currentTree, "", System.out);
         }
 
-        return GumTreeFacade.getReqMatcher(currentTree, doMethods, doInstructions);
+        return GumTreeFacade.getReqMatcher(currentTree, doMethods, doInstructions, doPackage);
 
     }
 

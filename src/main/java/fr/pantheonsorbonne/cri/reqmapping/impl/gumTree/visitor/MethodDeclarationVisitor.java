@@ -116,11 +116,12 @@ public class MethodDeclarationVisitor extends JavaParserTreeExclusiveCompositeVi
     }
 
     protected void extractMethodLike(Tree tree, String methodName, String strParameter) {
-        ReqMatcherBuilder currentMethodMatcher = this.parentMatcherBuilder
+        ReqMatcherBuilder currentMethodMatcher = this.parentMatcherBuilder.getCopy()
                 .methodName(methodName)
                 .args(strParameter)
                 .issues((Collection<String>) tree.getMetadata(GumTreeFacade.BLAME_ID))
-                .getCopy();
+                .commits((Collection<String>) tree.getMetadata(GumTreeFacade.COMMIT_ID))
+                ;
         this.matchersBuilders.add(currentMethodMatcher);
     }
 
