@@ -12,12 +12,16 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatch;
 import fr.pantheonsorbonne.cri.reqmapping.ReqMatchImpl;
 import fr.pantheonsorbonne.cri.reqmapping.impl.Utils;
+import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor.CantComputeParameterException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class BlameMethodDeclarationVisitor extends VoidVisitorAdapter<BlameDataWrapper> {
 
+    private static Logger LOGGER = LoggerFactory.getLogger("BlameMethodDeclarationVisitor");
     public static final String INIT = "<init>";
     private final Set<ReqMatch> reqMatcherImpls = new HashSet<>();
     private String className = "";
@@ -38,15 +42,22 @@ public class BlameMethodDeclarationVisitor extends VoidVisitorAdapter<BlameDataW
         if ((pos).isPresent()) {
             if (wraper.blameData.containsKey(fqClassName)) {
 
-                List<String> args = extractArgsAsStringList(cd);
-                Collection<String> commitId = wraper.blameData.get(fqClassName).get(pos.get().line);
-                if (commitId != null) {
-                    reqMatcherImpls.add(ReqMatchImpl.newBuilder()
-                            .className(this.className)
-                            .packageName(this.packageName)
-                            .methodName(INIT)
-                            .args(args)
-                            .commits(commitId).build());
+                List<String> args = null;
+                try {
+                    args = extractArgsAsStringList(cd);
+
+                    Collection<String> commitId = wraper.blameData.get(fqClassName).get(pos.get().line);
+                    if (commitId != null) {
+                        reqMatcherImpls.add(ReqMatchImpl.newBuilder()
+                                .className(this.className)
+                                .packageName(this.packageName)
+                                .methodName(INIT)
+                                .args(args)
+                                .commits(commitId).build());
+                    }
+                } catch (CantComputeParameterException e) {
+                    LOGGER.error("failed to compute method signature {}. Method was ignored", e.getMessage());
+                    e.printStackTrace();
                 }
 
             }
@@ -62,16 +73,23 @@ public class BlameMethodDeclarationVisitor extends VoidVisitorAdapter<BlameDataW
         if ((pos).isPresent()) {
             if (wraper.blameData.containsKey(fqClassName)) {
 
-                List<String> args = extractArgsAsStringList(md);
-                Collection<String> commitId = wraper.blameData.get(fqClassName).get(pos.get().line);
-                if (commitId != null) {
-                    reqMatcherImpls.add(ReqMatchImpl.newBuilder()
-                            .className(this.className)
-                            .packageName(this.packageName)
-                            .methodName(md.getNameAsString())
-                            //.line(pos.get().line) //no line info required for method declaration
-                            .args(args)
-                            .commits(commitId).build());
+                List<String> args = null;
+                try {
+                    args = extractArgsAsStringList(md);
+
+                    Collection<String> commitId = wraper.blameData.get(fqClassName).get(pos.get().line);
+                    if (commitId != null) {
+                        reqMatcherImpls.add(ReqMatchImpl.newBuilder()
+                                .className(this.className)
+                                .packageName(this.packageName)
+                                .methodName(md.getNameAsString())
+                                //.line(pos.get().line) //no line info required for method declaration
+                                .args(args)
+                                .commits(commitId).build());
+                    }
+                } catch (CantComputeParameterException e) {
+                    LOGGER.error("failed to compute method signature {}. Method was ignored", e.getMessage());
+                    e.printStackTrace();
                 }
 
             }
@@ -90,27 +108,35 @@ public class BlameMethodDeclarationVisitor extends VoidVisitorAdapter<BlameDataW
         return this.packageName + "." + this.className;
     }
 
-    private static List<String> extractArgsAsStringList(CallableDeclaration<?> md) {
-        return md.getParameters().stream().map(parameter -> {
-                    Type type = null;
-                    StringBuilder sb = new StringBuilder();
-                    if (parameter.getType().isArrayType()) {
-                        sb.append("[");
-                        type = parameter.getType().getElementType();
-                    } else {
-                        type = parameter.getType();
-                    }
+    private static List<String> extractArgsAsStringList(CallableDeclaration<?> md) throws CantComputeParameterException {
+        try {
+            return md.getParameters().stream().map(parameter -> {
+                        Type type = null;
+                        StringBuilder sb = new StringBuilder();
+                        if (parameter.getType().isArrayType()) {
+                            sb.append("[");
+                            type = parameter.getType().getElementType();
+                        } else {
+                            type = parameter.getType();
+                        }
 
-                    if (type.isClassOrInterfaceType()) {
-                        sb.append("L");
+                        if (type.isClassOrInterfaceType()) {
+                            sb.append("L");
 
-                        sb.append(((ClassOrInterfaceType) type).getName());
-                    } else {
-                        sb.append(Utils.typeToCodeJVM(type.toString()));
-                    }
-                    return sb.toString();
-                })
-                .collect(Collectors.toList());
+                            sb.append(((ClassOrInterfaceType) type).getName());
+                        } else {
+                            try {
+                                sb.append(Utils.typeToCodeJVM(type.toString()));
+                            } catch (CantComputeParameterException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                        return sb.toString();
+                    })
+                    .collect(Collectors.toList());
+        } catch (RuntimeException e) {
+            throw new CantComputeParameterException(e);
+        }
     }
 
     public Collection<ReqMatch> getMatchers() {

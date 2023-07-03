@@ -1,8 +1,10 @@
 package fr.pantheonsorbonne.cri.reqmapping.impl;
 
+import fr.pantheonsorbonne.cri.reqmapping.impl.gumTree.visitor.CantComputeParameterException;
+
 public class Utils {
 
-    public static String typeToCodeJVM(String type) {
+    public static String typeToCodeJVM(String type) throws CantComputeParameterException {
         switch (type) {
             case "boolean":
                 return "Z";
@@ -27,6 +29,6 @@ public class Utils {
             case "":
                 return "";
         }
-        throw new RuntimeException("failed to convert type " + type);
+        throw new CantComputeParameterException("failed to convert type " + type);
     }
 }

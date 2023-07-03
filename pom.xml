@@ -5,7 +5,7 @@
 
     <groupId>fr.pantheonsorbonne.cri</groupId>
     <artifactId>dextorm</artifactId>
-    <version>1.5.2-SNAPSHOT</version>
+    <version>1.5.3</version>
     <packaging>jar</packaging>
 
 

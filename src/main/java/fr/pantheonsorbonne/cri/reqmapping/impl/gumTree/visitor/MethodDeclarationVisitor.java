@@ -59,7 +59,6 @@ public class MethodDeclarationVisitor extends JavaParserTreeExclusiveCompositeVi
                 .map(p -> p.getDescendants()).collect(Collectors.toList());
 
 
-        String strParameter = extractMethodLikeParameters(parameters);
         //String trace = this.parentMatcherBuilder.getPackageName() + "." + this.parentMatcherBuilder.getClassName() + "." + methodName.get().getLabel() + "(" + strParameter + ")" + ((Collection<String>) tree.getMetadata(GumTreeFacade.BLAME_ID)).stream().collect(Collectors.joining("-"));
         //System.out.println("#" + trace);
 
@@ -68,13 +67,18 @@ public class MethodDeclarationVisitor extends JavaParserTreeExclusiveCompositeVi
         }
 
         if (this.doMethods) {
-            extractMethodLike(tree, methodName, strParameter);
+            try {
+                String strParameter = extractMethodLikeParameters(parameters);
+                extractMethodLike(tree, methodName, strParameter);
+            } catch (CantComputeParameterException e) {
+                LOGGER.error("failed to compute signature for parameters {}", parameters);
+            }
         }
 
 
     }
 
-    private String extractMethodLikeParameters(List<List<Tree>> parameters) {
+    private String extractMethodLikeParameters(List<List<Tree>> parameters) throws CantComputeParameterException{
         StringBuilder strParameter = new StringBuilder("(");
         for (List<Tree> parameter : parameters) {
 

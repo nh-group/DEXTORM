@@ -80,6 +80,7 @@ public class GeneralConfiguration {
                 '}';
     }
 
+    @JsonIgnore
     public Set<Module> getModules() {
         Set<Module> res = new HashSet<>(this.inheritedModules);
 
