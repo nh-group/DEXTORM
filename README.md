@@ -1,9 +1,29 @@
 # DEXTORM
 
-Software artefacts of our under press short paper
+Software artefacts of our short paper: "Automated and Robust User Story Coverage."
 
-Mickael Gudin, Nicolas Herbaut Automated and Robust User Story Coverage *"International Conference on Product-Focused Software Process Improvement" PROFES2022*, Jyvaskyla (FI)
+Citation: 
 
+```Gudin, Mickael, and Nicolas Herbaut. "Automated and Robust User Story Coverage." In International Conference on Product-Focused Software Process Improvement, pp. 538-543. Cham: Springer International Publishing, 2022.```
+
+Bibtex:
+
+```bibtex
+@inproceedings{DBLP:conf/profes/GudinH22,
+  author       = {Mickael Gudin and
+                  Nicolas Herbaut},
+  title        = {Automated and Robust User Story Coverage},
+  booktitle    = {Product-Focused Software Process Improvement - 23rd International
+                  Conference, {PROFES} 2022, Jyv{\"{a}}skyl{\"{a}}, Finland,
+                  November 21-23, 2022, Proceedings},
+  series       = {Lecture Notes in Computer Science},
+  volume       = {13709},
+  pages        = {538--543},
+  publisher    = {Springer},
+  year         = {2022},
+  doi          = {10.1007/978-3-031-21388-5\_39},
+}
+```
 
 ## Requirements
 
