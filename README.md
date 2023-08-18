@@ -59,6 +59,10 @@ java -jar ./dextorm.jar dextorm_config.yaml
 
 ### Configuration File
 
+#### Automatic configuration
+You can use the copanion repo [dextorm-onboarding](https://github.com/nh-group/dextorm-onboarding) to automatically configure and run dextorm on your project (subject to conditions)
+
+#### Manual configuration
 To configure dextorm, you need to provide some configuration parameters and the folder where it will fetch the coverage data.
 Please take a look at the `src/main/resources/benchmark` folder for several examples.
 
@@ -74,15 +78,15 @@ app:
   ideToolExportPath: /home/nherbaut/Desktop/toto.json
 differs:
   gmethods:
-    diffAlgorithm: GUMTREE
-    instructions: false
-    methods: true
+    diffAlgorithm: GUMTREE #GUMTREE or GITBLAME
+    instructions: true #run the diff algorithm on instructions 
+    methods: false #run the diff algorithm on method signature
 issueCollectors:
   github:
     dummy:
-      gitHubRepoName: dnsjava/dnsjava
+      gitHubRepoName: dnsjava/dnsjava # url of the github repositorry
 publishers:
   filePublishers:
     console1:
-      filePath: stdout
+      filePath: stdout # where to show the output of dextorm while it runs
 ```
